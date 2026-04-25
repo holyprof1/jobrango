@@ -15,6 +15,7 @@ use Botble\JobBoard\Models\Account;
 use Botble\JobBoard\Models\AccountActivityLog;
 use Botble\JobBoard\Models\AccountEducation;
 use Botble\JobBoard\Models\AccountExperience;
+use Botble\JobBoard\Models\Job;
 use Botble\JobBoard\Models\JobSkill;
 use Botble\JobBoard\Models\Tag;
 use Botble\Media\Facades\RvMedia;
@@ -57,7 +58,63 @@ class AccountController extends BaseController
             ->where('account_id', $account->id)
             ->get();
 
-        $data = compact('account', 'educations', 'experiences');
+        $recentApplications = $account->applications()
+            ->with(['job.company', 'job.jobTypes'])
+            ->latest()
+            ->limit(4)
+            ->get();
+
+        $savedJobs = $account->savedJobs()
+            ->with(['company', 'jobTypes', 'currency'])
+            ->latest('jb_saved_jobs.created_at')
+            ->limit(4)
+            ->get();
+
+        $recommendedJobs = Job::query()
+            ->whereKeyNot($savedJobs->pluck('id')->all())
+            ->whereKeyNot($recentApplications->pluck('job_id')->filter()->all())
+            ->active()
+            ->with(['company', 'jobTypes', 'currency', 'slugable'])
+            ->latest('created_at')
+            ->limit(3)
+            ->get();
+
+        $profileChecks = [
+            filled($account->avatar_id),
+            filled($account->address),
+            filled($account->description ?: $account->bio),
+            filled($account->resume),
+            $experiences->isNotEmpty(),
+            $educations->isNotEmpty(),
+        ];
+
+        $profileCompletion = (int) round((collect($profileChecks)->filter()->count() / count($profileChecks)) * 100);
+
+        $profileTips = collect([
+            ! $account->resume ? __('Upload a CV/resume so employers can review your profile faster.') : null,
+            ! $account->address ? __('Add your location to improve job matching and profile trust.') : null,
+            blank($account->description ?: $account->bio) ? __('Write a short profile summary that explains your strengths and target roles.') : null,
+            $experiences->isEmpty() ? __('Add at least one experience entry to make your profile feel complete.') : null,
+        ])->filter()->values();
+
+        $stats = [
+            'applied_jobs' => $account->applications()->count(),
+            'saved_jobs' => $account->savedJobs()->count(),
+            'profile_completion' => $profileCompletion,
+            'recent_applications' => $recentApplications->count(),
+        ];
+
+        $data = compact(
+            'account',
+            'educations',
+            'experiences',
+            'recentApplications',
+            'savedJobs',
+            'recommendedJobs',
+            'profileTips',
+            'profileCompletion',
+            'stats'
+        );
 
         return JobBoardHelper::scope('account.overview', $data);
     }

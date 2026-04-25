@@ -15,6 +15,11 @@
 @if (is_plugin_active('job-board'))
     @include(Theme::getThemeNamespace('partials.apply-modal'))
 @endif
+@php
+    $account = auth('account')->user();
+    $dashboardRoute = $account?->isEmployer() ? route('public.account.dashboard') : route('public.account.overview');
+    $accountName = $account ? Str::limit($account->name, 15) : null;
+@endphp
 <header class="header @if (theme_option('enabled_sticky_header', 'yes') == 'yes') sticky-bar @endif">
     <div class="container">
         <div class="main-header">
@@ -45,17 +50,32 @@
                     @auth('account')
                         <ul class="header-menu list-inline d-flex align-items-center mb-0 user-header-dropdown">
                             {!! apply_filters('theme-header-right-nav', null) !!}
-                            @if (auth('account')->check() && $account = auth('account')->user())
+                            @if ($account)
+                                <li class="list-inline-item">
+                                    <a class="header-item" href="{{ $dashboardRoute }}">
+                                        {{ $account->isEmployer() ? __('Employer Dashboard') : __('Dashboard') }}
+                                    </a>
+                                </li>
+                                @if ($account->isEmployer())
+                                    <li class="list-inline-item">
+                                        <a class="header-item" href="{{ route('public.account.jobs.create') }}">
+                                            {{ __('Post a Job') }}
+                                        </a>
+                                    </li>
+                                @endif
                                 <li class="list-inline-item dropdown">
                                     <a href="#" class="d-inline-flex header-item" id="userdropdown" data-bs-toggle="dropdown"
                                        aria-expanded="false">
                                         <img src="{{ $account->avatar_thumb_url }}" alt="{{ $account->name }}" width="35" height="35" class="rounded-circle me-1 mt-1 mr-2">
-                                        <span class="text-left fw-medium icon-down" title="{{ __('Hi, :name', ['name' => $name = Str::limit($account->name, 15)]) }}">{{ __('Hi, :name', ['name' => $name]) }} </span>
+                                        <span class="text-left fw-medium icon-down" title="{{ __('Hi, :name', ['name' => $accountName]) }}">{{ __('Hi, :name', ['name' => $accountName]) }} </span>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end user-dropdown-menu" aria-labelledby="userdropdown">
                                         @if ($account->isEmployer())
                                             <li><a class="dropdown-item" href="{{ route('public.account.dashboard') }}">{{ __('Employer Dashboard') }}</a></li>
+                                            <li><a class="dropdown-item" href="{{ route('public.account.jobs.create') }}">{{ __('Post a Job') }}</a></li>
+                                            <li><a class="dropdown-item" href="{{ route('public.account.companies.index') }}">{{ __('My Companies') }}</a></li>
                                         @else
+                                            <li><a class="dropdown-item" href="{{ route('public.account.overview') }}">{{ __('Dashboard') }}</a></li>
                                             <li><a class="dropdown-item" href="{{ route('public.account.jobs.saved') }}">{{ __('Saved Jobs') }}</a></li>
                                             <li><a class="dropdown-item" href="{{ route('public.account.jobs.applied-jobs') }}">{{ __('Applied Jobs') }}</a></li>
                                         @endif
@@ -112,8 +132,10 @@
                         <div class="mobile-account">
                             <h6 class="mb-10">{{ __('Your Account') }}</h6>
                             <ul class="mobile-menu font-heading">
-                                @if (auth('account')->user()->isEmployer())
-                                    <li><a href="{{ route('public.account.dashboard') }}">{{ __('Employer Dashboard') }}</a></li>
+                                <li><a href="{{ $dashboardRoute }}">{{ $account->isEmployer() ? __('Employer Dashboard') : __('Dashboard') }}</a></li>
+                                @if ($account->isEmployer())
+                                    <li><a href="{{ route('public.account.jobs.create') }}">{{ __('Post a Job') }}</a></li>
+                                    <li><a href="{{ route('public.account.companies.index') }}">{{ __('My Companies') }}</a></li>
                                 @else
                                     <li><a href="{{ route('public.account.jobs.saved') }}">{{ __('Saved Jobs') }}</a></li>
                                     <li><a href="{{ route('public.account.jobs.applied-jobs') }}">{{ __('Applied Jobs') }}</a></li>

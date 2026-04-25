@@ -7,11 +7,16 @@
     Theme::asset()->container('footer')->usePath()->add('jquery-bar-rating-js', 'plugins/jquery-bar-rating/jquery.barrating.min.js');
     Theme::set('pageTitle', $company->name);
 
-    $coverImage = '';
-
-    if ($company->cover_image_url) {
-        $coverImage = $company->cover_image_url;
-    }
+    $coverImage = $company->cover_image ?: null;
+    $companySummary = trim(strip_tags((string) $company->description));
+    $companyContent = trim((string) $company->content);
+    $hasDemoDescription = $companySummary && str_contains(strtolower($companySummary), 'lorem ipsum');
+    $hasDemoContent = $companyContent && str_contains(strtolower(strip_tags($companyContent)), 'lorem ipsum');
+    $viewer = auth('account')->user();
+    $isCompanyOwner = $viewer && $viewer->isEmployer() && $viewer->companies()->whereKey($company->getKey())->exists();
+    $companySummary = $hasDemoDescription || ! $companySummary
+        ? __('Hiring team profile for :company across operations, customer service, administration, and other active JobRango categories.', ['company' => $company->name])
+        : $companySummary;
 @endphp
 
 <section class="section-box-2 company-detail">
@@ -23,11 +28,15 @@
         <div class="banner-hero banner-image-single">
             <div class="wrap-cover-image">
                 @if ($coverImage)
-                    <img src="{{ $coverImage }}" alt="{{ $company->name }}">
-                @elseif(theme_option('default_company_cover_image'))
-                    <img src="{{ RvMedia::getImageUrl(theme_option('default_company_cover_image')) }}" alt="{{ $company->name }}">
+                    <img src="{{ RvMedia::getImageUrl($coverImage) }}" alt="{{ $company->name }}">
                 @else
-                    <img src="{{ Theme::asset()->url('imgs/backgrounds/cover-image-default.png') }}" alt="{{ $company->name }}">
+                    <div class="jobrango-cover jobrango-cover--company">
+                        <div class="jobrango-cover__inner">
+                            <span class="jobrango-cover__eyebrow">{{ __('Company profile') }}</span>
+                            <h1>{{ $company->name }}</h1>
+                            <p>{{ __('Clean employer branding without the generic demo illustration.') }}</p>
+                        </div>
+                    </div>
                 @endif
             </div>
         </div>
@@ -41,14 +50,23 @@
                         {{ $company->name }} {!! $company->badge !!}
                         <span class="card-location font-regular ml-20">{{ implode(', ', array_filter([$company->state_name, $company->country_name])) }}</span>
                     </h5>
-                    <p class="mt-5 font-md color-text-paragraph-2 mb-15">{{ $company->description }}</p>
+                    <p class="mt-5 font-md color-text-paragraph-2 mb-15">{{ $companySummary }}</p>
                 </div>
                 <div class="col-lg-4 col-md-12 text-lg-end">
-                @if ($company->phone && (! JobBoardHelper::isCompanyInformationHiddenForGuests() || auth('account')->check()))
-                    <a class="btn btn-call-icon btn-apply btn-apply-big" href="tel:{{ $company->phone }}">
-                        {{ __('Contact Us') }}
-                    </a>
-                @endif
+                    @if ($isCompanyOwner)
+                        <div class="jobrango-company-actions">
+                            <a class="btn btn-default btn-shadow hover-up" href="{{ route('public.account.companies.edit', $company->getKey()) }}">
+                                {{ __('Edit Company') }}
+                            </a>
+                            <a class="btn btn-border hover-up" href="{{ route('public.account.dashboard') }}">
+                                {{ __('Employer Dashboard') }}
+                            </a>
+                        </div>
+                    @elseif ($company->phone && (! JobBoardHelper::isCompanyInformationHiddenForGuests() || auth('account')->check()))
+                        <a class="btn btn-call-icon btn-apply btn-apply-big" href="tel:{{ $company->phone }}">
+                            {{ __('Contact Us') }}
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>
@@ -64,7 +82,11 @@
                         <div class="tab-pane fade show active" id="tab-about" role="tabpanel" aria-labelledby="tab-about">
                             <h4>{{ __('Welcome to :company_name', ['company_name' => $company->name]) }}</h4>
                             <div class="ck-content">
-                                {!! BaseHelper::clean($company->content) !!}
+                                @if ($hasDemoContent || ! $companyContent)
+                                    <p>{{ __('This employer profile is available for candidate discovery, company research, and direct contact through JobRango.') }}</p>
+                                @else
+                                    {!! BaseHelper::clean($company->content) !!}
+                                @endif
                             </div>
                         </div>
                     </div>

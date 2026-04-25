@@ -16,7 +16,7 @@ class RedirectIfAccount
                 return redirect(route('public.account.dashboard'));
             }
 
-            return redirect()->route('public.index');
+            return redirect()->route('public.account.overview');
         }
 
         AdminBar::setIsDisplay(false);

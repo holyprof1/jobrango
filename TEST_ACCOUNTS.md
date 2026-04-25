@@ -14,12 +14,12 @@ These credentials are for local/demo testing only. Change or remove them before 
 - URL: `/login`
 - Email: `jobseeker@jobrango.test`
 - Password: `JobRango123!`
-- Account type: `job-seeker`
+- Dashboard route: `/account/overview`
 
 ## Employer / Talent Finder
 
 - URL: `/login`
 - Email: `employer@jobrango.test`
 - Password: `JobRango123!`
-- Account type: `employer`
+- Dashboard route: `/account/dashboard`
 - Company: `JobRango Talent Partners`

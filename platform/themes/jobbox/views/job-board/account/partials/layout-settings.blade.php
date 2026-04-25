@@ -9,57 +9,66 @@
     Theme::asset()->container('footer')->add('tag-js', 'vendor/core/core/base/js/tags.js');
 
     $url = url()->current();
-
-    $coverImage = '';
-
-    if ($account->getMetaData('cover_image', true)) {
-        $coverImage = $account->getMetaData('cover_image', true);
-    } else if (theme_option('background_cover_candidate_default')) {
-        $coverImage = theme_option('background_cover_candidate_default');
-    }
+    $profileSummary = trim(strip_tags((string) ($account->description ?: $account->bio)));
+    $profileSummary = $profileSummary ?: __('Complete your profile so employers can quickly understand your experience and preferred role.');
+    $resumeLabel = $account->resume ? __('View CV / Resume') : __('Add CV / Resume');
 @endphp
 
 <main class="main crop-avatar user-profile-section">
-    <section class="section-box-2">
+    <section class="section-box jobrango-account-dashboard pt-40 pb-20">
         <div class="container">
-            <div class="banner-hero banner-image-single" style="background: url('{{ RvMedia::getImageUrl($coverImage, null, false, RvMedia::getDefaultImage()) }}') center no-repeat"></div>
-            <div class="box-company-profile">
-                <div class="image-candidate"><img src="{{ $account->avatar_url }}" alt="{{ $account->name }}"></div>
-                <div class="row mt-30">
-                    <div class="col-lg-8 col-md-12">
-                        <h5 class="f-18">{{ $account->name }} <span class="card-location font-regular ml-20">{{ $account->address }}</span></h5>
-                        <p class="mt-0 font-md color-text-paragraph-2 mb-15">{!! BaseHelper::clean($account->description) !!}</p>
+            <div class="jobrango-account-hero">
+                <div class="jobrango-account-hero__identity">
+                    <div class="jobrango-account-hero__avatar">
+                        <img src="{{ $account->avatar_url }}" alt="{{ $account->name }}">
                     </div>
+                    <div class="jobrango-account-hero__copy">
+                        <span class="jobrango-account-hero__eyebrow">{{ __('Job seeker dashboard') }}</span>
+                        <h1>{{ $account->name }}</h1>
+                        @if ($account->address)
+                            <p class="jobrango-account-hero__location">{{ $account->address }}</p>
+                        @endif
+                        <p class="jobrango-account-hero__summary">{{ $profileSummary }}</p>
+                    </div>
+                </div>
+                <div class="jobrango-account-hero__actions">
+                    <a class="btn btn-default btn-shadow hover-up" href="{{ route('public.account.settings') }}">{{ __('Edit Profile') }}</a>
                     @if ($account->is_public_profile)
-                        <div class="col-lg-4 col-md-12 text-lg-end">
-                            <a class="btn btn-preview-icon btn-apply btn-apply-big" href="{{ $account->url }}"  >{{ __('Preview') }}</a>
-                        </div>
+                        <a class="btn btn-border hover-up" href="{{ $account->url }}">{{ __('Preview Profile') }}</a>
+                    @else
+                        <a class="btn btn-border hover-up" href="{{ route('public.account.settings') }}">{{ $resumeLabel }}</a>
                     @endif
                 </div>
             </div>
-            <div class="border-bottom pt-10 pb-10"></div>
         </div>
     </section>
-    <section class="section-box mt-50 ">
+    <section class="section-box pb-50">
         <div class="container">
-            <div class="row">
+            <div class="row g-4 align-items-start">
                 <div class="col-lg-3 col-md-4 col-sm-12">
-                    <div class="box-nav-tabs nav-tavs-profile mb-5">
+                    <div class="box-nav-tabs nav-tavs-profile mb-5 jobrango-account-sidebar">
+                        <div class="jobrango-account-sidebar__heading">
+                            <h5>{{ __('My Dashboard') }}</h5>
+                            <p>{{ __('Quick access to your profile, jobs, and account security.') }}</p>
+                        </div>
                         <ul class="nav" role="tablist">
-                            <li><a @class(['btn btn-border aboutus-icon mb-20', 'active' => $url === route('public.account.settings')]) href="{{ route('public.account.settings') }}" >{{ __('My Profile') }}</a></li>
-                            <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $url === route('public.account.security')]) href="{{ route('public.account.security') }}" >{{ __('Security') }}</a></li>
+                            <li><a @class(['btn btn-border aboutus-icon mb-20', 'active' => $url === route('public.account.settings')]) href="{{ route('public.account.settings') }}">{{ __('My Profile') }}</a></li>
                             <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $url === route('public.account.overview')]) href="{{ route('public.account.overview') }}">{{ __('Overview') }}</a></li>
-                           @if ($account->isJobSeeker())
-                                <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $url === route('public.account.experiences.index')]) href="{{ route('public.account.experiences.index') }}" >{{ __('Experiences') }}</a></li>
-                                <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $url === route('public.account.educations.index')]) href="{{ route('public.account.educations.index') }}" >{{ __('Educations') }}</a></li>
-                           @endif
+                            <li><a class="btn btn-border recruitment-icon mb-20" href="{{ route('public.account.jobs.applied-jobs') }}">{{ __('Applied Jobs') }}</a></li>
+                            <li><a class="btn btn-border recruitment-icon mb-20" href="{{ route('public.account.jobs.saved') }}">{{ __('Saved Jobs') }}</a></li>
+                            <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $url === route('public.account.settings')]) href="{{ route('public.account.settings') }}">{{ $resumeLabel }}</a></li>
+                            <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $url === route('public.account.security')]) href="{{ route('public.account.security') }}">{{ __('Security') }}</a></li>
+                            @if ($account->isJobSeeker())
+                                <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $url === route('public.account.experiences.index')]) href="{{ route('public.account.experiences.index') }}">{{ __('Experiences') }}</a></li>
+                                <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $url === route('public.account.educations.index')]) href="{{ route('public.account.educations.index') }}">{{ __('Educations') }}</a></li>
+                            @endif
                         </ul>
                     </div>
                 </div>
                 <div class="col-lg-9 col-md-8 col-sm-12 col-12 mb-50">
-                    <div class="content-single ">
+                    <div class="content-single jobrango-account-content">
                         <div class="tab-content">
-                           @yield('content')
+                            @yield('content')
                         </div>
                     </div>
                 </div>

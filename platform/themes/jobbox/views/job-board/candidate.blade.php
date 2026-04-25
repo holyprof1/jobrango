@@ -4,13 +4,7 @@
 
     Theme::set('pageTitle', $candidate->name);
 
-    $coverImage = null;
-
-    if ($candidate->getMetaData('cover_image', true)) {
-        $coverImage = RvMedia::getImageUrl($candidate->getMetaData('cover_image', true));
-    } elseif (theme_option('background_cover_candidate_default')) {
-        $coverImage = RvMedia::getImageUrl(theme_option('background_cover_candidate_default'));
-    }
+    $coverImage = $candidate->getMetaData('cover_image', true);
 @endphp
 
 <section class="section-box-2">
@@ -22,7 +16,17 @@
         <div class="banner-hero banner-image-single">
             @if ($coverImage)
                 <div class="wrap-cover-image">
-                    <img src="{{ $coverImage }}" alt="{{ $candidate->name }}">
+                    <img src="{{ RvMedia::getImageUrl($coverImage) }}" alt="{{ $candidate->name }}">
+                </div>
+            @else
+                <div class="wrap-cover-image">
+                    <div class="jobrango-cover jobrango-cover--candidate">
+                        <div class="jobrango-cover__inner">
+                            <span class="jobrango-cover__eyebrow">{{ __('Candidate profile') }}</span>
+                            <h1>{{ $candidate->name }}</h1>
+                            <p>{{ __('A simpler public profile layout without the repeated template banner.') }}</p>
+                        </div>
+                    </div>
                 </div>
             @endif
         </div>
@@ -341,4 +345,3 @@
         {!! apply_filters('ads_render', null, 'candidate_after', ['class' => 'my-2 text-center']) !!}
     @endif
 </section>
-

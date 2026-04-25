@@ -45,10 +45,6 @@ class RegisterController extends BaseController
             ['jquery']
         );
 
-        if (! session()->has('url.intended')) {
-            session(['url.intended' => url()->previous()]);
-        }
-
         return Theme::scope(
             'job-board.auth.register',
             ['form' => RegisterForm::create()],
@@ -168,10 +164,10 @@ class RegisterController extends BaseController
         $this->guard()->login($account);
 
         $this->registered($request, $account);
-
-        if ($account->isEmployer()) {
-            $this->redirectTo = route('public.account.dashboard');
-        }
+        $this->redirectTo = $account->isEmployer()
+            ? route('public.account.dashboard')
+            : route('public.account.overview');
+        $request->session()->forget('url.intended');
 
         return $this
             ->httpResponse()->setNextUrl($this->redirectPath());

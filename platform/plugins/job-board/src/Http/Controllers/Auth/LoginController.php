@@ -10,6 +10,7 @@ use Botble\JobBoard\Http\Requests\Fronts\Auth\LoginRequest;
 use Botble\JsValidation\Facades\JsValidator;
 use Botble\SeoHelper\Facades\SeoHelper;
 use Botble\Theme\Facades\Theme;
+use Botble\JobBoard\Models\Account;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -26,10 +27,6 @@ class LoginController extends Controller
         SeoHelper::setTitle(trans('plugins/job-board::messages.login'));
 
         Theme::breadcrumb()->add(trans('plugins/job-board::messages.login'), route('public.account.register'));
-
-        if (! session()->has('url.intended')) {
-            session(['url.intended' => url()->previous()]);
-        }
 
         Theme::asset()->container('footer')->add('js-validation', 'vendor/core/core/js-validation/js/js-validation.js', ['jquery']);
         Theme::asset()->container('footer')
@@ -57,9 +54,8 @@ class LoginController extends Controller
         }
 
         if ($this->attemptLogin($request)) {
-            if (auth('account')->user()->isEmployer()) {
-                $this->redirectTo = route('public.account.dashboard');
-            }
+            $this->redirectTo = $this->dashboardRedirect(auth('account')->user());
+            $request->session()->forget('url.intended');
 
             return $this->sendLoginResponse($request);
         }
@@ -94,6 +90,13 @@ class LoginController extends Controller
         }
 
         return false;
+    }
+
+    protected function dashboardRedirect(Account $account): string
+    {
+        return $account->isEmployer()
+            ? route('public.account.dashboard')
+            : route('public.account.overview');
     }
 
     public function logout(Request $request)

@@ -1,5 +1,6 @@
 <ul {!! BaseHelper::clean($options) !!}>
     @foreach ($menu_nodes as $key => $row)
+        @continue(($row->url === '/login' || $row->url === route('public.account.login', absolute: false)) && ! $row->has_child)
         <li class="@if ($row->has_child) has-children @endif {{ $row->css_class }}">
             <a href="{{ $row->url }}" target="{{ $row->target }}">
                 @if ($row->icon_font) <i class="{{ trim($row->icon_font) }}"></i> @endif {{ $row->title }}
