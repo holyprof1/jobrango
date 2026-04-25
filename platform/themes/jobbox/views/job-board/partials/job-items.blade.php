@@ -3,6 +3,10 @@
     if (! in_array($layout, ['list', 'grid', 'map'])) {
         $layout = 'list';
     }
+
+    $jobCollection = method_exists($jobs, 'getCollection') ? $jobs->getCollection() : $jobs;
+    $jobCollection->loadMissing(['categories', 'jobTypes', 'company']);
+
     $isMapActive = (theme_option('show_map_on_jobs_page', 'yes') === 'yes' && $layout === 'map') && $jobs->isNotEmpty();
     $template = $isMapActive ? 'map' : $layout;
 @endphp

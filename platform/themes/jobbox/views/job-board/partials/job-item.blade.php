@@ -2,7 +2,7 @@
     @class(['job-box card mt-4', 'bookmark-post' => $job->is_saved])
      data-latitude="{{ $job->latitude }}"
      data-longitude="{{ $job->longitude }}"
-     data-company_logo_thumb="{{ $job->company->logo_thumb }}"
+     data-company_logo_thumb="{{ $job->company_logo_thumb }}"
      data-company_name="{{ $job->company_name ?: $job->name }}"
      data-map_icon="{{ ! JobBoardHelper::isSalaryHiddenForGuests() ? $job->salary_text : $job->name }}"
      data-job_name="{{ $job->name }}"
@@ -11,6 +11,11 @@
      data-job_types="{{ json_encode($job->jobTypes->toArray()) }}"
      data-number_of_positions="{{ $job->number_of_positions }}"
      data-full_address="{{ $job->full_address }}">
+    @php
+        $companyName = $job->company_name ?: $job->company?->name ?: $job->name;
+        $categoryLabels = $job->categories->pluck('name')->filter()->take(4);
+        $isRemoteJob = \Illuminate\Support\Str::contains(\Illuminate\Support\Str::lower((string) $job->location), 'remote');
+    @endphp
     @if ($job->canShowSavedJob())
         <div class="bookmark-label text-center">
             <a
@@ -38,9 +43,13 @@
         <div class="row align-items-center g-lg-3 g-md-2 cursor-pointer" data-toggle="clickable" data-url="{{ $job->url }}">
             <div class="col-md-2">
                 <div class="text-center mb-4 mb-md-0">
-                    <a href="{{ $job->company_url ?: 'javascript:void(0);' }}">
-                        <img src="{{ $job->company_logo_thumb }}" alt="{{ $job->company_name ?: $job->name }}" width="55" class="img-fluid rounded-3">
-                    </a>
+                    @include(Theme::getThemeNamespace('partials.job-company-badge'), [
+                        'job' => $job,
+                        'companyName' => $companyName,
+                        'companyUrl' => $job->company_url,
+                        'logo' => $job->company_logo_thumb,
+                        'wrapperClass' => 'job-box-company-badge',
+                    ])
                 </div>
             </div>
             <div class="col-md-3">
@@ -49,7 +58,7 @@
                         <a href="{{ $job->url }}" class="text-dark">{{ $job->name }}</a>
                     </h5>
                     @if ($job->has_company)
-                        <p class="text-muted fs-14 mb-0">{{ $job->company->name }} {!! $job->company->badge !!}</p>
+                        <p class="text-muted fs-14 mb-0">{{ $companyName }} {!! $job->company->badge !!}</p>
                     @endif
                 </div>
             </div>
@@ -96,19 +105,16 @@
     <div class="p-3 bg-light">
         <div class="row">
             <div class="col-md-10">
-                <div class="d-flex">
+                <div class="d-flex flex-wrap align-items-center gap-2">
                     <div class="text-muted mb-0">
                         <span class="text-dark">{{ __('Published') }}: </span>
                         <span>{{ $job->created_at->diffForHumans() }}</span>
                     </div>
-                    @if($job->tags->isNotEmpty())
-                        <div class="ms-4">
-                            @foreach($job->tags->take(5) as $tag)
-                                <a href="{{ $tag->url }}">
-                                    <span class="badge bg-white text-dark border me-1">{{ $tag->name }}</span>
-                                </a>
-                            @endforeach
-                        </div>
+                    @foreach($categoryLabels as $categoryLabel)
+                        <span class="badge bg-white text-dark border me-1">{{ $categoryLabel }}</span>
+                    @endforeach
+                    @if($isRemoteJob)
+                        <span class="badge bg-white text-dark border me-1">{{ __('Remote') }}</span>
                     @endif
                 </div>
             </div>

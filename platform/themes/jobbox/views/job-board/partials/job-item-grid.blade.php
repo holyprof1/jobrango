@@ -1,15 +1,25 @@
 <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-12 jobs-item job-grid">
+    @php
+        $companyName = $job->company_name ?: $job->company?->name ?: $job->name;
+        $categoryLabels = $job->categories->pluck('name')->filter()->take(3);
+        $isRemoteJob = \Illuminate\Support\Str::contains(\Illuminate\Support\Str::lower((string) $job->location), 'remote');
+    @endphp
     <div class="card-grid-2 hover-up @if ($job->is_featured) featured-job-item @endif">
         <div class="card-grid-2-image-left">
             @if($job->is_featured)
                 <span class="flash"></span>
             @endif
             <div class="image-box">
-                <img src="{{ RvMedia::getImageUrl($job->company_logo_thumb) }}" alt="{{ $job->name }}">
+                @include(Theme::getThemeNamespace('partials.job-company-badge'), [
+                    'job' => $job,
+                    'companyName' => $companyName,
+                    'companyUrl' => $job->company_url,
+                    'logo' => $job->company_logo_thumb,
+                ])
             </div>
             <div class="right-info">
                 <a class="name-job" href="{{ $job->company_url ?: 'javascript:void(0);' }}">
-                    {{ $job->company_name ?: $job->name }} {!! $job->company && $job->company->badge ? $job->company->badge : '' !!}
+                    {{ $companyName }} {!! $job->company && $job->company->badge ? $job->company->badge : '' !!}
                 </a>
                 <span class="location-small">
                     {{ $job->location }}
@@ -31,11 +41,12 @@
                 <span class="card-time">{{ $job->created_at->diffForHumans() }}</span>
             </div>
             <p class="font-sm color-text-paragraph mt-15 job-description">{{ $job->description }}</p>
-            <div class="mt-30">
-                @if($job->tags->isNotEmpty())
-                    @foreach($job->tags->take(10) as $tag)
-                        <a class="btn btn-grey-small mr-5 mb-2" href="{{ $tag->url }}">{{ $tag->name }}</a>
-                    @endforeach
+            <div class="mt-20 job-card-taxonomy">
+                @foreach($categoryLabels as $categoryLabel)
+                    <span class="btn btn-grey-small mr-5 mb-2">{{ $categoryLabel }}</span>
+                @endforeach
+                @if($isRemoteJob)
+                    <span class="btn btn-grey-small mr-5 mb-2">{{ __('Remote') }}</span>
                 @endif
             </div>
             <div class="card-2-bottom mt-30">

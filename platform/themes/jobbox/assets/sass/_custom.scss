@@ -870,6 +870,128 @@ span {
     }
 }
 
+.job-company-badge {
+    align-items: center;
+    display: inline-flex;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+
+    &__link {
+        align-items: center;
+        background: linear-gradient(180deg, #f8faff 0%, #eef3ff 100%);
+        border: 1px solid #d6e0fb;
+        border-radius: 16px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        display: inline-flex;
+        height: 56px;
+        justify-content: center;
+        overflow: hidden;
+        width: 56px;
+    }
+
+    &__image {
+        display: block;
+        height: 100%;
+        object-fit: contain;
+        padding: 10px;
+        width: 100%;
+    }
+
+    &__fallback {
+        align-items: center;
+        color: #0b1f4d;
+        display: inline-flex;
+        font-size: 18px;
+        font-weight: 700;
+        height: 100%;
+        justify-content: center;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        width: 100%;
+    }
+}
+
+.card-grid-2 {
+    .image-box {
+        align-items: flex-start;
+        display: flex;
+        flex: 0 0 auto;
+        width: auto;
+
+        img {
+            max-width: 100%;
+        }
+    }
+
+    .card-grid-2-image-left {
+        align-items: flex-start;
+        column-gap: 14px;
+    }
+
+    .right-info {
+        min-width: 0;
+    }
+
+    .name-job {
+        display: inline-block;
+        overflow-wrap: anywhere;
+        white-space: normal;
+    }
+
+    .job-description {
+        display: -webkit-box;
+        line-clamp: 3;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        min-height: 72px;
+        overflow: hidden;
+        white-space: normal;
+    }
+}
+
+.job-card-taxonomy {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    .btn {
+        margin: 0;
+    }
+}
+
+.job-box-company-badge {
+    margin: 0 auto;
+}
+
+.job-box {
+    .job-company-badge {
+        width: 60px;
+        height: 60px;
+    }
+
+    .job-company-badge__link {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+@media screen and (max-width: 991px) {
+    .card-grid-2 {
+        .card-grid-2-image-left {
+            align-items: center;
+        }
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .job-box {
+        .job-box-company-badge {
+            margin: 0 0 12px;
+        }
+    }
+}
+
 @media screen and (max-width: 992px) {
     .container {
         .row-filter {
@@ -1334,6 +1456,24 @@ span {
 .box-newsletter {
     .g-recaptcha {
         margin-top: 20px;
+    }
+
+    &.jobrango-newsletter-clean {
+        padding: 58px 28px 64px;
+        background: linear-gradient(135deg, #0b1f4d 0%, #1f6bff 100%) !important;
+        border-radius: 16px;
+
+        .text-md-newsletter {
+            max-width: 760px;
+            margin: 0 auto;
+            color: #ffffff;
+            font-size: 34px;
+            line-height: 1.35;
+        }
+
+        .box-form-newsletter {
+            box-shadow: 0 20px 50px rgba(4, 18, 52, 0.2);
+        }
     }
 }
 
@@ -2160,6 +2300,57 @@ form.auth-form {
 .bb-social-sharing {
     a *:hover {
         color: #ffffff;
+    }
+}
+
+.login-register {
+    position: relative;
+    overflow: hidden;
+    padding-bottom: 80px;
+    background: #f6f9ff;
+
+    .login-register-cover {
+        align-items: center;
+        justify-content: center;
+        min-height: 640px;
+        border-bottom: 0;
+    }
+
+    .auth-card {
+        position: relative;
+        z-index: 2;
+        max-width: 520px;
+        padding: 42px 40px;
+        border: 1px solid rgba(11, 31, 77, 0.08);
+        border-radius: 20px;
+        background: #ffffff;
+        box-shadow: 0 24px 60px rgba(11, 31, 77, 0.1);
+    }
+}
+
+@media screen and (max-width: 992px) {
+    .login-register {
+        padding-bottom: 48px;
+
+        .login-register-cover {
+            min-height: auto;
+        }
+
+        .auth-card {
+            max-width: 100%;
+            padding: 30px 22px;
+            border-radius: 16px;
+            box-shadow: 0 16px 36px rgba(11, 31, 77, 0.08);
+        }
+    }
+
+    .box-newsletter.jobrango-newsletter-clean {
+        padding: 42px 18px;
+
+        .text-md-newsletter {
+            font-size: 24px;
+            line-height: 1.35;
+        }
     }
 }
 

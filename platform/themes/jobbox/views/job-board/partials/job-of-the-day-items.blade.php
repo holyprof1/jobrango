@@ -1,8 +1,17 @@
+@php
+    $jobCollection = method_exists($jobs, 'getCollection') ? $jobs->getCollection() : $jobs;
+    $jobCollection->loadMissing(['categories', 'jobTypes', 'company', 'metadata']);
+@endphp
+
 @if (count($jobs) > 0)
     {!! Theme::partial('loading') !!}
 
     @foreach ($jobs as $job)
         @if ($style === 'style-1')
+            @php
+                $categoryLabels = $job->categories->pluck('name')->filter()->take(3);
+                $isRemoteJob = \Illuminate\Support\Str::contains(\Illuminate\Support\Str::lower((string) $job->location), 'remote');
+            @endphp
             <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-12">
                 <div @class(['card-grid-2 hover-up items', 'featured-job-item' => $job->is_featured])>
                     <div class="card-grid-2-image-left job-item">
@@ -10,7 +19,12 @@
                             <span class="flash"></span>
                         @endif
                         <div class="image-box">
-                            <img src="{{ $job->company_logo_thumb }}" alt="{{ $job->company->name }}">
+                            @include(Theme::getThemeNamespace('partials.job-company-badge'), [
+                                'job' => $job,
+                                'companyName' => $job->company_name ?: $job->company?->name ?: $job->name,
+                                'companyUrl' => $job->company_url,
+                                'logo' => $job->company_logo_thumb,
+                            ])
                         </div>
                         <div class="right-info">
                             @if (! $job->hide_company)
@@ -33,11 +47,12 @@
                             @endif
                             <span class="card-time">{{ $job->created_at->diffForHumans() }}</span></div>
                         <p class="font-sm color-text-paragraph job-description mt-15" title="{{ $job->description }}">{{ $job->description }}</p>
-                        <div class="mt-15">
-                            @if($job->tags->isNotEmpty())
-                                @foreach($job->tags->take(10) as $tag)
-                                    <a class="btn btn-grey-small mr-5 mb-2" href="{{ $tag->url }}">{{ $tag->name }}</a>
-                                @endforeach
+                        <div class="mt-15 job-card-taxonomy">
+                            @foreach($categoryLabels as $categoryLabel)
+                                <span class="btn btn-grey-small mr-5 mb-2">{{ $categoryLabel }}</span>
+                            @endforeach
+                            @if($isRemoteJob)
+                                <span class="btn btn-grey-small mr-5 mb-2">{{ __('Remote') }}</span>
                             @endif
                         </div>
                         <div class="card-2-bottom mt-15">

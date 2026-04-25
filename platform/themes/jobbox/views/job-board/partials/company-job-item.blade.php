@@ -1,12 +1,23 @@
 <div class="col-12 jobs-listing">
+    @php
+        $categoryLabels = $job->categories->pluck('name')->filter()->take(3);
+        $isRemoteJob = \Illuminate\Support\Str::contains(\Illuminate\Support\Str::lower((string) $job->location), 'remote');
+    @endphp
     <div class="card-grid-2 hover-up">
         @if($job->is_featured)
             <span class="flash"></span>
         @endif
         <div class="row">
-            <div class="@if($job->tags->isNotEmpty()) col-lg-6 col-md-6 @else col-lg-12 col-md-12 @endif col-sm-12">
+            <div class="@if($categoryLabels->isNotEmpty() || $isRemoteJob) col-lg-6 col-md-6 @else col-lg-12 col-md-12 @endif col-sm-12">
                 <div class="card-grid-2-image-left">
-                    <div class="image-box"><img src="{{ $company->logo_thumb }}" alt="{{ $company->name }}"></div>
+                    <div class="image-box">
+                        @include(Theme::getThemeNamespace('partials.job-company-badge'), [
+                            'job' => $job,
+                            'companyName' => $company->name,
+                            'companyUrl' => $company->url,
+                            'logo' => $company->logo_thumb,
+                        ])
+                    </div>
                     <div class="right-info">
                         <a class="name-job" href="{{ $job->url }}">{{ $job->name }}</a>
                         <span class="location-small">{{ $job->location }}</span>
@@ -14,12 +25,15 @@
                 </div>
             </div>
 
-            @if($job->tags->isNotEmpty())
+            @if($categoryLabels->isNotEmpty() || $isRemoteJob)
                 <div class="col-lg-6 text-start text-md-end pr-60 col-md-6 col-sm-12">
-                    <div class="pl-15 mb-15 mt-30">
-                        @foreach($job->tags->take(5) as $tag)
-                            <a class="btn btn-grey-small mr-5 mb-2" href="{{ $tag->url }}">{{ $tag->name }}</a>
+                    <div class="pl-15 mb-15 mt-20 job-card-taxonomy">
+                        @foreach($categoryLabels as $categoryLabel)
+                            <span class="btn btn-grey-small mr-5 mb-2">{{ $categoryLabel }}</span>
                         @endforeach
+                        @if($isRemoteJob)
+                            <span class="btn btn-grey-small mr-5 mb-2">{{ __('Remote') }}</span>
+                        @endif
                     </div>
                 </div>
             @endif
