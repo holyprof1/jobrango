@@ -202,6 +202,9 @@
 
 .job-of-the-day {
     .items {
+        height: auto;
+        min-height: 0;
+
         .image-box {
             width: 67px;
             height: 52px;
@@ -209,20 +212,18 @@
 
         .name-job {
             display: inline-block;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            width: 150px;
+            overflow-wrap: anywhere;
+            white-space: normal;
+            width: auto;
         }
 
         .card-block-info {
             h6 {
                 a {
                     display: inline-block;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                    width: 200px;
+                    overflow-wrap: anywhere;
+                    white-space: normal;
+                    width: auto;
                 }
             }
         }
@@ -913,6 +914,12 @@ span {
 }
 
 .card-grid-2 {
+    .card-block-info {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
     .image-box {
         align-items: flex-start;
         display: flex;
@@ -927,15 +934,36 @@ span {
     .card-grid-2-image-left {
         align-items: flex-start;
         column-gap: 14px;
+        position: relative;
+        row-gap: 10px;
     }
 
     .right-info {
         min-width: 0;
+        padding-right: 110px;
     }
 
     .name-job {
         display: inline-block;
         overflow-wrap: anywhere;
+        white-space: normal;
+    }
+
+    .card-time,
+    .card-briefcase,
+    .location-small {
+        color: #6a768f;
+    }
+
+    .lbl-hot {
+        align-self: flex-start;
+        border-radius: 999px;
+        font-size: 12px;
+        line-height: 1.2;
+        margin-left: auto;
+        max-width: 110px;
+        padding: 8px 12px;
+        text-align: center;
         white-space: normal;
     }
 
@@ -960,6 +988,18 @@ span {
     }
 }
 
+.salary-information,
+.card-2-bottom {
+    .btn-apply-now {
+        align-items: center;
+        border-radius: 12px;
+        display: inline-flex;
+        justify-content: center;
+        min-width: 128px;
+        padding: 12px 18px;
+    }
+}
+
 .job-box-company-badge {
     margin: 0 auto;
 }
@@ -976,10 +1016,88 @@ span {
     }
 }
 
+.job-of-the-day {
+    .job-item--compact {
+        align-items: flex-start;
+        column-gap: 14px;
+        flex-wrap: nowrap;
+        margin-bottom: 18px;
+
+        .lbl-hot {
+            margin-bottom: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+
+        .name-job {
+            width: auto;
+            white-space: normal;
+        }
+    }
+
+    .item-grid {
+        height: 100%;
+
+        .job-item--compact {
+            .name-job {
+                width: auto;
+            }
+        }
+    }
+}
+
+.footer {
+    .footer-col-1,
+    .footer-col-2 {
+        margin-bottom: 24px;
+    }
+
+    .footer-col-1 img {
+        max-height: 58px;
+        width: auto;
+    }
+
+    .footer-col-1 .font-xs {
+        font-size: 14px !important;
+        line-height: 1.8 !important;
+    }
+
+    .menu-footer {
+        li {
+            margin-bottom: 10px;
+        }
+    }
+
+    .footer-bottom {
+        border-top: 1px solid rgba(11, 31, 77, 0.08);
+        padding-top: 24px;
+    }
+}
+
 @media screen and (max-width: 991px) {
+    .job-of-the-day,
+    .jobs-listing {
+        .items {
+            height: auto;
+        }
+    }
+
     .card-grid-2 {
         .card-grid-2-image-left {
             align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .right-info {
+            padding-right: 0;
+            width: calc(100% - 70px);
+        }
+
+        .lbl-hot {
+            margin-left: 0;
+            order: -1;
+            position: static;
         }
     }
 }
@@ -988,6 +1106,16 @@ span {
     .job-box {
         .job-box-company-badge {
             margin: 0 0 12px;
+        }
+    }
+
+    .card-grid-2 {
+        .right-info {
+            width: 100%;
+        }
+
+        .card-2-bottom .btn-apply-now {
+            width: 100%;
         }
     }
 }

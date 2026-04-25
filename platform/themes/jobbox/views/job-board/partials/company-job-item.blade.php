@@ -1,6 +1,6 @@
 <div class="col-12 jobs-listing">
     @php
-        $categoryLabels = $job->categories->pluck('name')->filter()->take(3);
+        $categoryLabels = $job->categories->pluck('name')->filter()->take(2);
         $isRemoteJob = \Illuminate\Support\Str::contains(\Illuminate\Support\Str::lower((string) $job->location), 'remote');
     @endphp
     <div class="card-grid-2 hover-up">
@@ -54,7 +54,6 @@
                     <span>{{ $job->created_at->diffForHumans() }}</span>
                 </span>
             </div>
-            <p class="font-sm color-text-paragraph mt-10">{{ $job->description }}</p>
             <div class="card-2-bottom mt-20">
                 <div class="row">
                     <div class="col-lg-7 col-7">

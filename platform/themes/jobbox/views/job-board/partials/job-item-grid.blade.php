@@ -1,7 +1,7 @@
 <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-12 jobs-item job-grid">
     @php
         $companyName = $job->company_name ?: $job->company?->name ?: $job->name;
-        $categoryLabels = $job->categories->pluck('name')->filter()->take(3);
+        $categoryLabels = $job->categories->pluck('name')->filter()->take(2);
         $isRemoteJob = \Illuminate\Support\Str::contains(\Illuminate\Support\Str::lower((string) $job->location), 'remote');
     @endphp
     <div class="card-grid-2 hover-up @if ($job->is_featured) featured-job-item @endif">
@@ -40,7 +40,6 @@
                 </span>
                 <span class="card-time">{{ $job->created_at->diffForHumans() }}</span>
             </div>
-            <p class="font-sm color-text-paragraph mt-15 job-description">{{ $job->description }}</p>
             <div class="mt-20 job-card-taxonomy">
                 @foreach($categoryLabels as $categoryLabel)
                     <span class="btn btn-grey-small mr-5 mb-2">{{ $categoryLabel }}</span>

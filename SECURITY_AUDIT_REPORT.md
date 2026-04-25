@@ -86,11 +86,10 @@ What it is:
 - includes a warning that the default admin account uses a weak password
 - separate from the license notice
 
-Recommendation:
+Action taken:
 
-- change the default admin password immediately
-- complete or dismiss the onboarding wizard in a legitimate way
-- do not confuse this with license enforcement
+- the follow-up JobRango cleanup migration now marks the setup wizard complete through the supported `is_completed_get_started` setting
+- the local admin password is also rotated to a stronger local-demo credential
 
 ## Secrets and Tracked Files
 
@@ -146,16 +145,17 @@ Recommendation:
 
 ## Default Credentials
 
-Confirmed local default admin login used in this task:
+Current local admin login documented for this task:
 
 - username: `admin`
-- password: `12345678`
+- email: `admin@jobrango.test`
+- password: `JobRango123!`
 
-This is unsafe for any shared/staging/production environment.
+This is acceptable for local/demo use only.
 
-Required action:
+Required action before production:
 
-- change the admin password immediately
+- rotate or replace all demo credentials
 - review any other seeded/demo users before launch
 
 ## Debug Mode
@@ -197,7 +197,7 @@ Practical production notes:
 Before production, JobRango should:
 
 - activate a valid Botble license
-- change the default admin password
+- remove or rotate the documented local demo admin password
 - change the default admin path from `/admin`
 - set `APP_DEBUG=false`
 - verify installer is not usable
