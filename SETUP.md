@@ -88,7 +88,13 @@ mysql -u root -p jobrango < database.sql
 
 You can also import `database.sql` through phpMyAdmin or another database tool.
 
-7. Create the public storage link:
+7. Check the bundled media layout before creating a public storage link.
+
+This package currently ships demo media directly in `public/storage`, and the imported `media_files` records point to those files. On this package, `storage/app/public` may be nearly empty even though frontend and admin images work correctly.
+
+If `public/storage` already contains the expected media folders such as `general`, `companies`, `jobs`, `news`, and `pages`, do not delete or replace that directory just to force a Laravel symlink.
+
+Only run the storage link command on a clean install where media has been copied into `storage/app/public` and `public/storage` is missing:
 
 ```bash
 php artisan storage:link
@@ -210,7 +216,11 @@ Important admin settings pages:
 
 ## Storage and Media Setup
 
-Run this command after configuring `.env`:
+Do not assume this package uses the default Laravel `storage/app/public -> public/storage` symlink layout.
+
+The current bundled demo content is stored directly under `public/storage`, and local verification confirmed that the database media records resolve against those on-disk files.
+
+Run this command only when `public/storage` is missing and you intentionally want to expose files from `storage/app/public`:
 
 ```bash
 php artisan storage:link
@@ -222,6 +232,12 @@ Laravel's public disk uses:
 storage/app/public
 public/storage
 ```
+
+Current package note:
+
+- `public/storage` already contains the bundled demo media.
+- `storage/app/public` may only contain `.gitignore`.
+- Replacing the existing `public/storage` directory with a fresh symlink can make bundled demo images appear missing unless the files are first copied into `storage/app/public`.
 
 Botble media is managed through the admin media manager and the `media_files` table. The imported demo media references paths such as:
 
@@ -242,6 +258,13 @@ Logo and favicon locations are configurable from Botble admin:
 - Frontend logo and favicon: `/admin/theme/options`
 - Admin logo and favicon: `/admin/settings/general`
 - Email logo: `/admin/settings/email/templates`
+
+If images look blank locally, verify these items first:
+
+- `APP_URL` matches the local server URL.
+- `public/storage` contains the referenced media files.
+- `public/storage/general/logo.png`, `public/storage/general/logo-light.png`, and `public/storage/general/favicon.png` exist.
+- Cached config/views have been cleared with `php artisan optimize:clear`.
 
 ## Mail Setup
 
@@ -358,4 +381,3 @@ public/storage
 ```
 
 10. Log in to admin, change demo credentials, configure mail, replace media, and remove demo content before any public launch.
-

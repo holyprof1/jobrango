@@ -138,11 +138,18 @@ The dump includes 161 media records. Common demo media paths include:
 - `locations/*`
 - `job-categories/*`
 
+Current package verification:
+
+- The bundled script package currently includes the demo media files on disk under `public/storage`.
+- Local verification found 161 `media_files` database rows and those records resolved to existing files.
+- This package does not currently depend on `storage/app/public` being populated for the bundled demo media to display.
+
 Recommendation:
 
 - Replace logo and favicon from Botble admin.
 - Remove unused demo media from `/admin/media` after related content is removed.
 - Do not delete media files directly from disk until content relationships are reviewed.
+- If a future deployment package is missing `public/storage` media, restore that media separately before assuming the database dump is wrong.
 
 ## Demo Branding Still Likely to Appear
 
@@ -178,4 +185,3 @@ Database cleanup can be used only for:
 - One-time controlled removal where related tables are understood.
 
 Botble uses slugs, metadata, media records, settings, and relationship tables, so direct deletes can leave orphan records if they are not handled carefully.
-
