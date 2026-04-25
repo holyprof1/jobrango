@@ -2241,7 +2241,7 @@ form.auth-form {
     padding: 92px 0 44px;
     overflow: hidden;
     border-radius: 0 0 40px 40px;
-    background-position: right -80px top -36px !important;
+    background-position: right -80px top -64px !important;
 
     &::before {
         opacity: 1;
@@ -2385,6 +2385,20 @@ form.auth-form {
 
         .main-header {
             gap: 16px;
+            justify-content: space-between;
+
+            .header-left {
+                min-width: 0;
+            }
+
+            .header-nav {
+                flex: 0 0 auto;
+            }
+
+            .header-right {
+                display: none;
+                min-width: 0;
+            }
 
             .header-left .header-logo img {
                 max-height: 64px;
@@ -2395,7 +2409,7 @@ form.auth-form {
     .banner-hero.hero-2 {
         min-height: auto;
         padding: 78px 0 36px;
-        background-position: center top !important;
+        background-position: center -18px !important;
 
         &::before {
             background: linear-gradient(180deg, rgba(5, 24, 72, 0.92) 0%, rgba(7, 34, 99, 0.78) 52%, rgba(11, 58, 145, 0.42) 100%);
@@ -2419,5 +2433,49 @@ form.auth-form {
 
     .block-signin {
         gap: 12px;
+    }
+}
+
+@media screen and (max-width: 575px) {
+    body {
+        overflow-x: hidden;
+    }
+
+    .banner-hero.hero-2 {
+        width: 100vw;
+        max-width: 100vw;
+
+        .hero-2-title {
+            max-width: 11ch;
+            font-size: clamp(1.85rem, 7.4vw, 2.1rem);
+            line-height: 1.12;
+            margin-left: auto;
+            margin-right: auto;
+            overflow-wrap: break-word;
+        }
+
+        .banner-inner {
+            align-items: center;
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            padding: 0 16px;
+        }
+
+        .hero-2-panel {
+            width: 100%;
+            padding: 0 !important;
+            text-align: center;
+        }
+
+        .hero-2-description {
+            max-width: 30ch;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-search-form {
+            max-width: 100%;
+        }
     }
 }

@@ -1,71 +1,142 @@
-# JobRango Homepage Redesign Report
+# JobRango Homepage 2 Adjustment Report
 
-## Demo 2 As Default
+Date: 2026-04-25
 
-- Live homepage setting switched in the local database via `settings.key = theme-jobbox-homepage_id` from `1` to `2`.
-- Seeded default homepage updated in [ThemeOptionSeeder.php](C:/Users/HP/OneDrive/Desktop/JobRango/database/seeders/ThemeOptionSeeder.php) so fresh seeded installs prefer `Homepage 2`.
-- Main menu seeder updated in [MenuSeeder.php](C:/Users/HP/OneDrive/Desktop/JobRango/database/seeders/MenuSeeder.php) so `Home` points directly to `Homepage 2` instead of opening a multi-demo dropdown.
+## Homepage 2 Confirmation
 
-## Homepage Demos Removed Or Disabled
+- Active homepage setting: `settings.key = theme-jobbox-homepage_id`, value `2`.
+- Active/default homepage page: `Homepage 2`, page ID `2`.
+- Page status: `published`.
+- Page template: `homepage`, rendered by `platform/themes/jobbox/layouts/homepage.blade.php`.
+- Public slug: `homepage-2`, stored in Botble's `slugs` table for `Botble\Page\Models\Page` reference ID `2`.
+- Homepage 2 content starts with the `search-box` shortcode using `style="style-2"` and `background_image="pages/banner-section-search-box.png"`.
 
-- `Homepage 2` kept `published`.
-- `Homepage 1`, `Homepage 3`, `Homepage 4`, `Homepage 5`, and `Homepage 6` were moved to `draft` in the live database instead of being deleted.
-- Main menu child nodes `Home 1` through `Home 6` were removed from the live database.
-- Rollback path intentionally preserved by keeping the draft homepage page records in place.
-
-## Hero Changes
-
-- Demo 2 hero was refocused in [search-box.blade.php](C:/Users/HP/OneDrive/Desktop/JobRango/platform/themes/jobbox/partials/shortcodes/search-box.blade.php).
-- Added a branded eyebrow line for the JobRango tagline.
-- Moved the hero toward a clearer left-content layout with:
-  - headline
-  - supporting copy
-  - search box
-  - trust metrics
-- Reduced the stock template feel by removing the extra Demo 2 counter/ad section content from the seeded and live homepage body.
-- Updated homepage copy so the first pass feels like JobRango instead of generic JobBox demo text.
-- Hero background styling was adjusted to bring the illustration upward and preserve more of the lower composition.
-- Overlay treatment now fades from deep navy on the left into lighter transparency on the right so the artwork reads as one intentional composition instead of random floating content.
-
-## Header Changes
-
-- Header spacing was rebalanced in [\_custom.scss](C:/Users/HP/OneDrive/Desktop/JobRango/platform/themes/jobbox/assets/sass/_custom.scss) and [style.css](C:/Users/HP/OneDrive/Desktop/JobRango/platform/themes/jobbox/public/css/style.css).
-- Logo presence was increased by allowing a taller rendered logo.
-- Navigation was centered more deliberately between brand and auth actions.
-- Register and Sign In controls were tightened and given a more premium branded treatment.
-
-## Layout And Styling Changes
-
-- Added a JobRango color system baseline:
-  - primary blue `#1F6BFF`
-  - subtle blue surface `#D9E6FF`
-  - navy `#0B1F4D`
-- Live theme settings were updated with those colors for the current local install.
-- Search form wrapper was opened up in [job-search-box.blade.php](C:/Users/HP/OneDrive/Desktop/JobRango/platform/themes/jobbox/partials/job-search-box.blade.php) so Demo 2 can receive a dedicated hero form class.
-- Demo 2 metrics were restyled into glass-like cards for a cleaner trust strip.
-- Company logo strip below the hero was turned into a more premium brand rail.
+Other homepage demo pages were not deleted or changed in this task. `Homepage 1`, `Homepage 3`, `Homepage 4`, `Homepage 5`, and `Homepage 6` currently exist as draft pages, with their slugs still present for rollback/history.
 
 ## Files Changed
 
-- [database/seeders/MenuSeeder.php](C:/Users/HP/OneDrive/Desktop/JobRango/database/seeders/MenuSeeder.php)
-- [database/seeders/PageSeeder.php](C:/Users/HP/OneDrive/Desktop/JobRango/database/seeders/PageSeeder.php)
-- [database/seeders/ThemeOptionSeeder.php](C:/Users/HP/OneDrive/Desktop/JobRango/database/seeders/ThemeOptionSeeder.php)
-- [platform/themes/jobbox/assets/sass/_custom.scss](C:/Users/HP/OneDrive/Desktop/JobRango/platform/themes/jobbox/assets/sass/_custom.scss)
-- [platform/themes/jobbox/partials/job-search-box.blade.php](C:/Users/HP/OneDrive/Desktop/JobRango/platform/themes/jobbox/partials/job-search-box.blade.php)
-- [platform/themes/jobbox/partials/shortcodes/search-box.blade.php](C:/Users/HP/OneDrive/Desktop/JobRango/platform/themes/jobbox/partials/shortcodes/search-box.blade.php)
-- [platform/themes/jobbox/public/css/style.css](C:/Users/HP/OneDrive/Desktop/JobRango/platform/themes/jobbox/public/css/style.css)
-- [HOMEPAGE_REDESIGN_REPORT.md](C:/Users/HP/OneDrive/Desktop/JobRango/HOMEPAGE_REDESIGN_REPORT.md)
+- `platform/themes/jobbox/assets/sass/_custom.scss`
+- `platform/themes/jobbox/public/css/style.css`
+- `HOMEPAGE_REDESIGN_REPORT.md`
 
-## Risky Areas Left Alone
+No vendor files, Botble internals, routes, seeders, or database content were changed in this task.
 
-- Botble shortcode rendering internals were left untouched.
-- Vendor files were not edited.
-- Existing draft homepage page records were preserved for rollback instead of hard deletion.
-- No structural changes were made to job board routes, plugin logic, or CMS page rendering.
+## Hero Background Position Change
 
-## Recommended Next Steps
+Homepage 2's hero background is rendered by:
 
-- Replace the current logo file with a tighter horizontal lockup prepared specifically for the header slot.
-- Do a second pass on the section spacing below the hero so category, jobs, company, and blog sections feel like one branded system.
-- Replace remaining generic section headings and helper copy that still sound like demo content.
-- Consider one homepage-only custom partial for the Demo 2 hero if you want a more original right-side illustration composition than the bundled background image can provide.
+- Template: `platform/themes/jobbox/partials/shortcodes/search-box.blade.php`
+- CSS override: `platform/themes/jobbox/assets/sass/_custom.scss`
+- Compiled CSS: `platform/themes/jobbox/public/css/style.css`
+
+Exact CSS adjustment:
+
+```scss
+// Before
+background-position: right -80px top -36px !important;
+
+// After
+background-position: right -80px top -64px !important;
+```
+
+Responsive adjustment under `991px`:
+
+```scss
+// Before
+background-position: center top !important;
+
+// After
+background-position: center -18px !important;
+```
+
+This moves the existing background image upward slightly without replacing the image, changing the hero structure, changing `background-size`, or zooming the artwork. The intended effect is that the people/illustration elements sit a little higher and read more clearly inside the existing Homepage 2 composition.
+
+A small mobile-only guardrail was also added after screenshot review because the existing hero title could overflow narrow screens:
+
+```scss
+@media screen and (max-width: 575px) {
+    body {
+        overflow-x: hidden;
+    }
+
+    .banner-hero.hero-2 {
+        width: 100vw;
+        max-width: 100vw;
+    }
+
+    .banner-hero.hero-2 .hero-2-title {
+        max-width: 11ch;
+        font-size: clamp(1.85rem, 7.4vw, 2.1rem);
+        line-height: 1.12;
+        margin-left: auto;
+        margin-right: auto;
+        overflow-wrap: break-word;
+    }
+
+    .banner-hero.hero-2 .banner-inner {
+        align-items: center;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 0 16px;
+    }
+
+    .banner-hero.hero-2 .hero-2-panel {
+        width: 100%;
+        padding: 0 !important;
+        text-align: center;
+    }
+
+    .banner-hero.hero-2 .hero-2-description {
+        max-width: 30ch;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .banner-hero.hero-2 .hero-search-form {
+        max-width: 100%;
+    }
+}
+```
+
+## Header And Logo Findings
+
+- No logo size change was made in this task.
+- Current custom header CSS already allows a larger logo with `max-height: 72px` on desktop and `64px` under `991px`.
+- The active logo is `general/logo.png`, currently a tall image asset at `890x706`, so increasing it more could crowd the nav and auth controls.
+- Safest future edit location: `platform/themes/jobbox/assets/sass/_custom.scss`, inside `.header .main-header .header-left .header-logo img`.
+- A small mobile header containment rule was added under `991px` after screenshot review so existing desktop min-widths do not create horizontal overflow on phone screens. It hides the desktop auth block on mobile, where the mobile account links already exist in the offcanvas menu.
+
+## Navigation Cleanup Recommendation
+
+No navigation items were removed in this task.
+
+Current main navigation comes from the Botble `main-menu` menu records. The remaining cleanup should be handled later in the admin/database menu records, not by hard-coding the Blade partials.
+
+Recommended later direction:
+
+- Simplify the main nav around `Jobs`, `Companies`, `Post a Job`, and `Sign In`.
+- Reduce demo-style dropdowns under `Find a Job`, `Companies`, `Candidates`, and `Pages`.
+- Keep the homepage item pointing directly to `Homepage 2`.
+
+## Login Page Findings
+
+- `/login` route is `public.account.login`.
+- Template: `platform/themes/jobbox/views/job-board/auth/login.blade.php`.
+- Main auth image: `theme-jobbox-auth_background_image_1 = authentication/img-1.png`.
+- Secondary auth image: `theme-jobbox-auth_background_image_2 = authentication/img-2.png`.
+- `authentication/img-1.png` is a valid wide illustration image at `1505x941`.
+- `authentication/img-2.png` is a valid smaller image at `320x200`.
+
+The image/layout issue appears to be CSS/layout related, not a broken image asset. The auth template uses the class `login-register` on both the outer section and the generated auth form (`formClass('login-register text-start mt-20 auth-form')`). Any broad `.login-register` page-level styling can therefore also affect the inner form. There is also absolute-positioned `.img-1` artwork on desktop and hidden artwork on smaller screens, which makes the demo auth layout sensitive to image proportions.
+
+No login page redesign was made in this task. The safest later fix is to scope any auth page wrapper styling to `section.login-register` and then tune only the `.img-1` image placement if needed.
+
+## Risks And Items Left Untouched
+
+- The homepage remains shortcode-driven through Botble CMS.
+- The active homepage setting is database-driven and was only inspected, not changed.
+- Other homepage demo records remain available as drafts.
+- Main menu records were inspected, not changed.
+- The login page was inspected and documented, not redesigned.
+- Existing local uncommitted public assets/runtime-style changes should be reviewed separately before any broader cleanup commit.
