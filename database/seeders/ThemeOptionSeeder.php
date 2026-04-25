@@ -51,15 +51,15 @@ class ThemeOptionSeeder extends BaseSeeder
         $data = [
             [
                 'key' => 'site_title',
-                'value' => 'JobBox - Laravel Job Board Script',
+                'value' => 'JobRango',
             ],
             [
                 'key' => 'seo_description',
-                'value' => 'JobBox is a neat, clean and professional job board website script for your organization. It’s easy to build a complete Job Board site with JobBox script.',
+                'value' => 'JobRango is a job platform where companies post work opportunities and applicants apply through a simple user portal.',
             ],
             [
                 'key' => 'copyright',
-                'value' => '©' . Carbon::now()->format('Y') . ' Archi Elite JSC. All right reserved.',
+                'value' => 'Copyright (c) ' . Carbon::now()->format('Y') . ' JobRango. All rights reserved.',
             ],
             [
                 'key' => 'favicon',
@@ -119,7 +119,7 @@ class ThemeOptionSeeder extends BaseSeeder
             ],
             [
                 'key' => 'email',
-                'value' => 'contact@jobbox.com',
+                'value' => 'contact@jobrango.example',
             ],
             [
                 'key' => '404_page_image',

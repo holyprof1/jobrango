@@ -40,7 +40,7 @@ class FaqSeeder extends BaseSeeder
                 'category_id' => 1,
             ],
             [
-                'question' => 'How JobBox Work?',
+                'question' => 'How JobRango works?',
                 'answer' => 'To an English person, it will seem like simplified English, as a skeptical Cambridge friend of mine told me what Occidental is. The European languages are members of the same family. Their separate existence is a myth.',
                 'category_id' => 1,
             ],
@@ -70,7 +70,7 @@ class FaqSeeder extends BaseSeeder
                 'category_id' => 2,
             ],
             [
-                'question' => 'How JobBox Work?',
+                'question' => 'How JobRango works?',
                 'answer' => 'To an English person, it will seem like simplified English, as a skeptical Cambridge friend of mine told me what Occidental is. The European languages are members of the same family. Their separate existence is a myth.',
                 'category_id' => 2,
             ],
@@ -100,7 +100,7 @@ class FaqSeeder extends BaseSeeder
                 'category_id' => 3,
             ],
             [
-                'question' => 'How JobBox Work?',
+                'question' => 'How JobRango works?',
                 'answer' => 'To an English person, it will seem like simplified English, as a skeptical Cambridge friend of mine told me what Occidental is. The European languages are members of the same family. Their separate existence is a myth.',
                 'category_id' => 3,
             ],
@@ -130,7 +130,7 @@ class FaqSeeder extends BaseSeeder
                 'category_id' => 4,
             ],
             [
-                'question' => 'How JobBox Work?',
+                'question' => 'How JobRango works?',
                 'answer' => 'To an English person, it will seem like simplified English, as a skeptical Cambridge friend of mine told me what Occidental is. The European languages are members of the same family. Their separate existence is a myth.',
                 'category_id' => 4,
             ],

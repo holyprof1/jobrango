@@ -4,7 +4,7 @@
 
 JobRango is a job opportunity platform for companies, employers, agencies, and outsourcing firms to publish work opportunities while applicants can register, apply for jobs, save jobs, and track applications through an account portal.
 
-The current installed script is still the upstream JobBox/Botble implementation. No major JobRango-specific features have been added yet; this cleanup records the current architecture before custom development begins.
+The current installed script is based on the upstream JobBox/Botble implementation. The first rebranding pass has updated safe frontend/admin-facing defaults to JobRango while leaving internal Botble theme identifiers, namespaces, and plugin paths stable.
 
 ## Technology Stack
 
@@ -268,9 +268,10 @@ Installed plugins include payment integrations for PayPal, Paystack, Razorpay, S
 
 ## Known Issues and Unclear Areas
 
-- The app is still branded internally as JobBox/Jobbox in theme names, package names, settings, and demo content.
+- The active theme folder, theme option key prefix, and PHP namespace still use the upstream `jobbox` / `Theme\Jobbox` identifiers; these are intentionally unchanged to avoid breaking Botble theme loading.
+- Some unrelated upstream plugin metadata still names the original vendor and should be reviewed only if those plugins are customized.
 - Demo credentials and demo data exist in `database.sql`; they must be changed before production.
 - `public/storage` contains local demo/upload media and is ignored from Git.
 - `public/vendor` and `public/themes` are generated/published assets and are ignored; regenerate them during setup.
-- No new JobRango-specific features have been added yet.
+- No new JobRango-specific features have been added yet beyond safe branding/setup defaults.
 - Test coverage was not expanded during this cleanup.

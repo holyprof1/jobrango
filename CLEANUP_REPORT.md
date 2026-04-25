@@ -100,7 +100,7 @@ After GitHub push protection flagged a bundled Mapbox demo token in `platform/th
 ## Recommended Next Steps
 
 - Replace demo/admin credentials and demo content.
-- Rebrand visible JobBox/Jobbox strings and theme settings to JobRango.
+- Complete final logo/favicon replacement and review remaining demo page content.
 - Decide whether production should start from `database.sql` or from migrations/seeders.
 - Add focused tests around registration, employer job posting, application submission, and email notifications before major feature work.
 - Define the JobRango-specific data model changes before modifying the Botble job-board plugin.

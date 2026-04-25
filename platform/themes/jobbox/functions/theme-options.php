@@ -46,7 +46,7 @@ app()->booted(function (): void {
             'label' => __('Copyright'),
             'attributes' => [
                 'name' => 'copyright',
-                'value' => __('Copyright © :year Your Company. All right reserved', ['year' => Carbon::now()->year]),
+                'value' => __('Copyright (c) :year JobRango. All rights reserved.', ['year' => Carbon::now()->year]),
                 'options' => [
                     'class' => 'form-control',
                     'placeholder' => __('Change copyright'),
@@ -62,7 +62,7 @@ app()->booted(function (): void {
             'label' => __('Introduction'),
             'attributes' => [
                 'name' => 'introduction',
-                'value' => __('JobBox is the heart of the design community and the best resource to discover and connect with designers and jobs worldwide.'),
+                'value' => __('JobRango is a job platform where companies post work opportunities and applicants apply through a simple user portal.'),
                 'options' => [
                     'class' => 'form-control',
                     'placeholder' => __('Change introduction'),
@@ -78,7 +78,7 @@ app()->booted(function (): void {
             'label' => __('App advertisement'),
             'attributes' => [
                 'name' => 'app_advertisement',
-                'value' => __('Download our Apps and get extra 15% Discount on your first Order&mldr;!'),
+                'value' => __('Find your range of work.'),
                 'options' => [
                     'class' => 'form-control',
                     'placeholder' => __('Change app advertisement'),

@@ -27,7 +27,7 @@ class PageSeeder extends BaseSeeder
                 'content' =>
                     Html::tag(
                         'div',
-                        '[search-box title="The Easiest Way to Get Your New Job" highlight_text="Easiest Way" description="Each month, more than 3 million job seekers turn to website in their search for work, making over 140,000 applications every single day" banner_image_1="pages/banner1.png" icon_top_banner="pages/icon-top-banner.png" banner_image_2="pages/banner2.png" icon_bottom_banner="pages/icon-bottom-banner.png" style="style-1" trending_keywords="Design,Development,Manager,Senior"][/search-box]'
+                        '[search-box title="Find your range of work." highlight_text="range of work" description="JobRango is a job platform where companies post work opportunities and applicants apply through a simple user portal." banner_image_1="pages/banner1.png" icon_top_banner="pages/icon-top-banner.png" banner_image_2="pages/banner2.png" icon_bottom_banner="pages/icon-bottom-banner.png" style="style-1" trending_keywords="Design,Development,Manager,Senior"][/search-box]'
                     ) .
                     Html::tag(
                         'div',
@@ -65,7 +65,7 @@ class PageSeeder extends BaseSeeder
                 'content' =>
                     Html::tag(
                         'div',
-                        '[search-box subtitle="We have 150,000+ live jobs" title="The #1 Job Board for Hiring or Find your next job" highlight_text="Job Board for" description="Each month, more than 3 million job seekers turn to website in their search for work, making over 140,000 applications every single day" counter_title_1="Daily Jobs Posted" counter_number_1="265" counter_title_2="Recruiters" counter_number_2="17" counter_title_3="Freelancers" counter_number_3="15" counter_title_4="Blog Tips" counter_number_4="28" background_image="pages/banner-section-search-box.png" style="style-2" trending_keywords="Design,Development,Manager,Senior"][/search-box]'
+                        '[search-box subtitle="Find your range of work." title="JobRango connects employers and applicants" highlight_text="JobRango" description="JobRango is a job platform where companies post work opportunities and applicants apply through a simple user portal." counter_title_1="Daily Jobs Posted" counter_number_1="265" counter_title_2="Recruiters" counter_number_2="17" counter_title_3="Freelancers" counter_number_3="15" counter_title_4="Blog Tips" counter_number_4="28" background_image="pages/banner-section-search-box.png" style="style-2" trending_keywords="Design,Development,Manager,Senior"][/search-box]'
                     ) .
                     Html::tag(
                         'div',
@@ -103,7 +103,7 @@ class PageSeeder extends BaseSeeder
                 'content' =>
                     Html::tag(
                         'div',
-                        '[search-box title="The #1 Job Board for Hiring or Find your next job" highlight_text="Job Board for" description="Each month, more than 3 million job seekers turn to website in their search for work, making over 140,000 applications every single day" style="style-3" trending_keywords="Design,Development,Manager,Senior"][/search-box]'
+                        '[search-box title="JobRango connects employers and applicants" highlight_text="JobRango" description="JobRango is a job platform where companies post work opportunities and applicants apply through a simple user portal." style="style-3" trending_keywords="Design,Development,Manager,Senior"][/search-box]'
                     ) .
                     Html::tag(
                         'div',
@@ -243,7 +243,7 @@ class PageSeeder extends BaseSeeder
                 'content' =>
                     Html::tag(
                         'div',
-                        '[search-box title="The official IT Jobs site" highlight_text="IT Jobs" description="“JobBox is our first stop whenever we\'re hiring a PHP role. We\'ve hired 10 PHP developers in the last few years, all thanks to JobBox.” — Andrew Hall, Elite JSC." banner_image_1="pages/left-job-head.png" banner_image_2="pages/right-job-head.png" style="style-3" background_color="#000"][/search-box]'
+                        '[search-box title="Find your range of work." highlight_text="range of work" description="JobRango is a job platform where companies post work opportunities and applicants apply through a simple user portal." banner_image_1="pages/left-job-head.png" banner_image_2="pages/right-job-head.png" style="style-3" background_color="#000"][/search-box]'
                     ) .
                     Html::tag('div', '[job-list max_salary_range="10000"][/job-list]')
                 ,
@@ -318,7 +318,7 @@ class PageSeeder extends BaseSeeder
                 'content' =>
                     Html::tag(
                         'div',
-                        '[company-information company_name="Jobbox Company" logo_company="general/logo-company.png" company_address="205 North Michigan Avenue, Suite 810 Chicago, 60601, US" company_phone="0543213336" company_email="contact@jobbox.com" branch_company_name_0="London" branch_company_address_0="2118 Thornridge Cir. Syracuse, Connecticut 35624" branch_company_name_1="New York" branch_company_address_1="4517 Washington Ave. Manchester, Kentucky 39495" branch_company_name_2="Chicago" branch_company_address_2="3891 Ranchview Dr. Richardson, California 62639" branch_company_name_3="San Francisco" branch_company_address_3="4140 Parker Rd. Allentown, New Mexico 31134" branch_company_name_4="Sysney" branch_company_address_4="3891 Ranchview Dr. Richardson, California 62639" branch_company_name_5="Singapore" branch_company_address_5="4140 Parker Rd. Allentown, New Mexico 31134"][/company-information]'
+                        '[company-information company_name="JobRango" logo_company="general/logo-company.png" company_address="205 North Michigan Avenue, Suite 810 Chicago, 60601, US" company_phone="0543213336" company_email="contact@jobrango.example" branch_company_name_0="London" branch_company_address_0="2118 Thornridge Cir. Syracuse, Connecticut 35624" branch_company_name_1="New York" branch_company_address_1="4517 Washington Ave. Manchester, Kentucky 39495" branch_company_name_2="Chicago" branch_company_address_2="3891 Ranchview Dr. Richardson, California 62639" branch_company_name_3="San Francisco" branch_company_address_3="4140 Parker Rd. Allentown, New Mexico 31134" branch_company_name_4="Sysney" branch_company_address_4="3891 Ranchview Dr. Richardson, California 62639" branch_company_name_5="Singapore" branch_company_address_5="4140 Parker Rd. Allentown, New Mexico 31134"][/company-information]'
                     ) .
                     Html::tag(
                         'div',

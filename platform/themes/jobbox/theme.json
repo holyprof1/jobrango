@@ -1,7 +1,7 @@
 {
-    "name": "Jobbox",
+    "name": "JobRango",
     "namespace": "Theme\\Jobbox\\",
-    "description": "Laravel Job Portal Script",
-    "author": "Archi Elite",
+    "description": "JobRango Laravel job opportunity platform theme",
+    "author": "JobRango",
     "required_plugins": []
 }

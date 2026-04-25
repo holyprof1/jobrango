@@ -21,7 +21,7 @@ class WidgetSeeder extends BaseSeeder
                 'position' => 0,
                 'data' => [
                     'id' => 'NewsletterWidget',
-                    'title' => 'New Things Will Always <br> Update Regularly',
+                    'title' => 'Find your range of work.',
                     'background_image' => 'general/newsletter-background-image.png',
                     'image_left' => 'general/newsletter-image-left.png',
                     'image_right' => 'general/newsletter-image-right.png',
@@ -32,7 +32,7 @@ class WidgetSeeder extends BaseSeeder
                 'sidebar_id' => 'footer_sidebar',
                 'position' => 1,
                 'data' => [
-                    'introduction' => 'JobBox is the heart of the design community and the best resource to discover and connect with designers and jobs worldwide.',
+                    'introduction' => 'JobRango is a job platform where companies post work opportunities and applicants apply through a simple user portal.',
                     'facebook_url' => '#',
                     'twitter_url' => '#',
                     'linkedin_url' => '#',

@@ -4,7 +4,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-lg-6">
-                        <img class="bdrd-10" src="{{ RvMedia::getImageUrl($shortcode->image) }}" alt="jobBox">
+                        <img class="bdrd-10" src="{{ RvMedia::getImageUrl($shortcode->image) }}" alt="JobRango">
                     </div>
                     <div class="col-lg-6">
                         <div class="pl-30">
