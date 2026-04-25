@@ -27,7 +27,7 @@ class PageSeeder extends BaseSeeder
                 'content' =>
                     Html::tag(
                         'div',
-                        '[search-box title="Find your range of work." highlight_text="range of work" description="JobRango is a job platform where companies post work opportunities and applicants apply through a simple user portal." banner_image_1="pages/banner1.png" icon_top_banner="pages/icon-top-banner.png" banner_image_2="pages/banner2.png" icon_bottom_banner="pages/icon-bottom-banner.png" style="style-1" trending_keywords="Design,Development,Manager,Senior"][/search-box]'
+                        '[search-box title="Find your range of work." highlight_text="range of work" description="JobRango is a job platform where companies post work opportunities and applicants apply through a simple user portal." banner_image_1="pages/banner1.png" icon_top_banner="pages/icon-top-banner.png" banner_image_2="pages/banner2.png" icon_bottom_banner="pages/icon-bottom-banner.png" style="style-1" trending_keywords="Administration,Sales & Marketing,Customer Service,Remote Work"][/search-box]'
                     ) .
                     Html::tag(
                         'div',
@@ -65,11 +65,11 @@ class PageSeeder extends BaseSeeder
                 'content' =>
                     Html::tag(
                         'div',
-                        '[search-box subtitle="Find your range of work." title="Find your range of work with JobRango" highlight_text="JobRango" description="Search better roles, discover credible hiring teams, and move from first application to next big step with a cleaner job board experience." counter_title_1="Open Roles" counter_number_1="51" counter_title_2="Hiring Teams" counter_number_2="20" counter_title_3="Job Categories" counter_number_3="10" counter_title_4="Career Guides" counter_number_4="3" background_image="pages/banner-section-search-box.png" style="style-2" trending_keywords="Remote,Design,Product,Engineering"][/search-box]'
+                        '[search-box title="Find your range of work with JobRango" highlight_text="JobRango" description="Search better roles, discover credible hiring teams, and move from first application to next big step with a cleaner job board experience." counter_title_1="Open Roles" counter_number_1="51" counter_title_2="Hiring Teams" counter_number_2="20" counter_title_3="Job Categories" counter_number_3="10" counter_title_4="Career Guides" counter_number_4="3" background_image="pages/banner-section-search-box.png" style="style-2" trending_keywords="Administration,Sales & Marketing,Customer Service,Remote Work"][/search-box]'
                     ) .
                     Html::tag(
                         'div',
-                        '[job-of-the-day title="Fresh roles worth a closer look" subtitle="A tighter first pass through the latest openings across the categories candidates search most." job_categories="1,2,5,4,7,8" style="style-2"][/job-of-the-day]'
+                        '[job-of-the-day title="Fresh roles worth a closer look" subtitle="A practical mix of administration, sales, service, operations, finance, healthcare, education, hospitality, and skilled trade openings." job_categories="1,2,3,4,5,6,7,8" style="style-2"][/job-of-the-day]'
                     ) .
                     Html::tag(
                         'div',
@@ -235,7 +235,7 @@ class PageSeeder extends BaseSeeder
                 'content' =>
                     Html::tag(
                         'div',
-                        '[search-box title="Find your range of work." highlight_text="range of work" description="JobRango is a job platform where companies post work opportunities and applicants apply through a simple user portal." banner_image_1="pages/left-job-head.png" banner_image_2="pages/right-job-head.png" style="style-3" background_color="#000"][/search-box]'
+                        '[search-box title="Find jobs across every sector." highlight_text="jobs" description="Browse administration, sales, customer service, operations, logistics, finance, healthcare, education, hospitality, skilled trade, remote, contract, field, graduate trainee, and internship opportunities on JobRango." banner_image_1="pages/left-job-head.png" banner_image_2="pages/right-job-head.png" style="style-3" background_color="#000"][/search-box]'
                     ) .
                     Html::tag('div', '[job-list max_salary_range="10000"][/job-list]')
                 ,

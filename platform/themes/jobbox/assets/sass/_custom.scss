@@ -2271,20 +2271,6 @@ form.auth-form {
         padding-top: 12px;
     }
 
-    .hero-2-eyebrow {
-        display: inline-flex;
-        align-items: center;
-        padding: 8px 14px;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.12);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        color: #f8fbff;
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-    }
-
     .hero-2-title {
         margin-top: 18px;
         max-width: 11.5ch;
@@ -2383,6 +2369,18 @@ form.auth-form {
     .header {
         padding: 16px 0;
 
+        .nav-main-menu,
+        .main-menu {
+            display: none !important;
+        }
+
+        .burger-icon {
+            display: inline-block;
+            position: relative;
+            top: auto;
+            right: auto;
+        }
+
         .main-header {
             gap: 16px;
             justify-content: space-between;
@@ -2393,6 +2391,8 @@ form.auth-form {
 
             .header-nav {
                 flex: 0 0 auto;
+                justify-content: flex-end;
+                width: auto;
             }
 
             .header-right {

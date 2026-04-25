@@ -16,29 +16,29 @@ class JobCategorySeeder extends BaseSeeder
         Category::query()->truncate();
 
         $data = [
-            'Content Writer',
-            'Market Research',
-            'Marketing & Sale',
-            'Customer Help',
-            'Finance',
-            'Software',
-            'Human Resource',
-            'Management',
-            'Retail & Products',
-            'Security Analyst',
+            'Administration',
+            'Sales & Marketing',
+            'Customer Service',
+            'Operations',
+            'Logistics & Delivery',
+            'Finance & Accounting',
+            'Healthcare',
+            'Education & Training',
+            'Hospitality',
+            'Construction & Skilled Trade',
         ];
 
         $imageData = [
-            'content',
-            'research',
+            'management',
             'marketing',
             'customer',
-            'finance',
-            'lightning',
-            'human',
-            'management',
+            'research',
             'retail',
-            'security',
+            'finance',
+            'human',
+            'content',
+            'marketing',
+            'lightning',
         ];
 
         foreach ($data as $index => $item) {

@@ -6,11 +6,6 @@
             <div class="banner-hero hero-2" @if($shortcode->background_image) style="background-image: url({{ RvMedia::getImageUrl($shortcode->background_image) }}) !important;" @endif>
                 <div class="banner-inner">
                     <div class="block-banner hero-2-panel">
-                        @if($shortcode->subtitle)
-                            <span class="hero-2-eyebrow wow animate__animated animate__fadeInUp">
-                                {!! BaseHelper::clean($shortcode->subtitle) !!}
-                            </span>
-                        @endif
                         <h1 class="text-42 color-white hero-2-title wow animate__animated animate__fadeInUp">
                             {!! BaseHelper::clean(str_replace($shortcode->highlight_text, '<span class="color-green">' . $shortcode->highlight_text . '</span>', $shortcode->title)) !!}
                         </h1>
