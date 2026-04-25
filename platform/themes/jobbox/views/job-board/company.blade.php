@@ -214,10 +214,6 @@
                     <div class="sidebar-list-job">
                         @if(! JobBoardHelper::isCompanyInformationHiddenForGuests() || auth('account')->check())
                             <ul class="ul-disc">
-                                @if ($uniqueId = $company->unique_id)
-                                    <li>{{ __('ID: :id', ['id' => $uniqueId]) }}</li>
-                                @endif
-
                                 @if ($company->address)
                                     <li>{{ $company->address }}</li>
                                 @endif

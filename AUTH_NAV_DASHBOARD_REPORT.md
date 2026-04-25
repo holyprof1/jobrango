@@ -7,6 +7,10 @@
 - Logged-in employers no longer see `Sign In` in the desktop or mobile header. They now get direct `Employer Dashboard` and `Post a Job` links plus the existing account dropdown with `My Companies`, `Account Settings`, and `Logout`.
 - The theme still uses the Botble account dropdown pattern rather than replacing account handling with a custom auth component.
 - The job seeker account shell was rebuilt into a compact dashboard layout with a profile header, sidebar navigation, and overview stat cards so `/account/overview` no longer has the oversized broken profile banner.
+- Header rendering was rechecked directly after the employer-flow cleanup:
+  - guest header still contains `Sign In` and `Get Started`
+  - job seeker header hides `Sign In` and shows `Dashboard`
+  - employer header hides `Sign In` and shows `Employer Dashboard` plus `Post a Job`
 
 ## Redirect routes
 
@@ -36,6 +40,7 @@
 - `platform/themes/jobbox/partials/navbar.blade.php`
 - `platform/themes/jobbox/views/job-board/account/overview.blade.php`
 - `platform/themes/jobbox/views/job-board/account/partials/layout-settings.blade.php`
+- `platform/plugins/job-board/resources/views/themes/dashboard/layouts/menu-top.blade.php`
 - `database/migrations/2026_04_25_223000_clean_authenticated_flows_and_free_mode.php`
 
 ## Remaining limitations

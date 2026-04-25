@@ -1,20 +1,18 @@
+@php($account = auth('account')->user())
+
 <div class="ps-sidebar__top">
     <div class="ps-block--user-wellcome">
         <div class="ps-block__left">
             <img
-                src="{{ auth('account')->user()->avatar_url }}"
-                alt="{{ auth('account')->user()->name }}"
+                src="{{ $account->avatar_url }}"
+                alt="{{ $account->name }}"
                 class="avatar avatar-lg"
             />
         </div>
         <div class="ps-block__right">
-            <p>{{ trans('plugins/job-board::dashboard.hello') }}, {{ auth('account')->user()->name }}</p>
-            <small>{{ trans('plugins/job-board::dashboard.joined_on', ['date' => auth('account')->user()->created_at->translatedFormat('M d, Y')]) }}</small>
-            @if ($uniqueId = auth('account')->user()->unique_id)
-                <small class="d-block mt-1">
-                    {!!  trans('plugins/job-board::dashboard.id_label', ['id' => Html::tag('strong', $uniqueId)])  !!}
-                </small>
-            @endif
+            <p>{{ trans('plugins/job-board::dashboard.hello') }}, {{ $account->name }}</p>
+            <small>{{ trans('plugins/job-board::dashboard.joined_on', ['date' => $account->created_at->translatedFormat('M d, Y')]) }}</small>
+            <small class="d-block mt-1">{{ $account->isEmployer() ? __('Employer account') : __('Job seeker account') }}</small>
         </div>
         <div class="ps-block__action">
             <a

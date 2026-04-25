@@ -1,6 +1,6 @@
 <footer>
     @php
-        $currencies = get_all_currencies();
+        $currencies = get_all_currencies()->whereIn('title', ['NGN', 'USD']);
     @endphp
 
     @if ($currencies->count() > 1)

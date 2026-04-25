@@ -59,7 +59,7 @@
                                                 {{ $application->job->name }}
                                             @endif
                                         </h4>
-                                        <p>{{ $application->job->company->name }} · {{ $application->job->full_address ?: __('Location not specified') }}</p>
+                                        <p>{{ $application->job->company->name }} | {{ $application->job->full_address ?: __('Location not specified') }}</p>
                                         <span>{{ $application->created_at->diffForHumans() }}</span>
                                     </div>
                                 </article>
@@ -69,7 +69,7 @@
                         <div class="jobrango-empty-state">
                             <h4>{{ __('No applications yet') }}</h4>
                             <p>{{ __('Start browsing current roles and apply to a few strong matches to build momentum here.') }}</p>
-                            <a class="btn btn-default btn-shadow hover-up" href="{{ route('public.jobs') }}">{{ __('Browse Jobs') }}</a>
+                            <a class="btn btn-default btn-shadow hover-up" href="{{ url('/jobs') }}">{{ __('Browse Jobs') }}</a>
                         </div>
                     @endif
                 </div>
@@ -92,7 +92,7 @@
                                     </div>
                                     <div class="jobrango-job-list__copy">
                                         <h4><a href="{{ $job->url }}">{{ $job->name }}</a></h4>
-                                        <p>{{ $job->company->name }} · {{ $job->full_address ?: __('Location not specified') }}</p>
+                                        <p>{{ $job->company->name }} | {{ $job->full_address ?: __('Location not specified') }}</p>
                                     </div>
                                     <div class="jobrango-job-list__meta">
                                         <span>{{ $job->salary_text }}</span>
@@ -112,7 +112,7 @@
                                         </div>
                                         <div class="jobrango-job-list__copy">
                                             <h4><a href="{{ $job->url }}">{{ $job->name }}</a></h4>
-                                            <p>{{ $job->company->name }} · {{ $job->full_address ?: __('Location not specified') }}</p>
+                                            <p>{{ $job->company->name }} | {{ $job->full_address ?: __('Location not specified') }}</p>
                                         </div>
                                         <div class="jobrango-job-list__meta">
                                             <a href="{{ $job->url }}">{{ __('View Job') }}</a>

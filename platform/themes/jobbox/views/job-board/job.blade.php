@@ -62,26 +62,6 @@
                 <div class="job-overview">
                     <h2 class="border-bottom pb-15 mb-30 h5">{{ __('Employment Information') }}</h2>
                     <div class="row">
-                        @if ($uniqueId = $job->unique_id)
-                            <div class="col-12 d-flex mt-15">
-                                <div class="sidebar-icon-item">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-id">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path d="M3 4m0 3a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v10a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3z" />
-                                        <path d="M9 10m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                                        <path d="M15 8l2 0" />
-                                        <path d="M15 12l2 0" />
-                                        <path d="M7 16l10 0" />
-                                    </svg>
-                                </div>
-                                <div class="sidebar-text-info ml-10">
-                                    <span class="text-description joblevel-icon mb-10" style="line-height: 28px !important;">{{ __('Identify') }}</span>
-                                    <strong class="small-heading">{!! BaseHelper::clean($uniqueId) !!}</strong>
-                                </div>
-                            </div>
-                        @endif
-
-
                         @if($job->categories->isNotEmpty())
                             <div class="col-md-12 d-flex mt-15">
                                 <div class="sidebar-icon-item">

@@ -66,7 +66,7 @@ class AccountController extends BaseController
 
         $savedJobs = $account->savedJobs()
             ->with(['company', 'jobTypes', 'currency'])
-            ->latest('jb_saved_jobs.created_at')
+            ->latest('jb_jobs.created_at')
             ->limit(4)
             ->get();
 

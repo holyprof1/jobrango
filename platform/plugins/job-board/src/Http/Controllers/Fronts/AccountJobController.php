@@ -2,6 +2,7 @@
 
 namespace Botble\JobBoard\Http\Controllers\Fronts;
 
+use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Events\BeforeEditContentEvent;
 use Botble\Base\Events\CreatedContentEvent;
 use Botble\Base\Events\UpdatedContentEvent;
@@ -15,6 +16,7 @@ use Botble\JobBoard\Forms\Fronts\JobForm;
 use Botble\JobBoard\Http\Requests\AccountJobRequest;
 use Botble\JobBoard\Models\Account;
 use Botble\JobBoard\Models\AccountActivityLog;
+use Botble\JobBoard\Models\Company;
 use Botble\JobBoard\Models\CustomFieldValue;
 use Botble\JobBoard\Models\Job;
 use Botble\JobBoard\Models\JobApplication;
@@ -104,6 +106,7 @@ class AccountJobController extends BaseController
             'expire_date' => Carbon::now()->addDays(JobBoardHelper::jobExpiredDays()),
             'author_id' => $account->getAuthIdentifier(),
             'author_type' => Account::class,
+            'status' => JobStatusEnum::PUBLISHED,
         ]);
 
         if (! $request->has('employer_colleagues')) {
@@ -113,12 +116,12 @@ class AccountJobController extends BaseController
         $job = new Job();
         $job->fill($request->input());
 
-        if (JobBoardHelper::isEnabledJobApproval()) {
-            $job->moderation_status = ModerationStatusEnum::PENDING;
-        } else {
+        if ($this->shouldAutoApproveJob($request)) {
             $job->moderation_status = ModerationStatusEnum::APPROVED;
 
             event(new JobPublishedEvent($job));
+        } else {
+            $job->moderation_status = ModerationStatusEnum::PENDING;
         }
 
         $job->save();
@@ -213,6 +216,11 @@ class AccountJobController extends BaseController
         }
 
         $job->fill($request->input());
+
+        if ($job->moderation_status != ModerationStatusEnum::APPROVED && $this->shouldAutoApproveJob($request, $job)) {
+            $job->moderation_status = ModerationStatusEnum::APPROVED;
+        }
+
         $job->save();
 
         $customFields = CustomFieldValue::formatCustomFields($request->input('custom_fields') ?? []);
@@ -273,6 +281,25 @@ class AccountJobController extends BaseController
         }
 
         return $request;
+    }
+
+    protected function shouldAutoApproveJob(Request $request, ?Job $job = null): bool
+    {
+        if (! JobBoardHelper::isEnabledJobApproval()) {
+            return true;
+        }
+
+        $companyId = $request->input('company_id') ?: $job?->company_id;
+
+        if (! $companyId) {
+            return false;
+        }
+
+        $company = Company::query()
+            ->select(['id', 'status'])
+            ->find($companyId);
+
+        return $company && $company->status == BaseStatusEnum::PUBLISHED;
     }
 
     public function destroy(Job $job)

@@ -20,6 +20,7 @@ class CompanyForm extends FormAbstract
             ->setupModel(new Company())
             ->setValidatorClass(CompanyRequest::class)
             ->columns(12)
+            ->disablePermalinkField()
             ->setFormOption('enctype', 'multipart/form-data')
             ->template(JobBoardHelper::viewPath('dashboard.forms.base'))
             ->add('name', 'text', [
@@ -38,29 +39,13 @@ class CompanyForm extends FormAbstract
                     'placeholder' => trans('core/base::forms.description_placeholder'),
                 ],
             ])
-            ->add('tax_id', 'text', [
-                'label' => trans('plugins/job-board::forms.tax_id'),
-                'attr' => [
-                    'placeholder' => trans('plugins/job-board::forms.tax_id'),
-                    'data-counter' => 60,
-                ],
-                'colspan' => 4,
-            ])
-            ->add('ceo', 'text', [
-                'label' => trans('plugins/job-board::forms.company_ceo'),
-                'attr' => [
-                    'placeholder' => trans('plugins/job-board::forms.company_ceo'),
-                    'data-counter' => 120,
-                ],
-                'colspan' => 4,
-            ])
             ->add('email', 'email', [
                 'label' => trans('plugins/job-board::forms.email'),
                 'attr' => [
                     'placeholder' => trans('plugins/job-board::forms.email_placeholder'),
                     'data-counter' => 120,
                 ],
-                'colspan' => 4,
+                'colspan' => 6,
             ])
             ->add('phone', 'text', [
                 'label' => trans('plugins/job-board::forms.phone'),
@@ -68,7 +53,7 @@ class CompanyForm extends FormAbstract
                     'placeholder' => trans('plugins/job-board::forms.phone_placeholder'),
                     'data-counter' => 30,
                 ],
-                'colspan' => 4,
+                'colspan' => 6,
             ])
             ->add('website', 'text', [
                 'label' => trans('plugins/job-board::forms.website'),
@@ -76,39 +61,7 @@ class CompanyForm extends FormAbstract
                     'placeholder' => trans('plugins/job-board::forms.website_placeholder'),
                     'data-counter' => 120,
                 ],
-                'colspan' => 4,
-            ])
-            ->add('year_founded', 'number', [
-                'label' => trans('plugins/job-board::forms.year_founded'),
-                'attr' => [
-                    'placeholder' => trans('plugins/job-board::forms.year_founded_placeholder'),
-                    'data-counter' => 10,
-                ],
-                'colspan' => 4,
-            ])
-            ->add('number_of_offices', 'number', [
-                'label' => trans('plugins/job-board::forms.number_of_offices'),
-                'attr' => [
-                    'placeholder' => trans('plugins/job-board::forms.number_of_offices_placeholder'),
-                    'data-counter' => 10,
-                ],
-                'colspan' => 4,
-            ])
-            ->add('number_of_employees', 'number', [
-                'label' => trans('plugins/job-board::forms.number_of_employees'),
-                'attr' => [
-                    'placeholder' => trans('plugins/job-board::forms.number_of_employees_placeholder'),
-                    'data-counter' => 10,
-                ],
-                'colspan' => 4,
-            ])
-            ->add('annual_revenue', 'text', [
-                'label' => trans('plugins/job-board::forms.annual_revenue'),
-                'attr' => [
-                    'placeholder' => trans('plugins/job-board::forms.annual_revenue_placeholder'),
-                    'data-counter' => 10,
-                ],
-                'colspan' => 4,
+                'colspan' => 12,
             ])
             ->when(is_plugin_active('location'), function (FormAbstract $form): void {
                 $form->add(
