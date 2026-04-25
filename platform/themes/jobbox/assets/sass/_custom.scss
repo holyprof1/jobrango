@@ -2162,3 +2162,262 @@ form.auth-form {
         color: #ffffff;
     }
 }
+
+// JobRango homepage refresh: align the header and turn Demo 2 into a stronger
+// left-content/right-art hero without altering Botble's shortcode structure.
+.header {
+    padding: 22px 0;
+
+    .main-header {
+        align-items: center;
+        gap: 32px;
+
+        .header-left {
+            flex: 0 0 auto;
+            min-width: 180px;
+
+            .header-logo {
+                min-width: 0;
+
+                a {
+                    display: flex;
+                    align-items: center;
+                }
+
+                img {
+                    max-height: 72px;
+                    width: auto;
+                }
+            }
+        }
+
+        .header-nav {
+            flex: 1 1 auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .header-right {
+            flex: 0 0 auto;
+            min-width: 210px;
+        }
+    }
+
+    .nav-main-menu {
+        display: flex;
+        justify-content: center;
+    }
+
+    .main-menu > li {
+        padding: 10px 18px;
+
+        > a {
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+    }
+}
+
+.block-signin {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 18px;
+
+    .text-link-bd-btom {
+        text-underline-offset: 4px;
+    }
+
+    .btn.btn-default {
+        border-radius: 14px;
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #1f6bff 0%, #0c3fa8 100%);
+        box-shadow: 0 14px 30px rgba(12, 63, 168, 0.2);
+    }
+}
+
+.banner-hero.hero-2 {
+    min-height: 680px;
+    padding: 92px 0 44px;
+    overflow: hidden;
+    border-radius: 0 0 40px 40px;
+    background-position: right -80px top -36px !important;
+
+    &::before {
+        opacity: 1;
+        background:
+            linear-gradient(
+                90deg,
+                rgba(5, 24, 72, 0.96) 0%,
+                rgba(7, 34, 99, 0.88) 38%,
+                rgba(11, 58, 145, 0.45) 67%,
+                rgba(11, 58, 145, 0.08) 100%
+            );
+    }
+
+    .banner-inner {
+        max-width: 1350px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 0 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .hero-2-panel {
+        max-width: 620px;
+        text-align: left;
+        padding-top: 12px;
+    }
+
+    .hero-2-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: #f8fbff;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .hero-2-title {
+        margin-top: 18px;
+        max-width: 11.5ch;
+        font-size: clamp(3.4rem, 5vw, 5.15rem);
+        line-height: 1.03;
+        letter-spacing: -0.05em;
+
+        .color-green {
+            color: #27d3b5 !important;
+        }
+    }
+
+    .hero-2-description {
+        max-width: 52ch;
+        color: rgba(255, 255, 255, 0.84) !important;
+        font-size: 18px;
+        line-height: 1.75;
+    }
+
+    .hero-search-form {
+        max-width: 760px;
+        width: 100%;
+        margin-top: 32px !important;
+
+        form {
+            padding: 14px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            box-shadow: 0 28px 80px rgba(3, 18, 56, 0.22);
+        }
+    }
+
+    .list-tags-banner {
+        margin-top: 24px !important;
+
+        strong,
+        a {
+            color: rgba(255, 255, 255, 0.82);
+        }
+
+        a:hover {
+            color: #ffffff;
+        }
+    }
+
+    .hero-2-metrics {
+        max-width: 860px;
+        width: 100%;
+        margin-top: 34px !important;
+    }
+
+    .hero-2-metric {
+        min-width: 100%;
+        padding: 18px 20px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        backdrop-filter: blur(8px);
+        box-shadow: 0 18px 40px rgba(3, 18, 56, 0.16);
+
+        h4 {
+            margin-bottom: 6px;
+            font-size: 30px;
+            line-height: 1;
+        }
+
+        p {
+            margin-bottom: 0;
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+    }
+}
+
+.list-brands {
+    margin-top: -6px !important;
+
+    .swiper-container {
+        padding: 8px 0 2px;
+    }
+
+    .swiper-slide a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 72px;
+        padding: 18px 20px;
+        background: #ffffff;
+        border: 1px solid rgba(11, 31, 77, 0.08);
+        border-radius: 18px;
+        box-shadow: 0 16px 36px rgba(11, 31, 77, 0.08);
+    }
+}
+
+@media screen and (max-width: 991px) {
+    .header {
+        padding: 16px 0;
+
+        .main-header {
+            gap: 16px;
+
+            .header-left .header-logo img {
+                max-height: 64px;
+            }
+        }
+    }
+
+    .banner-hero.hero-2 {
+        min-height: auto;
+        padding: 78px 0 36px;
+        background-position: center top !important;
+
+        &::before {
+            background: linear-gradient(180deg, rgba(5, 24, 72, 0.92) 0%, rgba(7, 34, 99, 0.78) 52%, rgba(11, 58, 145, 0.42) 100%);
+        }
+
+        .hero-2-panel,
+        .hero-2-metrics {
+            max-width: 100%;
+        }
+
+        .hero-2-title {
+            max-width: 100%;
+            font-size: clamp(2.6rem, 9vw, 4rem);
+        }
+
+        .hero-2-description {
+            font-size: 16px;
+            line-height: 1.65;
+        }
+    }
+
+    .block-signin {
+        gap: 12px;
+    }
+}

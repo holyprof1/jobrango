@@ -70,6 +70,22 @@ class ThemeOptionSeeder extends BaseSeeder
                 'value' => 'general/logo.png',
             ],
             [
+                'key' => 'primary_font',
+                'value' => 'Plus Jakarta Sans',
+            ],
+            [
+                'key' => 'primary_color',
+                'value' => '#1F6BFF',
+            ],
+            [
+                'key' => 'primary_color_hover',
+                'value' => '#D9E6FF',
+            ],
+            [
+                'key' => 'secondary_color',
+                'value' => '#0B1F4D',
+            ],
+            [
                 'key' => 'hotline',
                 'value' => '+(123) 345-6789',
             ],
@@ -87,7 +103,7 @@ class ThemeOptionSeeder extends BaseSeeder
             ],
             [
                 'key' => 'homepage_id',
-                'value' => Page::query()->value('id'),
+                'value' => Page::query()->where('name', 'Homepage 2')->value('id') ?: Page::query()->value('id'),
             ],
             [
                 'key' => 'blog_page_id',

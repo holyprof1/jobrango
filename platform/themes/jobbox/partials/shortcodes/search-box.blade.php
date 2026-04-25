@@ -2,25 +2,29 @@
 
 @switch($shortcode->style)
     @case('style-2')
-        <div class="bg-homepage1"></div>
         <section class="section-box">
             <div class="banner-hero hero-2" @if($shortcode->background_image) style="background-image: url({{ RvMedia::getImageUrl($shortcode->background_image) }}) !important;" @endif>
                 <div class="banner-inner">
-                    <div class="block-banner">
-                        <h1 class="text-42 color-white wow animate__animated animate__fadeInUp">
+                    <div class="block-banner hero-2-panel">
+                        @if($shortcode->subtitle)
+                            <span class="hero-2-eyebrow wow animate__animated animate__fadeInUp">
+                                {!! BaseHelper::clean($shortcode->subtitle) !!}
+                            </span>
+                        @endif
+                        <h1 class="text-42 color-white hero-2-title wow animate__animated animate__fadeInUp">
                             {!! BaseHelper::clean(str_replace($shortcode->highlight_text, '<span class="color-green">' . $shortcode->highlight_text . '</span>', $shortcode->title)) !!}
                         </h1>
-                        <div class="font-lg font-regular color-white mt-20 wow animate__animated animate__fadeInUp" data-wow-delay=".1s">
+                        <div class="font-lg font-regular color-white mt-20 hero-2-description wow animate__animated animate__fadeInUp" data-wow-delay=".1s">
                             {!! BaseHelper::clean($shortcode->description) !!}
                         </div>
-                        {!! Theme::partial('job-search-box', ['trendingKeywords' => $shortcode->trending_keywords]) !!}
+                        {!! Theme::partial('job-search-box', ['trendingKeywords' => $shortcode->trending_keywords, 'class' => 'hero-search-form']) !!}
                     </div>
-                    <div class="mt-60">
+                    <div class="mt-60 hero-2-metrics">
                         <div class="row">
                             @for($i = 1; $i <= 4 ; $i++)
                                 @if($shortcode->{'counter_title_' . $i})
                                 <div class="col-lg-3 col-sm-3 col-6 text-center mb-20">
-                                    <div class="d-inline-block text-start">
+                                    <div class="d-inline-block text-start hero-2-metric">
                                         <h4 class="color-white">
                                             <span class="count">
                                                 {!! BaseHelper::clean($shortcode->{'counter_number_' . $i}) !!}

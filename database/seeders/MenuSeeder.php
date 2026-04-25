@@ -37,51 +37,9 @@ class MenuSeeder extends BaseSeeder
                 'items' => [
                     [
                         'title' => 'Home',
-                        'url' => '/',
-                        'children' => [
-                            [
-                                'title' => 'Home 1',
-                                'reference_id' => $this->getPageId('Homepage 1'),
-                                'reference_type' => Page::class,
-                                'position' => 1,
-                                'icon_font' => 'fi fi-rr-home',
-                            ],
-                            [
-                                'title' => 'Home 2',
-                                'reference_id' => $this->getPageId('Homepage 2'),
-                                'reference_type' => Page::class,
-                                'position' => 2,
-                                'icon_font' => 'fi fi-rr-home',
-                            ],
-                            [
-                                'title' => 'Home 3',
-                                'reference_id' => $this->getPageId('Homepage 3'),
-                                'reference_type' => Page::class,
-                                'position' => 3,
-                                'icon_font' => 'fi fi-rr-home',
-                            ],
-                            [
-                                'title' => 'Home 4',
-                                'reference_id' => $this->getPageId('Homepage 4'),
-                                'reference_type' => Page::class,
-                                'position' => 4,
-                                'icon_font' => 'fi fi-rr-home',
-                            ],
-                            [
-                                'title' => 'Home 5',
-                                'reference_id' => $this->getPageId('Homepage 5'),
-                                'reference_type' => Page::class,
-                                'position' => 5,
-                                'icon_font' => 'fi fi-rr-home',
-                            ],
-                            [
-                                'title' => 'Home 6',
-                                'reference_id' => $this->getPageId('Homepage 6'),
-                                'reference_type' => Page::class,
-                                'position' => 6,
-                                'icon_font' => 'fi fi-rr-home',
-                            ],
-                        ],
+                        'reference_id' => $this->getPageId('Homepage 2'),
+                        'reference_type' => Page::class,
+                        'icon_font' => 'fi fi-rr-home',
                     ],
                     [
                         'title' => 'Find a Job',

@@ -65,35 +65,27 @@ class PageSeeder extends BaseSeeder
                 'content' =>
                     Html::tag(
                         'div',
-                        '[search-box subtitle="Find your range of work." title="JobRango connects employers and applicants" highlight_text="JobRango" description="JobRango is a job platform where companies post work opportunities and applicants apply through a simple user portal." counter_title_1="Daily Jobs Posted" counter_number_1="265" counter_title_2="Recruiters" counter_number_2="17" counter_title_3="Freelancers" counter_number_3="15" counter_title_4="Blog Tips" counter_number_4="28" background_image="pages/banner-section-search-box.png" style="style-2" trending_keywords="Design,Development,Manager,Senior"][/search-box]'
+                        '[search-box subtitle="Find your range of work." title="Find your range of work with JobRango" highlight_text="JobRango" description="Search better roles, discover credible hiring teams, and move from first application to next big step with a cleaner job board experience." counter_title_1="Open Roles" counter_number_1="51" counter_title_2="Hiring Teams" counter_number_2="20" counter_title_3="Job Categories" counter_number_3="10" counter_title_4="Career Guides" counter_number_4="3" background_image="pages/banner-section-search-box.png" style="style-2" trending_keywords="Remote,Design,Product,Engineering"][/search-box]'
                     ) .
                     Html::tag(
                         'div',
-                        '[job-of-the-day title="Jobs of the day" subtitle="Search and connect with the right candidates faster." job_categories="1,2,5,4,7,8" style="style-2"][/job-of-the-day]'
+                        '[job-of-the-day title="Fresh roles worth a closer look" subtitle="A tighter first pass through the latest openings across the categories candidates search most." job_categories="1,2,5,4,7,8" style="style-2"][/job-of-the-day]'
                     ) .
                     Html::tag(
                         'div',
-                        '[popular-category title="Popular category" subtitle="Search and connect with the right candidates faster."][/popular-category]'
+                        '[popular-category title="Explore by category" subtitle="Start broad, then narrow into the paths that match your experience and preferred work style."][/popular-category]'
                     ) .
                     Html::tag(
                         'div',
-                        '[job-by-location title="Jobs by Location" description="Find your favourite jobs and get the benefits of yourself" city="12,46,69,111,121,116,62" style="style-2"][/job-by-location]'
+                        '[job-by-location title="Where opportunity is moving" description="Browse the strongest location clusters, then filter down to the roles that fit your next move." city="12,46,69,111,121,116,62" style="style-2"][/job-by-location]'
                     ) .
                     Html::tag(
                         'div',
-                        '[counter-section counter_title_1="Completed Cases" counter_description_1="We always provide people a complete solution upon focused of any business" counter_number_1="1000" counter_title_2="Our Office" counter_description_2="We always provide people a complete solution upon focused of any business" counter_number_2="1" counter_title_3="Skilled People" counter_description_3="We always provide people a complete solution upon focused of any business" counter_number_3="6" counter_title_4="Happy Clients" counter_description_4="We always provide people a complete solution upon focused of any business" counter_number_4="2"][/counter-section]'
+                        '[top-companies title="Teams hiring on JobRango" description="Meet the companies actively posting opportunities and building strong employer presence." style="style-2"][/top-companies]'
                     ) .
                     Html::tag(
                         'div',
-                        '[top-companies title="Top Recruiters" description="Discover your next career move, freelance gig, or internship" style="style-2"][/top-companies]'
-                    ) .
-                    Html::tag(
-                        'div',
-                        '[advertisement-banner first_title="Job Tools Services" first_description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam laoreet rutrum quam, id faucibus erat interdum a. Curabitur eget tortor a nulla interdum semper." load_more_first_content_text="Find Out More" load_more_link_first_content="#" image_of_first_content="pages/job-tools.png" second_title="Planning a Job?" second_description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam laoreet rutrum quam, id faucibus erat interdum a. Curabitur eget tortor a nulla interdum semper." load_more_second_content_text="Find Out More" load_more_link_second_content="#" image_of_second_content="pages/planning-job.png"][/advertisement-banner]'
-                    ) .
-                    Html::tag(
-                        'div',
-                        '[news-and-blogs title="News and Blog" subtitle="Get the latest news, updates and tips" button_text="Load More Posts" button_link="#" style="style-2"][/news-and-blogs]'
+                        '[news-and-blogs title="Career notes and hiring insight" subtitle="Useful reading for applicants and employers who want a smarter next move." button_text="Load More Posts" button_link="#" style="style-2"][/news-and-blogs]'
                     )
                 ,
                 'template' => 'homepage',
