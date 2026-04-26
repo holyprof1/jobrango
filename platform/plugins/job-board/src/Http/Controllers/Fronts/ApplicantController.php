@@ -9,18 +9,73 @@ use Botble\JobBoard\Facades\JobBoardHelper;
 use Botble\JobBoard\Forms\Fronts\ApplicantForm;
 use Botble\JobBoard\Http\Requests\EditJobApplicationRequest;
 use Botble\JobBoard\Models\Account;
+use Botble\JobBoard\Models\Job;
 use Botble\JobBoard\Models\JobApplication;
-use Botble\JobBoard\Tables\Fronts\ApplicantTable;
 use Botble\SeoHelper\Facades\SeoHelper;
+use Botble\Theme\Facades\Theme;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 
 class ApplicantController extends BaseController
 {
-    public function index(ApplicantTable $table)
+    public function index(Request $request)
     {
-        $this->pageTitle(trans('plugins/job-board::messages.applicants'));
+        /**
+         * @var Account $account
+         */
+        $account = auth('account')->user();
 
-        return $table->render(JobBoardHelper::viewPath('dashboard.table.base'));
+        $selectedJobId = (int) $request->input('job_id');
+
+        $jobs = Job::query()
+            ->byAccount($account->getKey())
+            ->with('company')
+            ->withCount([
+                'applicants',
+                'applicants as new_applicants_count' => function ($query): void {
+                    $query->where('status', 'pending');
+                },
+            ])
+            ->latest('jb_jobs.created_at')
+            ->paginate(10, ['*'], 'jobs_page')
+            ->withQueryString();
+
+        $selectedJob = null;
+        $applications = null;
+
+        if ($selectedJobId) {
+            $selectedJob = Job::query()
+                ->byAccount($account->getKey())
+                ->with('company')
+                ->withCount([
+                    'applicants',
+                    'applicants as new_applicants_count' => function ($query): void {
+                        $query->where('status', 'pending');
+                    },
+                ])
+                ->findOrFail($selectedJobId);
+
+            $applications = JobApplication::query()
+                ->where('job_id', $selectedJob->getKey())
+                ->with(['account', 'job.company'])
+                ->latest('created_at')
+                ->paginate(12)
+                ->withQueryString();
+        }
+
+        $title = $selectedJob
+            ? __('Applicants for :job', ['job' => $selectedJob->name])
+            : trans('plugins/job-board::messages.applicants');
+
+        $this->pageTitle($title);
+
+        Theme::breadcrumb()
+            ->add(trans('plugins/job-board::messages.my_profile'), route('public.account.dashboard'))
+            ->add(trans('plugins/job-board::messages.applicants'));
+
+        SeoHelper::setTitle($title);
+
+        return JobBoardHelper::scope('dashboard.applicants.index', compact('jobs', 'selectedJob', 'applications'));
     }
 
     public function edit(int|string $id)

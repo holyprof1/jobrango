@@ -1,50 +1,54 @@
 # Application Form Strategy
 
-## Basic application mode
+## Current Release
 
-- Keep the current Botble default apply flow as the launch path.
-- Candidates apply from the public job page.
-- Resume/CV upload already exists in the current flow.
-- This should remain the default while JobRango is still refining the core hiring flow.
+The current release intentionally ships the application-form workflow in two layers:
 
-## Custom application mode
+### Implemented Now
 
-- Build this later as an employer-level enhancement, not a replacement for the default apply path.
-- Employers should be able to add screening questions in a lightweight builder, similar to a simple Google Form.
-- Recommended behavior:
-  - keep one primary job URL
-  - render default candidate info fields first
-  - render employer-specific questions underneath
+- After an employer saves a job, they are sent to `Customize Application Form`.
+- Each job now stores:
+  - `application_mode`
+  - `application_form_schema`
+  - `application_form_settings`
+- Employers can choose:
+  - `Basic application`
+  - `Custom application`
+- Employers can also save early screening preferences:
+  - auto-highlight applicants later
+  - mark incomplete applications when required questions are missing
 
-## Public shareable application link
+### Honest Limitation
 
-- What exists now:
-  - every published job already has a public detail URL that acts as the shareable application page
-- What to build later:
-  - optional dedicated application-only route for cleaner sharing
-  - optional branded short link or share panel
+The full question builder is not live in this release.
 
-## Question types for later phases
+- Candidate applications still use the standard JobRango apply flow.
+- The custom mode currently acts as a reserved configuration state plus UX placeholder.
+- No fake drag/drop builder or pretend custom form runtime was added.
+
+## Planned Builder Shape
+
+The data model is prepared for a future builder with question types such as:
 
 - Short answer
 - Paragraph
 - Multiple choice
-- File upload
+- Checkbox
 - Phone
 - Email
-- CV / Resume
+- File upload
+- CV upload
+- Yes/No
 
-## What exists now
+Planned next-step capabilities:
 
-- Default public apply form
-- Candidate resume handling
-- Employer job posting
-- Internal/external apply capability in the platform, though the simplified employer UI currently hides external-apply complexity
+- author questions in employer UI
+- save required/optional per question
+- render job-specific apply forms to candidates
+- add knockout/scoring rules later
 
-## What still needs building
+## Why This Approach
 
-- Employer-managed question builder
-- Per-job stored application schema
-- Candidate answer storage and validation
-- Employer dashboard review UI for custom answers
-- Public/custom application route presentation
+- It keeps the employer flow calm now.
+- It avoids pretending a full builder works when it does not.
+- It preserves a clean migration path for the next phase without redoing the job model again.

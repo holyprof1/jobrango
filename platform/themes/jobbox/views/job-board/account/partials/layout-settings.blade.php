@@ -24,6 +24,15 @@
     $isSecurityRoute = request()->routeIs('public.account.security');
     $isExperienceRoute = request()->routeIs('public.account.experiences.*');
     $isEducationRoute = request()->routeIs('public.account.educations.*');
+    $completionChecks = [
+        filled($account->avatar_id),
+        filled($account->address),
+        filled($account->description ?: $account->bio),
+        filled($account->resume),
+        $account->experiences()->exists(),
+        $account->educations()->exists(),
+    ];
+    $profileCompletion = (int) round((collect($completionChecks)->filter()->count() / count($completionChecks)) * 100);
 @endphp
 
 <main class="main crop-avatar user-profile-section">
@@ -47,6 +56,13 @@
                         <p class="jobrango-account-hero__summary">{{ $profileSummary }}</p>
                     </div>
                 </div>
+                <div class="jobrango-account-hero__completion">
+                    <span>{{ __('Profile completion') }}</span>
+                    <strong>{{ $profileCompletion }}%</strong>
+                    <div class="jobrango-account-hero__completion-bar">
+                        <span style="width: {{ $profileCompletion }}%"></span>
+                    </div>
+                </div>
                 <div class="jobrango-account-hero__actions">
                     <a class="btn btn-default btn-shadow hover-up" href="{{ route('public.account.settings') }}">{{ __('Edit Profile') }}</a>
                     <a class="btn btn-border hover-up" href="{{ url('/jobs') }}">{{ __('Browse Jobs') }}</a>
@@ -66,14 +82,14 @@
                     <div class="box-nav-tabs nav-tavs-profile mb-5 jobrango-account-sidebar">
                         <div class="jobrango-account-sidebar__heading">
                             <h5>{{ __('My Dashboard') }}</h5>
-                            <p>{{ __('Quick access to your profile, jobs, and account security.') }}</p>
+                            <p>{{ __('Quick access to your profile, saved roles, and applications.') }}</p>
                         </div>
                         <ul class="nav" role="tablist">
                             <li><a @class(['btn btn-border aboutus-icon mb-20', 'active' => $isOverviewRoute]) href="{{ route('public.account.overview') }}">{{ __('Overview') }}</a></li>
                             <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $isSettingsRoute]) href="{{ route('public.account.settings') }}">{{ __('My Profile') }}</a></li>
                             <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $isAppliedRoute]) href="{{ route('public.account.jobs.applied-jobs') }}">{{ __('Applied Jobs') }}</a></li>
                             <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $isSavedRoute]) href="{{ route('public.account.jobs.saved') }}">{{ __('Saved Jobs') }}</a></li>
-                            <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $isSettingsRoute]) href="{{ route('public.account.settings') }}">{{ $resumeLabel }}</a></li>
+                            <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $isSettingsRoute]) href="{{ route('public.account.settings') }}">{{ __('Resume & Documents') }}</a></li>
                             <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $isSecurityRoute]) href="{{ route('public.account.security') }}">{{ __('Security') }}</a></li>
                             @if ($account->isJobSeeker())
                                 <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $isExperienceRoute]) href="{{ route('public.account.experiences.index') }}">{{ __('Experiences') }}</a></li>

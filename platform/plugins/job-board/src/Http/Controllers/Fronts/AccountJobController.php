@@ -8,6 +8,7 @@ use Botble\Base\Events\CreatedContentEvent;
 use Botble\Base\Events\UpdatedContentEvent;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\JobBoard\Enums\JobStatusEnum;
+use Botble\JobBoard\Enums\JobApplicationStatusEnum;
 use Botble\JobBoard\Enums\ModerationStatusEnum;
 use Botble\JobBoard\Events\EmployerPostedJobEvent;
 use Botble\JobBoard\Events\JobPublishedEvent;
@@ -23,13 +24,13 @@ use Botble\JobBoard\Models\JobApplication;
 use Botble\JobBoard\Models\Tag;
 use Botble\JobBoard\Repositories\Interfaces\AnalyticsInterface;
 use Botble\JobBoard\Services\StoreTagService;
-use Botble\JobBoard\Tables\Fronts\JobTable;
 use Botble\Media\Facades\RvMedia;
 use Botble\Optimize\Facades\OptimizerHelper;
 use Botble\SeoHelper\Facades\SeoHelper;
 use Botble\Theme\Facades\Theme;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class AccountJobController extends BaseController
 {
@@ -39,8 +40,13 @@ class AccountJobController extends BaseController
         OptimizerHelper::disable();
     }
 
-    public function index(JobTable $table)
+    public function index(Request $request)
     {
+        /**
+         * @var Account $account
+         */
+        $account = auth('account')->user();
+
         $this->pageTitle(trans('plugins/job-board::messages.manage_jobs'));
 
         Theme::breadcrumb()
@@ -49,7 +55,44 @@ class AccountJobController extends BaseController
 
         SeoHelper::setTitle(trans('plugins/job-board::messages.manage_jobs'));
 
-        return $table->render(JobBoardHelper::viewPath('dashboard.table.base'));
+        $jobsQuery = Job::query()
+            ->byAccount($account->getKey())
+            ->with(['company', 'jobTypes'])
+            ->withCount([
+                'applicants',
+                'applicants as new_applicants_count' => function ($query): void {
+                    $query->where('status', JobApplicationStatusEnum::PENDING);
+                },
+            ])
+            ->latest('jb_jobs.created_at');
+
+        $search = trim((string) $request->input('q'));
+        $status = $request->input('status');
+
+        if ($search !== '') {
+            $jobsQuery->where(function ($query) use ($search): void {
+                $query
+                    ->where('jb_jobs.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('jb_jobs.unique_id', 'LIKE', '%' . $search . '%');
+            });
+        }
+
+        if (in_array($status, JobStatusEnum::values(), true)) {
+            $jobsQuery->where('jb_jobs.status', $status);
+        }
+
+        $jobs = $jobsQuery->paginate(10)->withQueryString();
+
+        $stats = [
+            'total_jobs' => Job::query()->byAccount($account->getKey())->count(),
+            'published_jobs' => Job::query()->byAccount($account->getKey())->where('status', JobStatusEnum::PUBLISHED)->count(),
+            'pending_jobs' => Job::query()->byAccount($account->getKey())->where('moderation_status', ModerationStatusEnum::PENDING)->count(),
+            'total_applicants' => JobApplication::query()
+                ->whereHas('job', fn ($query) => $query->byAccount($account->getKey()))
+                ->count(),
+        ];
+
+        return JobBoardHelper::scope('dashboard.jobs.index', compact('jobs', 'stats', 'search', 'status'));
     }
 
     public function create()
@@ -160,8 +203,8 @@ class AccountJobController extends BaseController
         return $this
             ->httpResponse()
             ->setPreviousUrl(route('public.account.jobs.index'))
-            ->setNextUrl(route('public.account.jobs.edit', $job->id))
-            ->withCreatedSuccessMessage();
+            ->setNextUrl(route('public.account.jobs.application-form.edit', $job->id))
+            ->setMessage(__('Job saved. Next, customize how candidates will apply.'));
     }
 
     public function edit(Job $job, Request $request)
@@ -296,10 +339,98 @@ class AccountJobController extends BaseController
         }
 
         $company = Company::query()
-            ->select(['id', 'status'])
+            ->select(['id', 'status', 'is_verified'])
             ->find($companyId);
 
-        return $company && $company->status == BaseStatusEnum::PUBLISHED;
+        if (! $company || $company->status != BaseStatusEnum::PUBLISHED) {
+            return false;
+        }
+
+        if (! JobBoardHelper::isVerifiedCompanyAutoApprovalEnabled()) {
+            return false;
+        }
+
+        return (bool) $company->is_verified;
+    }
+
+    public function editApplicationForm(Job $job)
+    {
+        abort_unless($this->canManageJob($job), 404);
+
+        $this->pageTitle(__('Customize Application Form'));
+
+        Theme::breadcrumb()
+            ->add(trans('plugins/job-board::messages.my_profile'), route('public.account.dashboard'))
+            ->add(trans('plugins/job-board::messages.manage_jobs'), route('public.account.jobs.index'))
+            ->add(__('Customize Application Form'));
+
+        SeoHelper::setTitle(__('Customize Application Form'));
+
+        $applicationSettings = array_merge([
+            'auto_highlight' => false,
+            'mark_incomplete_required' => true,
+        ], (array) $job->application_form_settings);
+
+        $supportedQuestionTypes = [
+            __('Short answer'),
+            __('Paragraph'),
+            __('Multiple choice'),
+            __('Checkbox'),
+            __('Phone'),
+            __('Email'),
+            __('File upload'),
+            __('CV upload'),
+            __('Yes/No'),
+        ];
+
+        return JobBoardHelper::view('dashboard.jobs.application-form', compact('job', 'applicationSettings', 'supportedQuestionTypes'));
+    }
+
+    public function updateApplicationForm(Job $job, Request $request)
+    {
+        abort_unless($this->canManageJob($job), 404);
+
+        $validated = $request->validate([
+            'application_mode' => ['required', Rule::in(['basic', 'custom'])],
+            'auto_highlight' => ['nullable', 'boolean'],
+            'mark_incomplete_required' => ['nullable', 'boolean'],
+        ]);
+
+        $job->application_mode = $validated['application_mode'];
+        $job->application_form_settings = [
+            'auto_highlight' => (bool) $request->boolean('auto_highlight'),
+            'mark_incomplete_required' => (bool) $request->boolean('mark_incomplete_required'),
+            'builder_status' => $validated['application_mode'] === 'custom' ? 'planned' : 'default',
+        ];
+        $job->application_form_schema = $validated['application_mode'] === 'custom'
+            ? [
+                'version' => 1,
+                'builder_status' => 'planned',
+                'questions' => [],
+                'supported_types' => [
+                    'short_answer',
+                    'paragraph',
+                    'multiple_choice',
+                    'checkbox',
+                    'phone',
+                    'email',
+                    'file_upload',
+                    'cv_upload',
+                    'yes_no',
+                ],
+            ]
+            : null;
+        $job->save();
+
+        AccountActivityLog::query()->create([
+            'action' => 'update_application_form',
+            'reference_name' => $job->name,
+            'reference_url' => route('public.account.jobs.application-form.edit', $job->id),
+        ]);
+
+        return redirect()
+            ->route('public.account.jobs.application-form.edit', $job->id)
+            ->with('success_msg', __('Application form settings saved successfully.'));
     }
 
     public function destroy(Job $job)

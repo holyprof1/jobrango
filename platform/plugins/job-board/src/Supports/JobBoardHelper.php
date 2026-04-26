@@ -77,6 +77,11 @@ class JobBoardHelper
         return setting('job_board_enable_post_approval', 1) == 1;
     }
 
+    public function isVerifiedCompanyAutoApprovalEnabled(): bool
+    {
+        return setting('job_board_verified_company_auto_approval', 0) == 1;
+    }
+
     public function getThousandSeparatorForInputMask(): string
     {
         return ',';

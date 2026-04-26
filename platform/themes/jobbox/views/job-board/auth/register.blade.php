@@ -36,7 +36,7 @@
                                     <input type="checkbox" name="is_employer" value="1">
                                     <span class="text-small">%s</span>
                                     <span class="checkmark"></span>
-                                </label></div>', __('Is Employer?'))], true);
+                                </label></div>', __('Register as employer'))], true);
                         })
                          ->modify('agree_terms_and_policy', 'html', ['html' => sprintf('<div class="mb-3 position-relative"><label class="cb-container">
                                     <input type="checkbox" name="agree_terms_and_policy" value="1">

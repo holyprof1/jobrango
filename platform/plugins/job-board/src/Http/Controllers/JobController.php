@@ -14,6 +14,7 @@ use Botble\JobBoard\Events\AdminApprovedJobEvent;
 use Botble\JobBoard\Events\JobPublishedEvent;
 use Botble\JobBoard\Facades\JobBoardHelper;
 use Botble\JobBoard\Forms\JobForm;
+use Botble\JobBoard\Enums\JobStatusEnum;
 use Botble\JobBoard\Http\Requests\ExpireJobsRequest;
 use Botble\JobBoard\Http\Requests\JobRequest;
 use Botble\JobBoard\Models\Account;
@@ -183,6 +184,39 @@ class JobController extends BaseController
         $data = compact('job', 'viewsToday', 'numberSaved', 'applicants', 'referrers', 'countries');
 
         return view('plugins/job-board::analytics', $data);
+    }
+
+    public function view(Job $job)
+    {
+        return redirect()->to($job->url ?: route('jobs.edit', $job->getKey()));
+    }
+
+    public function approve(Job $job)
+    {
+        $wasApproved = $job->moderation_status == ModerationStatusEnum::APPROVED;
+
+        $job->moderation_status = ModerationStatusEnum::APPROVED;
+        $job->status = JobStatusEnum::PUBLISHED;
+        $job->save();
+
+        if (! $wasApproved) {
+            AdminApprovedJobEvent::dispatch($job);
+            event(new JobPublishedEvent($job));
+        }
+
+        return redirect()
+            ->route('jobs.index')
+            ->with('success_msg', __('Job approved successfully.'));
+    }
+
+    public function reject(Job $job)
+    {
+        $job->moderation_status = ModerationStatusEnum::REJECTED;
+        $job->save();
+
+        return redirect()
+            ->route('jobs.index')
+            ->with('success_msg', __('Job rejected successfully.'));
     }
 
     public function expireJobs(ExpireJobsRequest $request)

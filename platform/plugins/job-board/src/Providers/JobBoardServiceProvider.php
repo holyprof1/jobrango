@@ -595,7 +595,7 @@ class JobBoardServiceProvider extends ServiceProvider
                     $dashboardMenu
                         ->registerItem([
                             'id' => 'cms-account-reviews',
-                            'priority' => 4,
+                            'priority' => 5,
                             'parent_id' => null,
                             'name' => 'plugins/job-board::dashboard.menu.reviews',
                             'url' => fn () => route('public.account.reviews.index'),
@@ -604,7 +604,7 @@ class JobBoardServiceProvider extends ServiceProvider
                 })
                 ->registerItem([
                     'id' => 'cms-account-applicants',
-                    'priority' => 5,
+                    'priority' => 4,
                     'parent_id' => null,
                     'name' => 'plugins/job-board::dashboard.menu.applicants',
                     'url' => fn () => route('public.account.applicants.index'),
@@ -623,7 +623,7 @@ class JobBoardServiceProvider extends ServiceProvider
                 })
                 ->registerItem([
                     'id' => 'cms-account-settings',
-                    'priority' => 7,
+                    'priority' => 6,
                     'parent_id' => null,
                     'name' => 'plugins/job-board::dashboard.menu.settings',
                     'url' => fn () => route('public.account.employer.settings.edit'),

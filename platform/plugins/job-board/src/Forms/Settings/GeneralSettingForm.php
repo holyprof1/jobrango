@@ -70,6 +70,14 @@ class GeneralSettingForm extends SettingForm
                     ->helperText(trans('plugins/job-board::settings.general.enable_post_approval_helper'))
             )
             ->add(
+                'job_board_verified_company_auto_approval',
+                OnOffCheckboxField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('plugins/job-board::settings.general.verified_company_auto_approval'))
+                    ->value(setting('job_board_verified_company_auto_approval', false))
+                    ->helperText(trans('plugins/job-board::settings.general.verified_company_auto_approval_helper'))
+            )
+            ->add(
                 'verify_account_created_company',
                 OnOffCheckboxField::class,
                 OnOffFieldOption::make()

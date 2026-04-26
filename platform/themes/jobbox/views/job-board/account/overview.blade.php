@@ -3,10 +3,16 @@
 @section('content')
     <div class="jobrango-overview">
         <div class="jobrango-overview__intro">
-            <div>
-                <span class="jobrango-overview__eyebrow">{{ __('Overview') }}</span>
-                <h2>{{ __('Your job search at a glance') }}</h2>
-                <p>{{ __('Track applications, keep saved roles close, and spot the next profile updates that will strengthen your account.') }}</p>
+            <div class="jobrango-overview__profile-card">
+                <div>
+                    <span class="jobrango-overview__eyebrow">{{ __('Overview') }}</span>
+                    <h2>{{ __('Your job search at a glance') }}</h2>
+                    <p>{{ __('Track applications, keep saved roles close, and spot the next profile updates that will strengthen your account.') }}</p>
+                </div>
+                <div class="jobrango-overview__profile-meta">
+                    <span>{{ $account->address ?: __('Location not specified') }}</span>
+                    <a href="{{ route('public.account.settings') }}">{{ __('Edit profile') }}</a>
+                </div>
             </div>
         </div>
 
@@ -45,23 +51,23 @@
                     </div>
 
                     @if ($recentApplications->isNotEmpty())
-                        <div class="jobrango-activity-list">
+                        <div class="jobrango-application-table">
+                            <div class="jobrango-application-table__head">
+                                <span>{{ __('Role') }}</span>
+                                <span>{{ __('Company') }}</span>
+                                <span>{{ __('Applied') }}</span>
+                            </div>
                             @foreach ($recentApplications as $application)
-                                <article class="jobrango-activity-card">
-                                    <div class="jobrango-activity-card__logo">
-                                        <img src="{{ $application->job->company->logo_thumb }}" alt="{{ $application->job->company->name }}">
+                                <article class="jobrango-application-table__row">
+                                    <div>
+                                        @if ($application->job->url)
+                                            <a href="{{ $application->job->url }}">{{ $application->job->name }}</a>
+                                        @else
+                                            {{ $application->job->name }}
+                                        @endif
                                     </div>
-                                    <div class="jobrango-activity-card__copy">
-                                        <h4>
-                                            @if ($application->job->url)
-                                                <a href="{{ $application->job->url }}">{{ $application->job->name }}</a>
-                                            @else
-                                                {{ $application->job->name }}
-                                            @endif
-                                        </h4>
-                                        <p>{{ $application->job->company->name }} | {{ $application->job->full_address ?: __('Location not specified') }}</p>
-                                        <span>{{ $application->created_at->diffForHumans() }}</span>
-                                    </div>
+                                    <div>{{ $application->job->company->name }}</div>
+                                    <div>{{ $application->created_at->diffForHumans() }}</div>
                                 </article>
                             @endforeach
                         </div>

@@ -94,7 +94,7 @@ class JobForm extends FormsJobForm
                 'colspan' => 3,
             ])
             ->addAfter('currency_id', 'jobrango_advanced_notice', 'html', [
-                'html' => '<div class="col-12"><div class="alert alert-info mb-0">' . e(__('Advanced settings like unique IDs, moderation, visibility, and technical fields stay managed behind the scenes for now.')) . '</div></div>',
+                'html' => '<div class="col-12"><details class="jobrango-advanced-settings"><summary>' . e(__('Advanced Settings')) . '</summary><div class="jobrango-advanced-settings__body"><p class="mb-2">' . e(__('Technical fields like moderation status, redirect behavior, visibility, coordinates, SEO, and internal IDs are kept out of the main posting flow.')) . '</p><p class="mb-0">' . e(__('If you need those controls later, they can be added without making the everyday job posting experience heavier.')) . '</p></div></details></div>',
             ]);
 
         if (count($companies) === 1) {

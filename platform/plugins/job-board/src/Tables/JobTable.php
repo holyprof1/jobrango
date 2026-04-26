@@ -10,7 +10,6 @@ use Botble\JobBoard\Models\Company;
 use Botble\JobBoard\Models\Job;
 use Botble\Table\Abstracts\TableAbstract;
 use Botble\Table\Actions\Action;
-use Botble\Table\Actions\DeleteAction;
 use Botble\Table\Actions\EditAction;
 use Botble\Table\BulkActions\DeleteBulkAction;
 use Botble\Table\BulkChanges\CreatedAtBulkChange;
@@ -38,13 +37,22 @@ class JobTable extends TableAbstract
         $this
             ->model(Job::class)
             ->addActions([
-                Action::make('analytics')
-                    ->route('jobs.analytics')
-                    ->label(trans('plugins/job-board::job.analytics.title'))
-                    ->icon('ti ti-chart-line')
+                Action::make('view')
+                    ->route('jobs.view')
+                    ->label(__('View'))
+                    ->icon('ti ti-eye')
                     ->color('info'),
+                Action::make('approve')
+                    ->route('jobs.approve')
+                    ->label(__('Approve'))
+                    ->icon('ti ti-check')
+                    ->color('success'),
+                Action::make('reject')
+                    ->route('jobs.reject')
+                    ->label(__('Reject'))
+                    ->icon('ti ti-x')
+                    ->color('danger'),
                 EditAction::make()->route('jobs.edit'),
-                DeleteAction::make()->route('jobs.destroy'),
             ]);
     }
 
@@ -74,9 +82,8 @@ class JobTable extends TableAbstract
         return [
             IdColumn::make(),
             NameColumn::make()->route('jobs.edit'),
-            FormattedColumn::make('unique_id')
-                ->title(trans('plugins/job-board::job-board.form.unique_id'))
-                ->withEmptyState(),
+            FormattedColumn::make('display_id')
+                ->title(__('Display ID')),
             FormattedColumn::make('company_id')
                 ->title(trans('plugins/job-board::forms.company'))
                 ->withEmptyState()

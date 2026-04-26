@@ -70,6 +70,9 @@ class Job extends BaseModel
         'application_closing_date',
         'zip_code',
         'unique_id',
+        'application_mode',
+        'application_form_schema',
+        'application_form_settings',
     ];
 
     protected $casts = [
@@ -80,6 +83,8 @@ class Job extends BaseModel
         'expire_date' => 'datetime',
         'start_date' => 'date',
         'application_closing_date' => 'datetime',
+        'application_form_schema' => 'array',
+        'application_form_settings' => 'array',
         'name' => SafeContent::class,
         'description' => SafeContent::class,
         'content' => SafeContent::class,
@@ -190,6 +195,11 @@ class Job extends BaseModel
                 }
             }
         );
+    }
+
+    protected function displayId(): Attribute
+    {
+        return Attribute::get(fn () => 'JR-JOB-' . $this->getKey());
     }
 
     public function displayCurrency(): Currency

@@ -17,8 +17,17 @@
 @endif
 @php
     $account = auth('account')->user();
-    $dashboardRoute = $account?->isEmployer() ? route('public.account.dashboard') : route('public.account.overview');
-    $accountName = $account ? Str::limit($account->name, 15) : null;
+    $isEmployer = $account?->isEmployer() ?? false;
+    $isJobSeeker = $account?->isJobSeeker() ?? false;
+    $dashboardRoute = $isEmployer ? route('public.account.dashboard') : route('public.account.overview');
+    $accountName = $account ? Str::limit($account->name, 18) : null;
+    $companyProfileName = null;
+
+    if ($isEmployer) {
+        $account->loadMissing('companies');
+        $companyProfileName = Str::limit($account->companies->first()?->name ?: $account->name, 18);
+    }
+
     $primaryNavItems = [
         ['label' => __('Home'), 'url' => route('public.index')],
         ['label' => __('Jobs'), 'url' => url('/jobs')],
@@ -30,6 +39,44 @@
         ['label' => __('Post a Job'), 'url' => route('public.account.register'), 'class' => 'jobrango-header-link'],
         ['label' => __('Sign In'), 'url' => route('public.account.login'), 'class' => 'btn btn-default btn-shadow hover-up'],
     ];
+
+    $authenticatedNavItems = $isEmployer
+        ? [
+            ['label' => __('Employer Dashboard'), 'url' => route('public.account.dashboard')],
+            ['label' => __('Post a Job'), 'url' => route('public.account.jobs.create')],
+            ['label' => __('Applicants'), 'url' => route('public.account.applicants.index')],
+        ]
+        : [
+            ['label' => __('Dashboard'), 'url' => route('public.account.overview')],
+            ['label' => __('Applied Jobs'), 'url' => route('public.account.jobs.applied-jobs')],
+            ['label' => __('Saved Jobs'), 'url' => route('public.account.jobs.saved')],
+        ];
+
+    $profileMenuItems = $isEmployer
+        ? [
+            ['label' => __('Employer Dashboard'), 'url' => route('public.account.dashboard')],
+            ['label' => __('My Companies'), 'url' => route('public.account.companies.index')],
+            ['label' => __('Settings'), 'url' => route('public.account.employer.settings.edit')],
+        ]
+        : [
+            ['label' => __('My Profile'), 'url' => route('public.account.settings')],
+            ['label' => __('Dashboard'), 'url' => route('public.account.overview')],
+            ['label' => __('Security'), 'url' => route('public.account.security')],
+        ];
+
+    $mobileMenuItems = $primaryNavItems;
+
+    if ($account) {
+        $mobileMenuItems = array_merge($mobileMenuItems, $authenticatedNavItems, $profileMenuItems, [
+            ['label' => __('Logout'), 'url' => route('public.account.logout'), 'logout' => true],
+        ]);
+    } else {
+        $mobileMenuItems = array_merge($mobileMenuItems, [
+            ['label' => __('For Employers'), 'url' => route('public.account.register')],
+            ['label' => __('Post a Job'), 'url' => route('public.account.register')],
+            ['label' => __('Sign In'), 'url' => route('public.account.login')],
+        ]);
+    }
 @endphp
 <header class="header @if (theme_option('enabled_sticky_header', 'yes') == 'yes') sticky-bar @endif">
     <div class="container">
@@ -58,48 +105,36 @@
             <div class="header-right">
                 @if (is_plugin_active('job-board'))
                     @auth('account')
-                        <ul class="header-menu list-inline d-flex align-items-center mb-0 user-header-dropdown">
-                            {!! apply_filters('theme-header-right-nav', null) !!}
-                            @if ($account)
-                                <li class="list-inline-item">
-                                    <a class="header-item" href="{{ $dashboardRoute }}">
-                                        {{ $account->isEmployer() ? __('Employer Dashboard') : __('Dashboard') }}
-                                    </a>
-                                </li>
-                                @if ($account->isEmployer())
+                        <div class="jobrango-auth-nav">
+                            <ul class="header-menu list-inline d-flex align-items-center mb-0 user-header-dropdown">
+                                {!! apply_filters('theme-header-right-nav', null) !!}
+                                @foreach ($authenticatedNavItems as $navItem)
                                     <li class="list-inline-item">
-                                        <a class="header-item" href="{{ route('public.account.jobs.create') }}">
-                                            {{ __('Post a Job') }}
-                                        </a>
+                                        <a class="header-item" href="{{ $navItem['url'] }}">{{ $navItem['label'] }}</a>
                                     </li>
-                                @endif
+                                @endforeach
                                 <li class="list-inline-item dropdown">
-                                    <a href="#" class="d-inline-flex header-item" id="userdropdown" data-bs-toggle="dropdown"
+                                    <a href="#" class="d-inline-flex header-item jobrango-profile-trigger" id="userdropdown" data-bs-toggle="dropdown"
                                        aria-expanded="false">
-                                        <img src="{{ $account->avatar_thumb_url }}" alt="{{ $account->name }}" width="35" height="35" class="rounded-circle me-1 mt-1 mr-2">
-                                        <span class="text-left fw-medium icon-down" title="{{ __('Hi, :name', ['name' => $accountName]) }}">{{ __('Hi, :name', ['name' => $accountName]) }} </span>
+                                        <img src="{{ $account->avatar_thumb_url }}" alt="{{ $account->name }}" width="38" height="38" class="rounded-circle me-2">
+                                        <span class="text-left fw-medium icon-down" title="{{ $isEmployer ? $companyProfileName : $accountName }}">
+                                            {{ $isEmployer ? $companyProfileName : __('Profile') }}
+                                        </span>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end user-dropdown-menu" aria-labelledby="userdropdown">
-                                        @if ($account->isEmployer())
-                                            <li><a class="dropdown-item" href="{{ route('public.account.dashboard') }}">{{ __('Employer Dashboard') }}</a></li>
-                                            <li><a class="dropdown-item" href="{{ route('public.account.jobs.create') }}">{{ __('Post a Job') }}</a></li>
-                                            <li><a class="dropdown-item" href="{{ route('public.account.companies.index') }}">{{ __('My Companies') }}</a></li>
-                                        @else
-                                            <li><a class="dropdown-item" href="{{ route('public.account.overview') }}">{{ __('Dashboard') }}</a></li>
-                                            <li><a class="dropdown-item" href="{{ route('public.account.jobs.saved') }}">{{ __('Saved Jobs') }}</a></li>
-                                            <li><a class="dropdown-item" href="{{ route('public.account.jobs.applied-jobs') }}">{{ __('Applied Jobs') }}</a></li>
-                                        @endif
-                                        <li><a class="dropdown-item" href="{{ route('public.account.settings') }}">{{ __('Account Settings') }}</a></li>
-                                        <li>
-                                            <a class="dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" href="#">{{ __('Logout') }}</a>
-                                            <form id="logout-form" action="{{ route('public.account.logout') }}" method="POST" style="display: none;">
-                                                @csrf
-                                            </form>
-                                        </li>
+                                        @foreach ($profileMenuItems as $profileMenuItem)
+                                            <li><a class="dropdown-item" href="{{ $profileMenuItem['url'] }}">{{ $profileMenuItem['label'] }}</a></li>
+                                        @endforeach
                                     </ul>
                                 </li>
-                            @endif
-                        </ul>
+                                <li class="list-inline-item">
+                                    <a class="header-item jobrango-logout-link" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" href="#">{{ __('Logout') }}</a>
+                                </li>
+                            </ul>
+                            <form id="logout-form" action="{{ route('public.account.logout') }}" method="POST" style="display: none;">
+                                @csrf
+                            </form>
+                        </div>
                     @else
                         <div class="block-signin">
                             @foreach ($guestActionItems as $guestActionItem)
@@ -122,39 +157,21 @@
                 <div class="mobile-menu-wrap mobile-header-border">
                     <nav>
                         <ul class="mobile-menu font-heading">
-                            @foreach ($primaryNavItems as $navItem)
-                                <li><a href="{{ $navItem['url'] }}">{{ $navItem['label'] }}</a></li>
+                            @foreach ($mobileMenuItems as $navItem)
+                                <li>
+                                    @if (($navItem['logout'] ?? false) === true)
+                                        <a href="{{ $navItem['url'] }}" onclick="event.preventDefault(); document.getElementById('mobile-logout-form').submit()">{{ $navItem['label'] }}</a>
+                                    @else
+                                        <a href="{{ $navItem['url'] }}">{{ $navItem['label'] }}</a>
+                                    @endif
+                                </li>
                             @endforeach
-                            @guest('account')
-                                <li><a href="{{ route('public.account.register') }}">{{ __('For Employers') }}</a></li>
-                                <li><a href="{{ route('public.account.register') }}">{{ __('Post a Job') }}</a></li>
-                                <li><a href="{{ route('public.account.login') }}">{{ __('Sign In') }}</a></li>
-                            @endguest
                         </ul>
                     </nav>
                 </div>
-                @if (is_plugin_active('job-board'))
-                    @auth('account')
-                        <div class="mobile-account">
-                            <h6 class="mb-10">{{ __('Your Account') }}</h6>
-                            <ul class="mobile-menu font-heading">
-                                <li><a href="{{ $dashboardRoute }}">{{ $account->isEmployer() ? __('Employer Dashboard') : __('Dashboard') }}</a></li>
-                                @if ($account->isEmployer())
-                                    <li><a href="{{ route('public.account.jobs.create') }}">{{ __('Post a Job') }}</a></li>
-                                    <li><a href="{{ route('public.account.companies.index') }}">{{ __('My Companies') }}</a></li>
-                                @else
-                                    <li><a href="{{ route('public.account.jobs.saved') }}">{{ __('Saved Jobs') }}</a></li>
-                                    <li><a href="{{ route('public.account.jobs.applied-jobs') }}">{{ __('Applied Jobs') }}</a></li>
-                                @endif
-                                <li><a href="{{ route('public.account.settings') }}">{{ __('Account Settings') }}</a></li>
-                                <li><a href="{{ route('public.account.logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit()">{{ __('Sign Out') }}</a></li>
-                            </ul>
-                        </div>
-                        <form id="logout-form" action="{{ route('public.account.logout') }}" method="post">
-                            @csrf
-                        </form>
-                    @endauth
-                @endif
+                <form id="mobile-logout-form" action="{{ route('public.account.logout') }}" method="post">
+                    @csrf
+                </form>
                 <div class="site-copyright">{!! BaseHelper::clean(theme_option('copyright')) !!}</div>
             </div>
         </div>

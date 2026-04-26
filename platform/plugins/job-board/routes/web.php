@@ -82,6 +82,24 @@ AdminHelper::registerRoutes(function (): void {
         Route::group(['prefix' => 'jobs', 'as' => 'jobs.'], function (): void {
             Route::resource('', 'JobController')->parameters(['' => 'job']);
 
+            Route::get('{job}/view', [
+                'as' => 'view',
+                'uses' => 'JobController@view',
+                'permission' => 'jobs.index',
+            ])->wherePrimaryKey('job');
+
+            Route::get('{job}/approve', [
+                'as' => 'approve',
+                'uses' => 'JobController@approve',
+                'permission' => 'jobs.edit',
+            ])->wherePrimaryKey('job');
+
+            Route::get('{job}/reject', [
+                'as' => 'reject',
+                'uses' => 'JobController@reject',
+                'permission' => 'jobs.edit',
+            ])->wherePrimaryKey('job');
+
             Route::get('{id}/analytics', [
                 'as' => 'analytics',
                 'uses' => 'JobController@analytics',

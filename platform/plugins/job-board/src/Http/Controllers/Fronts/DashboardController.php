@@ -93,11 +93,15 @@ class DashboardController extends BaseController
                 'jb_applications.last_name',
                 'jb_applications.email',
                 'jb_applications.phone',
+                'jb_applications.job_id',
+                'jb_applications.status',
+                'jb_applications.created_at',
             ])
             ->whereHas('job', function (Builder $query) use ($account): void {
                 // @phpstan-ignore-next-line
                 $query->byAccount($account->getKey());
             })
+            ->with(['job.company'])
             ->orderBy('jb_applications.created_at', 'desc')
             ->limit(10)
             ->get();

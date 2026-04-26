@@ -19,6 +19,7 @@ class GeneralSettingRequest extends Request
             'verify_account_created_company' => $onOffRule,
             'job_board_enable_credits_system' => $onOffRule,
             'job_board_enable_post_approval' => $onOffRule,
+            'job_board_verified_company_auto_approval' => $onOffRule,
             'job_expired_after_days' => ['required', 'numeric', 'min:1'],
             'job_board_job_expiration_warning_days' => ['required', 'integer', 'min:1'],
             'job_board_job_location_display' => ['required', 'in:state_and_country,city_and_state,city_state_and_country'],

@@ -238,6 +238,16 @@ Route::group(['namespace' => 'Botble\JobBoard\Http\Controllers'], function (): v
                 Route::resource('', 'AccountJobController')->parameters(['' => 'job']);
 
                 Route::controller('AccountJobController')->group(function (): void {
+                    Route::get('{job}/application-form', [
+                        'as' => 'application-form.edit',
+                        'uses' => 'editApplicationForm',
+                    ])->wherePrimaryKey('job');
+
+                    Route::post('{job}/application-form', [
+                        'as' => 'application-form.update',
+                        'uses' => 'updateApplicationForm',
+                    ])->wherePrimaryKey('job');
+
                     Route::post('renew/{id}', [
                         'as' => 'renew',
                         'uses' => 'renew',

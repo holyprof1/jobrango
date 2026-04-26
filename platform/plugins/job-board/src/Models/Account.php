@@ -123,6 +123,15 @@ class Account extends BaseModel implements AuthenticatableContract, Authorizable
         return Attribute::get(fn () => $this->first_name . ' ' . $this->last_name);
     }
 
+    protected function displayId(): Attribute
+    {
+        return Attribute::get(function () {
+            $prefix = $this->isEmployer() ? 'JR-EMP-' : 'JR-ACC-';
+
+            return $prefix . $this->getKey();
+        });
+    }
+
     protected function avatarUrl(): Attribute
     {
         return Attribute::make(
