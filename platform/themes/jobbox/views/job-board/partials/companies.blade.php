@@ -3,13 +3,11 @@
         <div class="row ">
             <div class="col-xl-6 col-lg-5">
                 <span class="text-small text-showing font-weight-bold">
-                    {{
-                        __('Showing :from – :to of :total job(s)', [
-                            'from' => $companies->firstItem(),
-                            'to' => $companies->lastItem(),
-                            'total' => $companies->total(),
-                        ])
-                    }}
+                    {{ __('Showing :from-:to of :total company(s)', [
+                        'from' => $companies->firstItem(),
+                        'to' => $companies->lastItem(),
+                        'total' => $companies->total(),
+                    ]) }}
                 </span>
             </div>
             <div class="col-xl-6 col-lg-7 text-lg-end mt-sm-15">
@@ -74,5 +72,3 @@
     </div>
 </div>
 {!! $companies->withQueryString()->links(Theme::getThemeNamespace('partials.pagination')) !!}
-
-

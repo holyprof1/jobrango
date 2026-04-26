@@ -157,28 +157,106 @@ class Job extends BaseModel
                         return trans('plugins/job-board::messages.attractive');
                     case SalaryTypeEnum::FIXED:
                     default:
-                        // Original logic for fixed salary
-                        $salaryRange = strtolower($this->salary_range->label());
+                        $salaryRange = $this->displaySalaryRangeLabel();
                         $from = (float) $attributes['salary_from'];
                         $to = (float) $attributes['salary_to'];
-                        $currency = $this->currency->getKey() ? $this->currency : get_application_currency();
 
                         if ($from || $to) {
                             if ($from && $to) {
-                                return trans('plugins/job-board::messages.salary_range_format', ['from' => format_price($from, $currency), 'to' => format_price($to, $currency), 'range' => $salaryRange]);
+                                return sprintf(
+                                    '%s - %s / %s',
+                                    $this->formatDisplayedSalaryAmount($from),
+                                    $this->formatDisplayedSalaryAmount($to),
+                                    $salaryRange
+                                );
                             }
 
                             if ($from) {
-                                return trans('plugins/job-board::messages.salary_from_format', ['price' => format_price($from, $currency), 'range' => $salaryRange]);
+                                return sprintf(
+                                    '%s / %s',
+                                    __('From :price', ['price' => $this->formatDisplayedSalaryAmount($from)]),
+                                    $salaryRange
+                                );
                             }
 
-                            return trans('plugins/job-board::messages.salary_upto_format', ['price' => format_price($to, $currency), 'range' => $salaryRange]);
+                            return sprintf(
+                                '%s / %s',
+                                __('Upto :price', ['price' => $this->formatDisplayedSalaryAmount($to)]),
+                                $salaryRange
+                            );
                         }
 
                         return trans('plugins/job-board::messages.attractive');
                 }
             }
         );
+    }
+
+    public function displayCurrency(): Currency
+    {
+        $currency = $this->currency->getKey() ? $this->currency : get_application_currency();
+
+        if ($currency && strtoupper((string) $currency->title) === 'USD') {
+            return $currency;
+        }
+
+        return $this->fallbackNairaCurrency();
+    }
+
+    public function formatDisplayedSalaryAmount(float|int|string|null $amount): string
+    {
+        $amount = (float) $amount;
+        $currency = $this->displayCurrency();
+
+        if (strtoupper((string) $currency->title) === 'USD') {
+            return format_price($amount, $currency, fullNumber: true);
+        }
+
+        return $this->nairaSymbol() . number_format(round($amount));
+    }
+
+    public function displaySalaryRangeLabel(): string
+    {
+        return match ($this->salary_range) {
+            SalaryRangeEnum::HOURLY => __('Hour'),
+            SalaryRangeEnum::DAILY => __('Day'),
+            SalaryRangeEnum::WEEKLY => __('Week'),
+            SalaryRangeEnum::MONTHLY => __('Month'),
+            SalaryRangeEnum::YEARLY => __('Year'),
+            default => $this->salary_range->label(),
+        };
+    }
+
+    protected function fallbackNairaCurrency(): Currency
+    {
+        static $nairaCurrency = null;
+
+        if ($nairaCurrency instanceof Currency) {
+            return $nairaCurrency;
+        }
+
+        $nairaCurrency = Currency::query()->where('title', 'NGN')->first();
+
+        if ($nairaCurrency instanceof Currency) {
+            return $nairaCurrency;
+        }
+
+        $nairaCurrency = new Currency();
+        $nairaCurrency->forceFill([
+            'title' => 'NGN',
+            'symbol' => '₦',
+            'is_prefix_symbol' => true,
+            'decimals' => 0,
+            'number_format_style' => 'western',
+            'exchange_rate' => 1,
+        ]);
+
+        return $nairaCurrency;
+    }
+
+    protected function nairaSymbol(): string
+    {
+        return html_entity_decode('&#8358;', ENT_QUOTES, 'UTF-8');
     }
 
     public function scopeNotExpired(Builder $query): Builder

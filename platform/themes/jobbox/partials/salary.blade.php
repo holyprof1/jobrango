@@ -1,5 +1,5 @@
 @php
-    $currency = $job->currency->getKey() ? $job->currency : get_application_currency();
+    $salaryRange = $job->displaySalaryRangeLabel();
 @endphp
 
 @if ($job->hide_salary)
@@ -7,19 +7,19 @@
 @elseif ($job->salary_from || $job->salary_to)
     @if(! JobBoardHelper::isSalaryHiddenForGuests())
         @if ($job->salary_from && $job->salary_to)
-            <span class="card-text-price" title="{{ format_price($job->salary_from, $currency) }} - {{ format_price($job->salary_to, $currency) }}">
-            {{ format_price($job->salary_from, $currency) }} - {{ format_price($job->salary_to, $currency) }}
+            <span class="card-text-price" title="{{ $job->formatDisplayedSalaryAmount($job->salary_from) }} - {{ $job->formatDisplayedSalaryAmount($job->salary_to) }}">
+            {{ $job->formatDisplayedSalaryAmount($job->salary_from) }} - {{ $job->formatDisplayedSalaryAmount($job->salary_to) }}
         </span>
         @elseif ($job->salary_from)
-            <span class="card-text-price" title="{{ __('From :price', ['price' => format_price($job->salary_from, $currency)]) }}">
-            {{ __('From :price', ['price' => format_price($job->salary_from, $currency)]) }}
+            <span class="card-text-price" title="{{ __('From :price', ['price' => $job->formatDisplayedSalaryAmount($job->salary_from)]) }}">
+            {{ __('From :price', ['price' => $job->formatDisplayedSalaryAmount($job->salary_from)]) }}
         </span>
         @elseif ($job->salary_to)
-            <span class="card-text-price" title="{{ __('Upto :price', ['price' => format_price($job->salary_to, $currency)]) }}">
-            {{ __('Upto :price', ['price' => format_price($job->salary_to, $currency)]) }}
+            <span class="card-text-price" title="{{ __('Upto :price', ['price' => $job->formatDisplayedSalaryAmount($job->salary_to)]) }}">
+            {{ __('Upto :price', ['price' => $job->formatDisplayedSalaryAmount($job->salary_to)]) }}
         </span>
         @endif
-        <span class="text-muted">/{{ $job->salary_range->label() }}</span>
+        <span class="text-muted">/ {{ $salaryRange }}</span>
     @else
         <a class="job-hidden-job-for-guest-text" href="{{ route('public.account.login') }}">
             <x-core::icon name="ti ti-coin" />

@@ -78,6 +78,12 @@
             <h3 class="fs-1">{{ PageTitle::getTitle(false) }}</h3>
 
             <div class="d-flex align-items-center gap-4">
+                @if (auth('account')->user()?->isEmployer())
+                    <a href="{{ route('public.account.jobs.create') }}" class="jobrango-dashboard-shell__cta">
+                        <x-core::icon name="ti ti-briefcase" />
+                        {{ __('Post a Job') }}
+                    </a>
+                @endif
                 <a href="{{ route('public.index') }}" target="_blank" class="text-uppercase">
                     {{ trans('plugins/job-board::dashboard.go_to_homepage') }}
                     <x-core::icon name="ti ti-arrow-right" />

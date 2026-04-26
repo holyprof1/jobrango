@@ -1,0 +1,498 @@
+.jobrango-main-menu {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+}
+
+.jobrango-main-menu > li {
+    padding: 0 !important;
+}
+
+.jobrango-main-menu > li > a,
+.jobrango-header-link {
+    border-radius: 999px;
+    color: #0b1f4d;
+    display: inline-flex;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+    padding: 11px 16px;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.jobrango-main-menu > li > a:hover,
+.jobrango-main-menu > li.current-menu-item > a,
+.jobrango-header-link:hover {
+    background: #eef4ff;
+    color: #0c3fa8;
+    transform: translateY(-1px);
+}
+
+.header {
+    padding: 14px 0 16px;
+}
+
+.header .main-header {
+    display: grid;
+    gap: 24px;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    min-height: 72px;
+}
+
+.header .main-header .header-left,
+.header .main-header .header-nav {
+    min-width: 0;
+}
+
+.header .main-header .header-left .header-logo img {
+    max-height: 52px;
+}
+
+.header .main-header .header-right {
+    align-items: center;
+    display: flex;
+    justify-content: flex-end;
+    min-width: 0;
+}
+
+.block-signin {
+    gap: 10px;
+}
+
+.block-signin .btn.btn-default {
+    margin-left: 0;
+    min-width: 112px;
+}
+
+.mobile-menu-wrap .mobile-menu li a,
+.mobile-account .mobile-menu li a {
+    align-items: center;
+    display: flex;
+    font-weight: 600;
+    min-height: 46px;
+    padding: 8px 0;
+}
+
+.mobile-account {
+    margin-top: 16px;
+}
+
+.jobrango-overview__intro {
+    background: linear-gradient(135deg, #ffffff 0%, #f6f9ff 100%);
+    border: 1px solid rgba(11, 31, 77, 0.08);
+    border-radius: 22px;
+    box-shadow: 0 16px 36px rgba(11, 31, 77, 0.06);
+    padding: 22px 24px;
+}
+
+.jobrango-account-sidebar {
+    position: sticky;
+    top: 118px;
+}
+
+.jobrango-account-sidebar .nav {
+    display: grid;
+    gap: 10px;
+}
+
+.jobrango-account-sidebar .nav li,
+.jobrango-account-sidebar .nav li a {
+    margin: 0 !important;
+}
+
+.jobrango-account-sidebar .nav .btn {
+    align-items: center;
+    background: #f8fbff;
+    border: 1px solid rgba(11, 31, 77, 0.1);
+    border-radius: 16px;
+    box-shadow: none;
+    color: #31405c;
+    display: flex;
+    justify-content: flex-start;
+    min-height: 50px;
+    padding: 13px 16px;
+    width: 100%;
+}
+
+.jobrango-account-sidebar .nav .btn.active,
+.jobrango-account-sidebar .nav .btn:hover {
+    background: #0b1f4d;
+    border-color: #0b1f4d;
+    box-shadow: 0 16px 30px rgba(11, 31, 77, 0.14);
+    color: #ffffff;
+}
+
+.jobrango-panel__header a,
+.jobrango-job-list__meta a {
+    align-items: center;
+    background: #f3f7ff;
+    border-radius: 12px;
+    color: #0c3fa8;
+    display: inline-flex;
+    font-weight: 700;
+    min-height: 42px;
+    padding: 10px 14px;
+}
+
+.jobrango-job-list__meta {
+    gap: 10px;
+}
+
+.jobrango-job-list__meta .btn-link {
+    color: #b63737;
+    font-weight: 700;
+}
+
+.jobrango-empty-state {
+    border: 1px dashed rgba(11, 31, 77, 0.15);
+}
+
+.jobrango-action-list a {
+    border: 1px solid rgba(11, 31, 77, 0.08);
+}
+
+.jobrango-job-card {
+    background: #ffffff;
+    border: 1px solid rgba(11, 31, 77, 0.08);
+    border-radius: 24px;
+    box-shadow: 0 18px 40px rgba(11, 31, 77, 0.08);
+    gap: 20px;
+    padding: 24px;
+    position: relative;
+}
+
+.jobrango-job-card__overlay {
+    border-radius: 22px;
+    inset: 0;
+    position: absolute;
+    z-index: 1;
+}
+
+.jobrango-job-card__actions,
+.jobrango-job-card__body,
+.jobrango-job-card__company,
+.jobrango-job-card__company-name,
+.jobrango-job-card__company-row,
+.jobrango-job-card__footer,
+.jobrango-job-card__meta,
+.jobrango-job-card__title,
+.jobrango-job-card .job-card-taxonomy,
+.jobrango-job-card .job-company-badge,
+.jobrango-job-card .job-company-badge__link,
+.jobrango-job-card .salary-information {
+    position: relative;
+    z-index: 2;
+}
+
+.jobrango-job-card__content {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+    position: relative;
+    z-index: 2;
+}
+
+.jobrango-job-card__company-row {
+    align-items: flex-start;
+    display: flex;
+    gap: 14px;
+    justify-content: space-between;
+}
+
+.jobrango-job-card__company {
+    align-items: center;
+    display: flex;
+    gap: 14px;
+    min-width: 0;
+}
+
+.jobrango-job-card__company-name {
+    color: #0b1f4d;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.jobrango-job-card .job-company-badge__image,
+.jobrango-job-card .job-company-badge__fallback {
+    border-radius: 16px;
+    height: 52px;
+    width: 52px;
+}
+
+.jobrango-job-card__body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.jobrango-job-card__title a {
+    color: #0b1f4d;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.jobrango-job-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+}
+
+.jobrango-job-card__meta span {
+    align-items: center;
+    display: inline-flex;
+    position: relative;
+}
+
+.jobrango-job-card__meta span + span::before {
+    color: #9aa6bd;
+    content: "•";
+    margin-right: 10px;
+}
+
+.jobrango-job-card .job-card-taxonomy {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 0;
+}
+
+.jobrango-job-card .job-card-taxonomy .btn {
+    background: #f3f6fb;
+    border: 0;
+    border-radius: 999px;
+    color: #3a4966;
+    font-size: 12px;
+    font-weight: 700;
+    margin: 0 !important;
+    padding: 8px 12px;
+}
+
+.jobrango-job-card .salary-information {
+    color: #0b1f4d;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.jobrango-job-card .salary-information .text-muted {
+    color: #6d7a93 !important;
+}
+
+.jobrango-job-card__footer {
+    align-items: flex-end;
+    border-top: 1px solid rgba(11, 31, 77, 0.08);
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    padding-top: 18px;
+}
+
+.jobrango-job-card__actions {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.jobrango-job-card__actions .btn {
+    border-radius: 14px;
+    min-width: 120px;
+    padding: 12px 18px;
+}
+
+.jobrango-job-card__actions .btn-border {
+    background: #ffffff;
+}
+
+.jobrango-job-card__status {
+    color: #75839d;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.jobrango-job-card__type {
+    margin-left: auto;
+}
+
+.jobrango-job-card--list {
+    align-items: stretch;
+}
+
+.jobrango-job-card--list .jobrango-job-card__footer {
+    flex: 0 0 272px;
+}
+
+.jobrango-job-card--company {
+    padding: 22px 24px;
+}
+
+.ps-main__wrapper {
+    background: linear-gradient(180deg, #f6f8fc 0%, #eef3fb 100%);
+}
+
+.ps-main .ps-main__sidebar {
+    background: linear-gradient(180deg, #edf3fb 0%, #e6edf8 100%);
+}
+
+.ps-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.ps-sidebar .ps-sidebar__top {
+    margin-bottom: 0 !important;
+    padding-right: 0;
+}
+
+.ps-block--user-wellcome {
+    background: #ffffff;
+    border: 1px solid rgba(24, 36, 51, 0.08);
+    border-radius: 24px;
+    box-shadow: 0 18px 40px rgba(11, 31, 77, 0.08);
+    padding: 18px 52px 18px 18px;
+}
+
+.ps-block--user-wellcome .ps-block__left img {
+    height: 56px;
+    object-fit: cover;
+    width: 56px;
+}
+
+.ps-block--user-wellcome .ps-block__right p {
+    color: #0b1f4d;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.ps-block--user-wellcome .ps-block__right small {
+    color: #667792;
+    font-size: 13px;
+}
+
+.ps-block--user-wellcome .ps-block__action i {
+    color: #50607d;
+}
+
+.menu > li > a {
+    border-radius: 14px;
+    margin-bottom: 8px;
+    padding: 12px 16px;
+}
+
+.menu > li > a::after {
+    display: none;
+}
+
+.menu > li > a.active,
+.menu > li > a:hover {
+    background: #ffffff;
+    box-shadow: 0 14px 30px rgba(11, 31, 77, 0.08);
+}
+
+.ps-main__wrapper > header {
+    background: #ffffff;
+    border: 1px solid rgba(24, 36, 51, 0.08);
+    border-radius: 24px;
+    box-shadow: 0 18px 40px rgba(11, 31, 77, 0.08);
+    margin-bottom: 20px !important;
+    padding: 18px 22px;
+}
+
+.jobrango-dashboard-shell__cta {
+    align-items: center;
+    background: linear-gradient(135deg, #1f6bff 0%, #0c3fa8 100%);
+    border-radius: 14px;
+    color: #ffffff;
+    display: inline-flex;
+    font-size: 13px;
+    font-weight: 700;
+    gap: 8px;
+    letter-spacing: 0.02em;
+    min-height: 44px;
+    padding: 12px 16px;
+    text-transform: uppercase;
+}
+
+.jobrango-dashboard-shell__cta:hover {
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.header--mobile {
+    box-shadow: 0 10px 24px rgba(11, 31, 77, 0.08);
+    padding: 12px 16px;
+}
+
+.ps-drawer--mobile {
+    width: min(86vw, 360px);
+}
+
+@media screen and (max-width: 991px) {
+    .jobrango-account-sidebar {
+        position: static;
+    }
+
+    .jobrango-job-card--list {
+        flex-direction: column;
+    }
+
+    .jobrango-job-card--list .jobrango-job-card__footer {
+        flex: 1 1 auto;
+    }
+
+    .jobrango-job-card__footer,
+    .jobrango-job-card__actions,
+    .ps-main__wrapper > header {
+        align-items: flex-start !important;
+        justify-content: flex-start;
+    }
+
+    .ps-main__wrapper > header {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .header {
+        padding: 12px 0;
+    }
+
+    .header .main-header .header-left .header-logo img {
+        max-height: 44px;
+    }
+
+    .jobrango-job-card {
+        padding: 20px 18px;
+    }
+
+    .jobrango-job-card__company-row,
+    .jobrango-job-card__footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .jobrango-job-card__type {
+        margin-left: 0;
+    }
+
+    .jobrango-job-card__actions {
+        width: 100%;
+    }
+
+    .jobrango-job-card__actions .btn {
+        width: 100%;
+    }
+}

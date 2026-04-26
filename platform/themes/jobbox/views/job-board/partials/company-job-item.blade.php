@@ -1,68 +1,64 @@
 <div class="col-12 jobs-listing">
     @php
-        $categoryLabels = $job->categories->pluck('name')->filter()->take(2);
+        $jobTypeLabel = $job->jobTypes
+            ->pluck('name')
+            ->filter()
+            ->map(fn ($jobType) => $jobType === 'Intern' ? 'Internship' : $jobType)
+            ->first(fn ($jobType) => in_array($jobType, ['Full Time', 'Part Time', 'Contract', 'Freelance', 'Internship'], true));
+        $tagLabels = $job->categories->pluck('name')->filter()->take(2)->values();
         $isRemoteJob = \Illuminate\Support\Str::contains(\Illuminate\Support\Str::lower((string) $job->location), 'remote');
+
+        if ($isRemoteJob && $tagLabels->count() < 2) {
+            $tagLabels->push(__('Remote'));
+        }
     @endphp
-    <div class="card-grid-2 hover-up">
+    <div class="card-grid-2 hover-up jobrango-job-card jobrango-job-card--company">
         @if($job->is_featured)
             <span class="flash"></span>
         @endif
-        <div class="row">
-            <div class="@if($categoryLabels->isNotEmpty() || $isRemoteJob) col-lg-6 col-md-6 @else col-lg-12 col-md-12 @endif col-sm-12">
-                <div class="card-grid-2-image-left">
-                    <div class="image-box">
-                        @include(Theme::getThemeNamespace('partials.job-company-badge'), [
-                            'job' => $job,
-                            'companyName' => $company->name,
-                            'companyUrl' => $company->url,
-                            'logo' => $company->logo_thumb,
-                        ])
-                    </div>
-                    <div class="right-info">
-                        <a class="name-job" href="{{ $job->url }}">{{ $job->name }}</a>
-                        <span class="location-small">{{ $job->location }}</span>
-                    </div>
+        <div class="jobrango-job-card__content">
+            <div class="jobrango-job-card__company-row">
+                <div class="jobrango-job-card__company">
+                    @include(Theme::getThemeNamespace('partials.job-company-badge'), [
+                        'job' => $job,
+                        'companyName' => $company->name,
+                        'companyUrl' => $company->url,
+                        'logo' => $company->logo_thumb,
+                    ])
+                    <a class="jobrango-job-card__company-name" href="{{ $company->url }}">{{ $company->name }}</a>
                 </div>
-            </div>
-
-            @if($categoryLabels->isNotEmpty() || $isRemoteJob)
-                <div class="col-lg-6 text-start text-md-end pr-60 col-md-6 col-sm-12">
-                    <div class="pl-15 mb-15 mt-20 job-card-taxonomy">
-                        @foreach($categoryLabels as $categoryLabel)
-                            <span class="btn btn-grey-small mr-5 mb-2">{{ $categoryLabel }}</span>
-                        @endforeach
-                        @if($isRemoteJob)
-                            <span class="btn btn-grey-small mr-5 mb-2">{{ __('Remote') }}</span>
-                        @endif
-                    </div>
-                </div>
-            @endif
-        </div>
-        <div class="card-block-info">
-            <div class="mt-5">
-                @if ($job->jobTypes->isNotEmpty())
-                    <span class="card-briefcase">
-                        @foreach($job->jobTypes as $jobType)
-                            {{ $jobType->name }}
-                            @if (!$loop->last)
-                                ,
-                            @endif
-                        @endforeach
-                    </span>
+                @if ($jobTypeLabel)
+                    <span class="jobrango-job-card__type">{{ $jobTypeLabel }}</span>
                 @endif
-                <span class="card-time">
-                    <span>{{ $job->created_at->diffForHumans() }}</span>
-                </span>
             </div>
-            <div class="card-2-bottom mt-20">
-                <div class="row">
-                    <div class="col-lg-7 col-7">
-                        {!! Theme::partial('salary', compact('job')) !!}
-                    </div>
-                    <div class="col-lg-5 col-5 text-end">
-                        {!! Theme::partial('apply-button', compact('job')) !!}
-                    </div>
+            <div class="jobrango-job-card__body">
+                <h4 class="jobrango-job-card__title">
+                    <a href="{{ $job->url }}">{{ $job->name }}</a>
+                </h4>
+                <div class="jobrango-job-card__meta">
+                    @if ($job->location)
+                        <span>{{ $job->location }}</span>
+                    @endif
+                    <span>{{ $job->created_at->diffForHumans() }}</span>
                 </div>
+                @if($tagLabels->isNotEmpty())
+                    <div class="job-card-taxonomy">
+                        @foreach($tagLabels as $tagLabel)
+                            <span class="btn btn-grey-small mr-5 mb-2">{{ $tagLabel }}</span>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+        </div>
+        <div class="card-2-bottom jobrango-job-card__footer">
+            <div class="salary-information">
+                {!! Theme::partial('salary', compact('job')) !!}
+            </div>
+            <div class="jobrango-job-card__actions">
+                <a href="{{ $job->url }}" class="btn btn-apply-now">{{ __('View Job') }}</a>
+                @if ($job->canShowApplyJob())
+                    <a href="{{ $job->url }}#job-apply" class="btn btn-border">{{ __('Apply Now') }}</a>
+                @endif
             </div>
         </div>
     </div>

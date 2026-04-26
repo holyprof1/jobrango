@@ -49,6 +49,10 @@ if (! function_exists('format_price')) {
             return (string) $price;
         }
 
+        if (is_job_board_naira_currency($currency)) {
+            return format_job_board_naira_price($price);
+        }
+
         if ($useSymbol && $currency->is_prefix_symbol) {
             $space = setting('job_board_add_space_between_price_and_currency', 0) == 1 ? ' ' : null;
 
@@ -62,6 +66,12 @@ if (! function_exists('format_price')) {
 if (! function_exists('human_price_text')) {
     function human_price_text(float|null|string $price, Currency|null|string $currency, ?string $priceUnit = '', bool $fullNumber = false): string
     {
+        if (is_job_board_naira_currency($currency)) {
+            $price = number_format((float) $price, 0, '.', ',');
+
+            return $priceUnit ? $price . ' ' . trim($priceUnit) : $price;
+        }
+
         $numberAfterDot = ($currency instanceof Currency) ? $currency->decimals : 0;
 
         if (! $fullNumber && setting('job_board_convert_money_to_text_enabled', config('plugins.real-estate.real-estate.display_big_money_in_million_billion'))) {
@@ -108,6 +118,24 @@ if (! function_exists('human_price_text')) {
         $space = setting('job_board_add_space_between_price_and_currency', 0) == 1 ? ' ' : null;
 
         return $price . $space . ($priceUnit ?: '');
+    }
+}
+
+if (! function_exists('is_job_board_naira_currency')) {
+    function is_job_board_naira_currency(Currency|null|string $currency): bool
+    {
+        if (! $currency instanceof Currency) {
+            return false;
+        }
+
+        return strtoupper((string) $currency->title) === 'NGN';
+    }
+}
+
+if (! function_exists('format_job_board_naira_price')) {
+    function format_job_board_naira_price(float|null|string $price): string
+    {
+        return html_entity_decode('&#8358;', ENT_QUOTES, 'UTF-8') . number_format((float) $price, 0, '.', ',');
     }
 }
 

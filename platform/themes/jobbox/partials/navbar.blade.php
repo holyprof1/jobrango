@@ -19,6 +19,17 @@
     $account = auth('account')->user();
     $dashboardRoute = $account?->isEmployer() ? route('public.account.dashboard') : route('public.account.overview');
     $accountName = $account ? Str::limit($account->name, 15) : null;
+    $primaryNavItems = [
+        ['label' => __('Home'), 'url' => route('public.index')],
+        ['label' => __('Jobs'), 'url' => url('/jobs')],
+        ['label' => __('Companies'), 'url' => url('/companies')],
+    ];
+
+    $guestActionItems = [
+        ['label' => __('For Employers'), 'url' => route('public.account.register'), 'class' => 'jobrango-header-link'],
+        ['label' => __('Post a Job'), 'url' => route('public.account.register'), 'class' => 'jobrango-header-link'],
+        ['label' => __('Sign In'), 'url' => route('public.account.login'), 'class' => 'btn btn-default btn-shadow hover-up'],
+    ];
 @endphp
 <header class="header @if (theme_option('enabled_sticky_header', 'yes') == 'yes') sticky-bar @endif">
     <div class="container">
@@ -32,12 +43,11 @@
             </div>
             <div class="header-nav">
                 <nav class="nav-main-menu">
-                    {!!
-                        Menu::renderMenuLocation('main-menu', [
-                            'options' => ['class' => 'main-menu'],
-                            'view'    => 'main-menu',
-                        ])
-                    !!}
+                    <ul class="main-menu jobrango-main-menu">
+                        @foreach ($primaryNavItems as $navItem)
+                            <li><a href="{{ $navItem['url'] }}">{{ $navItem['label'] }}</a></li>
+                        @endforeach
+                    </ul>
                 </nav>
                 <div class="burger-icon burger-icon-white">
                     <span class="burger-icon-top"></span>
@@ -92,9 +102,9 @@
                         </ul>
                     @else
                         <div class="block-signin">
-                            <a class="text-link-bd-btom hover-up" href="{{ route('public.account.register') }}"><x-core::icon name="ti ti-briefcase" class="me-1" />{{ __('For Employers') }}</a>
-                            <a class="text-link-bd-btom hover-up" href="{{ route('public.account.register') }}"><x-core::icon name="ti ti-user-plus" class="me-1" />{{ __('Get Started') }}</a>
-                            <a class="btn btn-default btn-shadow ml-30 hover-up" href="{{ route('public.account.login') }}"><x-core::icon name="ti ti-user-shield" class="me-1" />{{ __('Sign In') }}</a>
+                            @foreach ($guestActionItems as $guestActionItem)
+                                <a class="{{ $guestActionItem['class'] }}" href="{{ $guestActionItem['url'] }}">{{ $guestActionItem['label'] }}</a>
+                            @endforeach
                         </div>
                     @endauth
                 @endif
@@ -109,23 +119,18 @@
     <div class="mobile-header-wrapper-inner">
         <div class="mobile-header-content-area">
             <div class="perfect-scroll">
-                <div class="mobile-search mobile-header-border mb-30">
-                    <form action="#">
-                        <input type="text" placeholder="{{ __('Search...') }}">
-                        <i class="fi-rr-search"></i>
-                    </form>
-                </div>
                 <div class="mobile-menu-wrap mobile-header-border">
                     <nav>
-                        {!!
-                            Menu::renderMenuLocation('main-menu', [
-                                'options' => ['class' => 'mobile-menu font-heading'],
-                                'view'    => 'main-menu',
-                            ])
-                        !!}
-                        @if (is_plugin_active('language'))
-                            {!! Theme::partial('language-and-currency-switcher-mobile') !!}
-                        @endif
+                        <ul class="mobile-menu font-heading">
+                            @foreach ($primaryNavItems as $navItem)
+                                <li><a href="{{ $navItem['url'] }}">{{ $navItem['label'] }}</a></li>
+                            @endforeach
+                            @guest('account')
+                                <li><a href="{{ route('public.account.register') }}">{{ __('For Employers') }}</a></li>
+                                <li><a href="{{ route('public.account.register') }}">{{ __('Post a Job') }}</a></li>
+                                <li><a href="{{ route('public.account.login') }}">{{ __('Sign In') }}</a></li>
+                            @endguest
+                        </ul>
                     </nav>
                 </div>
                 @if (is_plugin_active('job-board'))
@@ -148,14 +153,6 @@
                         <form id="logout-form" action="{{ route('public.account.logout') }}" method="post">
                             @csrf
                         </form>
-                    @else
-                        <div class="mobile-account">
-                            <ul class="mobile-menu font-heading">
-                                <li><a href="{{ route('public.account.register') }}"><x-core::icon name="ti ti-briefcase" class="me-1" />{{ __('For Employers') }}</a></li>
-                                <li><a href="{{ route('public.account.login') }}"><x-core::icon name="ti ti-user-plus" class="me-1" />{{ __('Sign In') }}</a></li>
-                                <li><a href="{{ route('public.account.register') }}"><x-core::icon name="ti ti-user-shield" class="me-1" />{{ __('Get Started') }}</a></li>
-                            </ul>
-                        </div>
                     @endauth
                 @endif
                 <div class="site-copyright">{!! BaseHelper::clean(theme_option('copyright')) !!}</div>

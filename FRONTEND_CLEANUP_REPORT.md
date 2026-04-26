@@ -2,37 +2,52 @@
 
 ## Summary
 
-- Homepage and listing job cards remain compact, clickable, and no longer render long descriptions.
-- Auth, newsletter, and footer surfaces remain free of the oversized broken demo imagery.
-- The job seeker account overview now renders as a compact dashboard instead of the broken oversized profile layout.
-- The default `/jobs` page shows active demo jobs again after refreshing expired local demo dates.
-- The employer posting flow now opens with a simpler form that defaults salary currency to `NGN` and limits visible choices to `NGN` or `USD`.
-- The account pages now share a cleaner dashboard shell with route-aware sidebar states and tighter mobile-safe layout spacing.
+- Guest header now uses a single clean navigation set with balanced spacing and a shorter visual logo footprint.
+- Homepage and listing job cards now use a consistent premium structure with no badge overlap and no long descriptions.
+- Salary display now defaults to naira formatting on public job cards and related account surfaces unless a job is explicitly in USD.
+- The job seeker account overview now renders as an intentional dashboard with stronger card structure and cleaner mobile spacing.
+- The employer posting flow still stays simple and keeps `Post a Job` easy to find without surfacing technical internal fields.
 
-## Job Card Changes
+## Header Fix
 
+- Guest desktop header now renders as:
+  - `Logo | Home | Jobs | Companies | For Employers | Post a Job | Sign In`
+- Removed the duplicate visible employer link pattern from the desktop header.
+- Removed the guest `Get Started` CTA in favor of the clearer `Post a Job` action.
+- Tightened header spacing, reduced logo height, and cleaned the mobile drawer to a simple menu-only treatment.
+
+## Job Card Layout And Badge Fix
+
+- Rebuilt homepage, listing, and company-detail job cards into a consistent structure:
+  - company badge and company name on the left
+  - job-type badge in its own top-right pill
+  - job title, location, and posted date in a separate content block
+  - 1 to 2 category tags maximum
+  - salary and CTA row at the bottom
 - Removed description/excerpt output from grid, list, company, and homepage job-card partials.
-- Reduced visible category chips to a maximum of 2.
-- Rebuilt the card header so the green job-type badge sits in its own top-right pill instead of colliding with company/title text.
-- Made the full card clickable to open the job detail page while keeping a clear `View Job` CTA.
-- Added a secondary `Apply` CTA on the public list/grid cards when the job supports direct applications.
-- Kept the company logo/initial badge treatment so the large placeholder image does not return.
-- Closed jobs no longer show a large closed-state button as the main action; they now keep the `View Job` CTA with a small muted `Closed` label.
+- Replaced the old overlapping green badge treatment with the new `jobrango-job-card__type` pill so company text no longer collides with `Contract` or other job-type labels.
+- Added card-level overlay support so the full card can be clicked while `View Job` and `Apply Now` buttons still work cleanly.
+- Kept company logo and initials compact so large broken placeholders do not return.
 
-## Jobs Listing Fix
+## Salary And Label Cleanup
 
-- The earlier `No Jobs` state on `/jobs` was caused by demo jobs still having 2025 `expire_date` and `application_closing_date` values while the local environment date is in 2026.
-- Category counts are generated from active jobs, so once demo dates were stale the page could feel inconsistent.
-- A local migration now refreshes stale published demo jobs into a current open window so the first page of `/jobs` loads visible roles again.
+- Public job-card salary formatting now defaults to naira display and renders in the `₦... / Period` pattern instead of plain dollar-style output.
+- English salary period labels now render as `Hour`, `Day`, `Week`, `Month`, and `Year`.
+- Job-card job-type labels are now constrained to actual employment types only:
+  - `Full Time`
+  - `Part Time`
+  - `Contract`
+  - `Freelance`
+  - `Internship`
+- Category tags are limited to a maximum of 2 so unrelated or noisy labeling does not crowd the card.
+- Company-name fallback on cards now avoids obviously broken title/company duplication by using a safer generic hiring label when needed.
 
-## Account Overview Cleanup
+## Dashboard Visual Cleanup
 
-- Replaced the large broken top banner on `/account/overview` with a compact profile header card.
-- Fixed the name/location/summary overlap by moving the account header into a dedicated dashboard shell.
-- Fixed a real account overview crash by normalizing `jb_saved_jobs` timestamps and ordering saved jobs safely.
-- Added overview stat cards for applied jobs, saved jobs, profile completion, and recent applications.
-- Added recent applications, saved jobs, recommended jobs, and profile tips panels without introducing heavy new product features.
-- Sidebar navigation now includes `My Profile`, `Overview`, `Applied Jobs`, `Saved Jobs`, `CV / Resume`, `Security`, `Experiences`, and `Educations`.
+- `/account/overview` now uses a stronger card-based layout instead of loose text and oversized empty spacing.
+- The job seeker dashboard keeps the intended profile card, stat cards, recent applications, saved jobs, recommended jobs, profile tips, and quick actions structure.
+- Sidebar, buttons, empty states, and panel spacing were tightened to feel intentional on desktop and mobile.
+- Employer dashboard shell was also checked so it keeps `Post a Job` prominent and avoids exposing long technical UUID strings in normal view.
 
 ## Employer Flow Cleanup
 
@@ -45,23 +60,21 @@
 
 ## Page Audit
 
-- `/` remained structurally healthy; navigation and job-card behavior were rechecked after the employer-flow cleanup.
-- `/jobs` remained healthy after the earlier active-job fix; this pass focused on card clickability and badge spacing.
-- `/jobs/administrative-officer` remained healthy; it now benefits from the cleaner related/listing card treatment and the simplified company/job identity display.
-- `/companies` and `/companies/linkedin` remained healthy; the company detail page keeps the cleaner cover behavior from the prior pass.
-- `/account/overview` was broken during authenticated probing because of the saved-jobs query bug and is now fixed.
-- `/account/dashboard` remained healthy and now avoids showing the long internal account ID in the dashboard shell.
-- `/account/jobs/create` remained healthy and now renders the simpler employer posting form with `NGN` and `USD` only.
-
-## Footer / Auth / Newsletter
-
-- Footer content remains JobRango-specific rather than JobBox demo copy.
-- Footer navigation remains aligned to job seeker, employer, and company workflows.
-- Auth screens remain form-first with no large illustration panel.
-- Newsletter keeps the cleaner text-led block without the broken side images.
+- Rendered HTML/CSS was checked on:
+  - `/`
+  - `/jobs`
+  - `/jobs/clinic-receptionist`
+  - `/account/overview`
+  - `/account/dashboard`
+  - `/account/jobs/create`
+  - `/companies`
+  - `/companies/honda`
+  - `/login`
+  - `/register`
+- Guest header rendering, job-type badge placement, salary display, dashboard shell, and employer posting entry point were all rechecked on the audited routes.
 
 ## Remaining Frontend Artifacts
 
-- Optional blog/candidate/plugin-driven features still exist if their modules remain active.
-- Real uploaded company/candidate cover media can still display where present; only the repeated default fallback treatment was reduced.
-- The real Botble license reminder is an admin concern and was not removed.
+- Demo salary amounts are still low-value seed numbers in some records, even though the formatting now renders correctly in naira.
+- Broader demo-content cleanup outside the audited routes was not part of this visual polish pass.
+- License and activation surfaces were intentionally left untouched.
