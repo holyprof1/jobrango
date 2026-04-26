@@ -1,40 +1,50 @@
 # Application Form Strategy
 
+## Basic application mode
+
+- Keep the current Botble default apply flow as the launch path.
+- Candidates apply from the public job page.
+- Resume/CV upload already exists in the current flow.
+- This should remain the default while JobRango is still refining the core hiring flow.
+
+## Custom application mode
+
+- Build this later as an employer-level enhancement, not a replacement for the default apply path.
+- Employers should be able to add screening questions in a lightweight builder, similar to a simple Google Form.
+- Recommended behavior:
+  - keep one primary job URL
+  - render default candidate info fields first
+  - render employer-specific questions underneath
+
+## Public shareable application link
+
+- What exists now:
+  - every published job already has a public detail URL that acts as the shareable application page
+- What to build later:
+  - optional dedicated application-only route for cleaner sharing
+  - optional branded short link or share panel
+
+## Question types for later phases
+
+- Short answer
+- Paragraph
+- Multiple choice
+- File upload
+- Phone
+- Email
+- CV / Resume
+
 ## What exists now
 
-- JobRango already supports the default Botble job application flow.
-- Applicants can apply from the public job detail page.
-- Employers can post jobs without paid-credit blockers while free mode is enabled.
-- External apply URLs exist in the underlying platform, but the simplified employer frontend form now hides that option to reduce friction.
+- Default public apply form
+- Candidate resume handling
+- Employer job posting
+- Internal/external apply capability in the platform, though the simplified employer UI currently hides external-apply complexity
 
-## Recommended product modes
+## What still needs building
 
-### Basic mode
-
-- Keep the current default application form as the standard path.
-- Best for most employers during the free-launch phase.
-- Minimal candidate friction and no extra configuration burden.
-
-### Custom mode
-
-- Future enhancement for employers who want their own screening questions.
-- Suggested field types:
-  - short text
-  - paragraph
-  - yes/no
-  - single choice
-  - multiple choice
-  - file upload
-
-## Public application links
-
-- Each published job already has a public detail URL that can act as the shareable application entry point.
-- A future custom application mode can still reuse that public URL and render employer-specific questions beneath the main job content.
-
-## What still needs building later
-
-- Employer-managed custom question builder
-- Stored per-job application schema
-- Applicant response rendering in the employer dashboard
-- Validation/reporting for custom answers
-- Optional reusable question templates for repeat hiring
+- Employer-managed question builder
+- Per-job stored application schema
+- Candidate answer storage and validation
+- Employer dashboard review UI for custom answers
+- Public/custom application route presentation

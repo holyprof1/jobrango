@@ -5,8 +5,13 @@
 @extends(Theme::getThemeNamespace('views.job-board.account.partials.layout-settings'))
 
 @section('content')
-    <div>
-        <h3 class="mt-0 mb-15 color-brand-1">{{ __('My Account') }}</h3>
+    <div class="jobrango-panel">
+        <div class="jobrango-panel__header">
+            <div>
+                <h3>{{ __('My Account') }}</h3>
+                <p>{{ __('Keep your profile details, resume, skills, and languages current for better job matching.') }}</p>
+            </div>
+        </div>
 
         @if ($account->avatar_id)
             <form id="delete-avatar-form" method="POST" action="{{ route('public.account.avatar.destroy') }}">
@@ -16,7 +21,7 @@
         @endif
 
         {!! Form::open(['route' => 'public.account.post.settings', 'method' => 'POST', 'files' => true]) !!}
-                <div class="mt-35 mb-40 box-info-profile avatar-view d-inline-block">
+                <div class="mt-15 mb-40 box-info-profile avatar-view d-inline-block">
                     <div class="image-profile">
                         <img src="{{ $account->avatar_url }}" id="profile-img" alt="{{ $account->name }}">
                     </div>

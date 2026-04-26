@@ -92,6 +92,7 @@
                         </ul>
                     @else
                         <div class="block-signin">
+                            <a class="text-link-bd-btom hover-up" href="{{ route('public.account.register') }}"><x-core::icon name="ti ti-briefcase" class="me-1" />{{ __('For Employers') }}</a>
                             <a class="text-link-bd-btom hover-up" href="{{ route('public.account.register') }}"><x-core::icon name="ti ti-user-plus" class="me-1" />{{ __('Get Started') }}</a>
                             <a class="btn btn-default btn-shadow ml-30 hover-up" href="{{ route('public.account.login') }}"><x-core::icon name="ti ti-user-shield" class="me-1" />{{ __('Sign In') }}</a>
                         </div>
@@ -150,6 +151,7 @@
                     @else
                         <div class="mobile-account">
                             <ul class="mobile-menu font-heading">
+                                <li><a href="{{ route('public.account.register') }}"><x-core::icon name="ti ti-briefcase" class="me-1" />{{ __('For Employers') }}</a></li>
                                 <li><a href="{{ route('public.account.login') }}"><x-core::icon name="ti ti-user-plus" class="me-1" />{{ __('Sign In') }}</a></li>
                                 <li><a href="{{ route('public.account.register') }}"><x-core::icon name="ti ti-user-shield" class="me-1" />{{ __('Get Started') }}</a></li>
                             </ul>

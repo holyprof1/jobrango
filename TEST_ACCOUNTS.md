@@ -15,6 +15,7 @@ These credentials are for local/demo testing only. Change or remove them before 
 - Email: `jobseeker@jobrango.test`
 - Password: `JobRango123!`
 - Dashboard route: `/account/overview`
+- Resume/CV management: `/account/settings`
 - Account type: `job seeker`
 
 ## Employer / Talent Finder
@@ -25,3 +26,4 @@ These credentials are for local/demo testing only. Change or remove them before 
 - Dashboard route: `/account/dashboard`
 - Company: `JobRango Talent Partners`
 - Account type: `employer`
+- Job posting route: `/account/jobs/create`

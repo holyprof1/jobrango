@@ -408,7 +408,7 @@ class AccountJobController extends BaseController
 
                 break;
             case 'oldest':
-                $applications = $applications->latest();
+                $applications = $applications->oldest();
 
                 break;
             case 'random':

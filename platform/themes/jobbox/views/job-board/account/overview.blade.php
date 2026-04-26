@@ -123,6 +123,40 @@
                         </div>
                     @endif
                 </div>
+
+                <div class="jobrango-panel mt-4">
+                    <div class="jobrango-panel__header">
+                        <div>
+                            <h3>{{ __('Recommended Jobs') }}</h3>
+                            <p>{{ __('Fresh roles that match an active candidate account.') }}</p>
+                        </div>
+                        <a href="{{ url('/jobs') }}">{{ __('Browse all jobs') }}</a>
+                    </div>
+
+                    @if ($recommendedJobs->isNotEmpty())
+                        <div class="jobrango-job-list">
+                            @foreach ($recommendedJobs as $job)
+                                <article class="jobrango-job-list__item">
+                                    <div class="jobrango-job-list__logo">
+                                        <img src="{{ $job->company->logo_thumb }}" alt="{{ $job->company->name }}">
+                                    </div>
+                                    <div class="jobrango-job-list__copy">
+                                        <h4><a href="{{ $job->url }}">{{ $job->name }}</a></h4>
+                                        <p>{{ $job->company->name }} | {{ $job->full_address ?: __('Location not specified') }}</p>
+                                    </div>
+                                    <div class="jobrango-job-list__meta">
+                                        <a href="{{ $job->url }}">{{ __('View Job') }}</a>
+                                    </div>
+                                </article>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="jobrango-empty-state jobrango-empty-state--compact">
+                            <h4>{{ __('Recommendations will appear here') }}</h4>
+                            <p>{{ __('Once you save roles or submit applications, this panel can prioritize stronger next-fit opportunities.') }}</p>
+                        </div>
+                    @endif
+                </div>
             </div>
 
             <div class="col-lg-4">

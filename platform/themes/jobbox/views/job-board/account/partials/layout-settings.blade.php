@@ -12,6 +12,18 @@
     $profileSummary = trim(strip_tags((string) ($account->description ?: $account->bio)));
     $profileSummary = $profileSummary ?: __('Complete your profile so employers can quickly understand your experience and preferred role.');
     $resumeLabel = $account->resume ? __('View CV / Resume') : __('Add CV / Resume');
+    $accountInitials = collect(explode(' ', $account->name))
+        ->filter()
+        ->take(2)
+        ->map(fn ($part) => strtoupper(mb_substr($part, 0, 1)))
+        ->implode('');
+    $isSettingsRoute = request()->routeIs('public.account.settings');
+    $isOverviewRoute = request()->routeIs('public.account.overview');
+    $isAppliedRoute = request()->routeIs('public.account.jobs.applied-jobs');
+    $isSavedRoute = request()->routeIs('public.account.jobs.saved');
+    $isSecurityRoute = request()->routeIs('public.account.security');
+    $isExperienceRoute = request()->routeIs('public.account.experiences.*');
+    $isEducationRoute = request()->routeIs('public.account.educations.*');
 @endphp
 
 <main class="main crop-avatar user-profile-section">
@@ -20,7 +32,11 @@
             <div class="jobrango-account-hero">
                 <div class="jobrango-account-hero__identity">
                     <div class="jobrango-account-hero__avatar">
-                        <img src="{{ $account->avatar_url }}" alt="{{ $account->name }}">
+                        @if ($account->avatar_id)
+                            <img src="{{ $account->avatar_url }}" alt="{{ $account->name }}">
+                        @else
+                            <span>{{ $accountInitials ?: 'JR' }}</span>
+                        @endif
                     </div>
                     <div class="jobrango-account-hero__copy">
                         <span class="jobrango-account-hero__eyebrow">{{ __('Job seeker dashboard') }}</span>
@@ -33,6 +49,7 @@
                 </div>
                 <div class="jobrango-account-hero__actions">
                     <a class="btn btn-default btn-shadow hover-up" href="{{ route('public.account.settings') }}">{{ __('Edit Profile') }}</a>
+                    <a class="btn btn-border hover-up" href="{{ url('/jobs') }}">{{ __('Browse Jobs') }}</a>
                     @if ($account->is_public_profile)
                         <a class="btn btn-border hover-up" href="{{ $account->url }}">{{ __('Preview Profile') }}</a>
                     @else
@@ -52,15 +69,15 @@
                             <p>{{ __('Quick access to your profile, jobs, and account security.') }}</p>
                         </div>
                         <ul class="nav" role="tablist">
-                            <li><a @class(['btn btn-border aboutus-icon mb-20', 'active' => $url === route('public.account.settings')]) href="{{ route('public.account.settings') }}">{{ __('My Profile') }}</a></li>
-                            <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $url === route('public.account.overview')]) href="{{ route('public.account.overview') }}">{{ __('Overview') }}</a></li>
-                            <li><a class="btn btn-border recruitment-icon mb-20" href="{{ route('public.account.jobs.applied-jobs') }}">{{ __('Applied Jobs') }}</a></li>
-                            <li><a class="btn btn-border recruitment-icon mb-20" href="{{ route('public.account.jobs.saved') }}">{{ __('Saved Jobs') }}</a></li>
-                            <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $url === route('public.account.settings')]) href="{{ route('public.account.settings') }}">{{ $resumeLabel }}</a></li>
-                            <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $url === route('public.account.security')]) href="{{ route('public.account.security') }}">{{ __('Security') }}</a></li>
+                            <li><a @class(['btn btn-border aboutus-icon mb-20', 'active' => $isOverviewRoute]) href="{{ route('public.account.overview') }}">{{ __('Overview') }}</a></li>
+                            <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $isSettingsRoute]) href="{{ route('public.account.settings') }}">{{ __('My Profile') }}</a></li>
+                            <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $isAppliedRoute]) href="{{ route('public.account.jobs.applied-jobs') }}">{{ __('Applied Jobs') }}</a></li>
+                            <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $isSavedRoute]) href="{{ route('public.account.jobs.saved') }}">{{ __('Saved Jobs') }}</a></li>
+                            <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $isSettingsRoute]) href="{{ route('public.account.settings') }}">{{ $resumeLabel }}</a></li>
+                            <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $isSecurityRoute]) href="{{ route('public.account.security') }}">{{ __('Security') }}</a></li>
                             @if ($account->isJobSeeker())
-                                <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $url === route('public.account.experiences.index')]) href="{{ route('public.account.experiences.index') }}">{{ __('Experiences') }}</a></li>
-                                <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $url === route('public.account.educations.index')]) href="{{ route('public.account.educations.index') }}">{{ __('Educations') }}</a></li>
+                                <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $isExperienceRoute]) href="{{ route('public.account.experiences.index') }}">{{ __('Experiences') }}</a></li>
+                                <li><a @class(['btn btn-border recruitment-icon mb-20', 'active' => $isEducationRoute]) href="{{ route('public.account.educations.index') }}">{{ __('Educations') }}</a></li>
                             @endif
                         </ul>
                     </div>

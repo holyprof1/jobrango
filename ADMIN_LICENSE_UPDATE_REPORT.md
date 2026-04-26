@@ -9,6 +9,7 @@
 - This is real Botble license enforcement/reminder behavior.
 - Proper activation path: `Settings -> General`
 - It was intentionally left in place.
+- This cleanup pass did not modify the license banner source, validation flow, updater gate, or any vendor/core enforcement path.
 
 ## Version update notice
 
@@ -54,3 +55,8 @@
 - Botble license reminder rendering
 - Botble updater license requirements
 - Core/vendor license validation code
+
+## Supported non-license cleanup only
+
+- Optional setup/performance widgets may still be hidden only through supported settings or completion flags.
+- No fake activation state, fake purchase code, or patched validation response was introduced.

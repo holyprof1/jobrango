@@ -54,6 +54,9 @@
                 </div>
                 <div class="jobrango-job-card__actions">
                     <a href="{{ $job->url }}" class="btn btn-apply-now">{{ __('View Job') }}</a>
+                    @if ($job->canShowApplyJob())
+                        <a href="{{ $job->url }}#job-apply" class="btn btn-border">{{ __('Apply') }}</a>
+                    @endif
                     @unless ($job->isJobOpen())
                         <span class="jobrango-job-card__status">{{ __('Closed') }}</span>
                     @endunless

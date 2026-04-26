@@ -241,7 +241,8 @@ class Account extends BaseModel implements AuthenticatableContract, Authorizable
 
     public function savedJobs(): BelongsToMany
     {
-        return $this->belongsToMany(Job::class, 'jb_saved_jobs', 'account_id', 'job_id');
+        return $this->belongsToMany(Job::class, 'jb_saved_jobs', 'account_id', 'job_id')
+            ->withTimestamps();
     }
 
     public function packages(): BelongsToMany

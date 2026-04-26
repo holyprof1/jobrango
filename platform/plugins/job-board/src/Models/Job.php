@@ -284,7 +284,8 @@ class Job extends BaseModel
 
     public function savedJobs(): BelongsToMany
     {
-        return $this->belongsToMany(Account::class, 'jb_saved_jobs', 'job_id', 'account_id');
+        return $this->belongsToMany(Account::class, 'jb_saved_jobs', 'job_id', 'account_id')
+            ->withTimestamps();
     }
 
     public function applicants(): HasMany

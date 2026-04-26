@@ -2,38 +2,27 @@
 
 ## Goal
 
-Create a future lightweight employer flow that feels closer to a short Google Form than a full admin form.
+- Add a lighter employer posting experience before building a full multi-step wizard.
+- Keep advanced fields available lower on the page or behind an advanced section, but lead with the essentials.
 
-## Proposed Steps
+## Suggested step order
 
-1. Job title
-   - One clear role title
-   - Optional short summary helper text
+1. Title
+2. Category / Job Type
+3. Location / Remote
+4. Salary / Currency
+5. Application Questions
+6. Publish / Share Link
 
-2. Category and job type
-   - Broad category selection
-   - One main job type with optional secondary type later
+## Practical rollout
 
-3. Location and remote setup
-   - City/state or simple location text
-   - Remote toggle
+- Current state:
+  - the frontend employer job form has already been simplified to foreground the most important posting fields
+  - currency is now restricted to `NGN` and `USD` in that front form
+- Next step:
+  - convert the simplified form into a real staged wizard only when the current publish flow is fully stable
 
-4. Salary
-   - Currency limited to `NGN` or `USD`
-   - Salary from/to
-   - Salary range label
+## Advanced settings handling
 
-5. Application questions
-   - Basic mode: default JobRango form
-   - Custom mode: add simple text, yes/no, and multiple-choice questions later
-
-6. Publish and share
-   - Review screen
-   - Publish button
-   - Copyable public job link
-
-## Implementation Notes
-
-- Keep the current simplified `/account/jobs/create` form as the base.
-- Build the wizard later as a dedicated frontend flow instead of overloading the existing Botble form builder.
-- Preserve the current company approval rule so approved companies can publish immediately while non-approved companies still go to moderation.
+- Keep advanced settings lower on the page or in a collapsible section.
+- Technical items such as unique IDs, moderation state, hidden-company toggles, and low-level behavior flags should stay out of the primary fast-post path.

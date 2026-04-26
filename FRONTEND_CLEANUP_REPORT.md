@@ -7,6 +7,7 @@
 - The job seeker account overview now renders as a compact dashboard instead of the broken oversized profile layout.
 - The default `/jobs` page shows active demo jobs again after refreshing expired local demo dates.
 - The employer posting flow now opens with a simpler form that defaults salary currency to `NGN` and limits visible choices to `NGN` or `USD`.
+- The account pages now share a cleaner dashboard shell with route-aware sidebar states and tighter mobile-safe layout spacing.
 
 ## Job Card Changes
 
@@ -14,6 +15,7 @@
 - Reduced visible category chips to a maximum of 2.
 - Rebuilt the card header so the green job-type badge sits in its own top-right pill instead of colliding with company/title text.
 - Made the full card clickable to open the job detail page while keeping a clear `View Job` CTA.
+- Added a secondary `Apply` CTA on the public list/grid cards when the job supports direct applications.
 - Kept the company logo/initial badge treatment so the large placeholder image does not return.
 - Closed jobs no longer show a large closed-state button as the main action; they now keep the `View Job` CTA with a small muted `Closed` label.
 
@@ -27,15 +29,16 @@
 
 - Replaced the large broken top banner on `/account/overview` with a compact profile header card.
 - Fixed the name/location/summary overlap by moving the account header into a dedicated dashboard shell.
-- Fixed a real account overview crash caused by ordering saved jobs on a non-existent `jb_saved_jobs.created_at` column.
+- Fixed a real account overview crash by normalizing `jb_saved_jobs` timestamps and ordering saved jobs safely.
 - Added overview stat cards for applied jobs, saved jobs, profile completion, and recent applications.
-- Added recent applications, saved jobs/recommended jobs, and profile tips panels without introducing heavy new product features.
+- Added recent applications, saved jobs, recommended jobs, and profile tips panels without introducing heavy new product features.
 - Sidebar navigation now includes `My Profile`, `Overview`, `Applied Jobs`, `Saved Jobs`, `CV / Resume`, `Security`, `Experiences`, and `Educations`.
 
 ## Employer Flow Cleanup
 
 - Front employer job posting now focuses on title, short summary, company, location, category, job type, salary range, currency, and full description/application instructions.
 - Front employer job posting hides technical or stressful fields such as unique IDs, lat/long, job status, approval status, external apply behavior, and extra taxonomy fields.
+- The form now explicitly warns that advanced settings remain managed in the background instead of surfacing technical fields in the primary posting flow.
 - Front company editing now hides extended admin-style company fields such as tax ID, CEO, office counts, revenue, and other non-essential setup inputs.
 - Employer dashboard/profile surfaces no longer show the long internal account unique ID in the sidebar welcome area.
 - Public company and job detail pages no longer surface internal unique IDs in the normal viewer experience.

@@ -92,6 +92,9 @@ class JobForm extends FormsJobForm
                 'choices' => $currencyChoices,
                 'selected' => $selectedCurrencyId,
                 'colspan' => 3,
+            ])
+            ->addAfter('currency_id', 'jobrango_advanced_notice', 'html', [
+                'html' => '<div class="col-12"><div class="alert alert-info mb-0">' . e(__('Advanced settings like unique IDs, moderation, visibility, and technical fields stay managed behind the scenes for now.')) . '</div></div>',
             ]);
 
         if (count($companies) === 1) {
