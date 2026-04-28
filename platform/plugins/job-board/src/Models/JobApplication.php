@@ -18,6 +18,7 @@ class JobApplication extends BaseModel
         'email',
         'resume',
         'cover_letter',
+        'application_answers',
         'message',
         'job_id',
         'account_id',
@@ -26,6 +27,7 @@ class JobApplication extends BaseModel
 
     protected $casts = [
         'status' => JobApplicationStatusEnum::class,
+        'application_answers' => 'array',
         'first_name' => SafeContent::class,
         'last_name' => SafeContent::class,
         'message' => SafeContent::class,

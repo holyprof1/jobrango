@@ -6,8 +6,19 @@ use Illuminate\Support\Str;
 
 trait UniqueId
 {
+    protected static function bootUniqueId(): void
+    {
+        static::creating(function ($model): void {
+            if (! $model->unique_id) {
+                $model->unique_id = $model->generateUniqueId();
+            }
+        });
+    }
+
     public function generateUniqueId(bool $force = false): float|string|null
     {
+        $sequenceId = $this->prefixedSequenceId();
+
         if (
             ! $force
             && (
@@ -15,13 +26,21 @@ trait UniqueId
                 ! setting('job_board_unique_id_format')
             )
         ) {
-            return null;
+            return $sequenceId;
         }
 
         $setting = (string) setting('job_board_unique_id_format');
 
+        if ($setting === '') {
+            return $sequenceId;
+        }
+
+        if (Str::contains($setting, '{id}')) {
+            return str_replace('{id}', $sequenceId, $setting);
+        }
+
         if (! Str::contains($setting, ['[%s]', '[%d]', '[%S]', '[%D]', '%s', '%d'])) {
-            return $setting . (mt_rand(10000, 99999) + time());
+            return $setting . $sequenceId;
         }
 
         $uniqueId = str_replace(
@@ -49,5 +68,12 @@ trait UniqueId
         }
 
         return $uniqueId;
+    }
+
+    public function prefixedSequenceId(): string
+    {
+        $key = $this->getKey() ?: (($this->newQuery()->max($this->getKeyName()) ?? 0) + 1);
+
+        return '1' . str_pad((string) $key, 5, '0', STR_PAD_LEFT);
     }
 }

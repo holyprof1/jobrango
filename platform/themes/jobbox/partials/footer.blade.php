@@ -4,31 +4,33 @@
         {!! apply_filters('ads_render', null, 'footer_before', ['class' => 'my-2 text-center']) !!}
     @endif
 
-    <footer class="footer mt-50">
+    <footer class="footer mt-50 jobrango-footer">
         <div class="container">
-            <div class="row">
+            <div class="row jobrango-footer__main">
                 {!! dynamic_sidebar('footer_sidebar') !!}
             </div>
-            <div class="footer-bottom mt-50">
+            <div class="footer-bottom mt-50 jobrango-footer__bottom">
                 <div class="row">
                     <div class="col-md-6">
-                        <span class="font-xs color-text-paragraph">
+                        <span class="font-xs color-text-paragraph jobrango-footer__copyright">
                             {!! BaseHelper::clean(theme_option('copyright')) !!}
                         </span>
                     </div>
                     <div class="col-md-6 text-md-end text-start">
-                        <div class="footer-social">
-                            {!!
-                                Menu::renderMenuLocation('footer-menu', [
-                                    'options' => ['class' => 'footer_menu'],
-                                    'view'    => 'support-menu',
-                                ])
-                            !!}
-                        </div>
-                        <div class="nav float-right language-switcher-footer">
-                            @if (is_plugin_active('language'))
-                                @include(JobBoardHelper::viewPath('dashboard.partials.language-switcher'))
-                            @endif
+                        <div class="jobrango-footer__utilities">
+                            <div class="footer-social">
+                                {!!
+                                    Menu::renderMenuLocation('footer-menu', [
+                                        'options' => ['class' => 'footer_menu'],
+                                        'view'    => 'support-menu',
+                                    ])
+                                !!}
+                            </div>
+                            <div class="nav float-right language-switcher-footer">
+                                @if (is_plugin_active('language'))
+                                    @include(JobBoardHelper::viewPath('dashboard.partials.language-switcher'))
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>

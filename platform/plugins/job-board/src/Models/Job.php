@@ -199,7 +199,7 @@ class Job extends BaseModel
 
     protected function displayId(): Attribute
     {
-        return Attribute::get(fn () => 'JR-JOB-' . $this->getKey());
+        return Attribute::get(fn () => 'JR-JOB-' . $this->prefixedSequenceId());
     }
 
     public function displayCurrency(): Currency

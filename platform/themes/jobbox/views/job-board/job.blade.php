@@ -303,16 +303,10 @@
                     </div>
                 @endif
 
+                @include(Theme::getThemeNamespace('views.job-board.partials.application-section'), ['job' => $job])
+
                 <div class="single-apply-jobs">
                     <div class="row align-items-center">
-                        <div class="col-md-5">
-                            @php($classButtonApplyBottom = 'btn btn-default mr-15')
-                            {!! Theme::partial('apply-button', [
-                                'job' => $job,
-                                'class' => $classButtonApplyBottom
-                            ]) !!}
-                        </div>
-
                         @include(Theme::getThemeNamespace('views.job-board.partials.share'), ['job' => $job])
                     </div>
                 </div>

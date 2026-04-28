@@ -128,7 +128,7 @@ class Account extends BaseModel implements AuthenticatableContract, Authorizable
         return Attribute::get(function () {
             $prefix = $this->isEmployer() ? 'JR-EMP-' : 'JR-ACC-';
 
-            return $prefix . $this->getKey();
+            return $prefix . $this->prefixedSequenceId();
         });
     }
 

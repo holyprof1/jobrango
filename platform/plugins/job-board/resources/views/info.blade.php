@@ -96,4 +96,35 @@
             {{ $jobApplication->message }}
         </x-core::datagrid.item>
     @endif
+
+    @if ($jobApplication->application_answers)
+        <div class="mt-4">
+            <h5 class="mb-3">{{ __('Custom application answers') }}</h5>
+
+            <x-core::datagrid>
+                @foreach ($jobApplication->application_answers as $answer)
+                    @php
+                        $value = $answer['value'] ?? null;
+                        $type = $answer['type'] ?? null;
+                    @endphp
+                    <x-core::datagrid.item>
+                        <x-slot:title>
+                            {{ $answer['label'] ?? __('Question') }}
+                        </x-slot:title>
+
+                        @if (is_array($value))
+                            {{ implode(', ', $value) }}
+                        @elseif (in_array($type, ['file_upload', 'cv_upload'], true) && $value)
+                            <a href="{{ RvMedia::url($value) }}" target="_blank" class="d-flex align-items-center gap-1">
+                                {{ basename((string) $value) }}
+                                <x-core::icon name="ti ti-external-link" />
+                            </a>
+                        @else
+                            {{ $value }}
+                        @endif
+                    </x-core::datagrid.item>
+                @endforeach
+            </x-core::datagrid>
+        </div>
+    @endif
 @endif

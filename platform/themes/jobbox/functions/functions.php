@@ -1,22 +1,15 @@
 <?php
 
 use Botble\Base\Facades\MetaBox;
-use Botble\Base\Forms\FieldOptions\CheckboxFieldOption;
 use Botble\Base\Forms\FieldOptions\MediaImageFieldOption;
 use Botble\Base\Forms\FieldOptions\TextFieldOption;
 use Botble\Base\Forms\Fields\MediaImageField;
-use Botble\Base\Forms\Fields\OnOffCheckboxField;
-use Botble\Base\Forms\Fields\OnOffField;
 use Botble\Base\Forms\Fields\TextField;
 use Botble\Base\Forms\FormAbstract;
-use Botble\Base\Rules\OnOffRule;
 use Botble\Blog\Models\Post;
 use Botble\JobBoard\Forms\AccountForm;
 use Botble\JobBoard\Forms\Fronts\AccountSettingForm;
-use Botble\JobBoard\Forms\JobForm;
-use Botble\JobBoard\Forms\Settings\GeneralSettingForm;
 use Botble\JobBoard\Http\Requests\SettingRequest;
-use Botble\JobBoard\Http\Requests\Settings\GeneralSettingRequest;
 use Botble\JobBoard\Models\Account;
 use Botble\JobBoard\Models\Category;
 use Botble\JobBoard\Models\Job;
@@ -131,43 +124,6 @@ app()->booted(function (): void {
 
             return $rules;
         }, 120, 2);
-
-        FormAbstract::extend(function (FormAbstract $form) {
-            if ($form instanceof JobForm) {
-                $form->addAfter(
-                    'apply_url',
-                    'is_direct_redirect',
-                    OnOffField::class,
-                    CheckboxFieldOption::make()
-                        ->defaultValue(setting('job_board_enabled_default_direct_redirect_apply_job_from_url', true))
-                        ->metadata()
-                        ->helperText(__('If you enable this option, the apply button will redirect to the apply URL directly.'))
-                        ->label(__('Is direct redirect?'))
-                );
-            }
-
-            return $form;
-        });
-
-        GeneralSettingForm::extend(function (GeneralSettingForm $form): void {
-            $form->add(
-                'job_board_enabled_default_direct_redirect_apply_job_from_url',
-                OnOffCheckboxField::class,
-                CheckboxFieldOption::make()
-                    ->value(setting('job_board_enabled_default_direct_redirect_apply_job_from_url', true))
-                    ->label(__('Enable default direct redirection when applying from URL?'))
-            );
-        });
-
-        add_filter('core_request_rules', function (array $rules, Request $request) {
-            if ($request instanceof GeneralSettingRequest) {
-                return [...$rules,
-                    'job_board_enabled_default_direct_redirect_apply_job_from_url' => new OnOffRule(),
-                ];
-            }
-
-            return $rules;
-        }, 120, 2);
     }
 
     add_filter(BASE_FILTER_BEFORE_RENDER_FORM, function (FormAbstract $form, ?Model $data) {
@@ -259,10 +215,6 @@ app()->booted(function (): void {
         if ($data instanceof Job) {
             if ($request->has('featured_image')) {
                 MetaBox::saveMetaBoxData($data, 'featured_image', $request->input('featured_image'));
-            }
-
-            if ($request->has('is_direct_redirect')) {
-                MetaBox::saveMetaBoxData($data, 'is_direct_redirect', $request->input('is_direct_redirect'));
             }
         }
     }, 120, 3);

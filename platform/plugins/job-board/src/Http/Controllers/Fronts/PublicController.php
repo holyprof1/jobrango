@@ -25,6 +25,7 @@ use Botble\JobBoard\Models\JobSkill;
 use Botble\JobBoard\Models\JobType;
 use Botble\JobBoard\Models\Tag;
 use Botble\JobBoard\Repositories\Interfaces\JobInterface;
+use Botble\JobBoard\Supports\ApplicationFormManager;
 use Botble\Language\Facades\Language;
 use Botble\Location\Facades\Location;
 use Botble\Media\Facades\RvMedia;
@@ -458,6 +459,7 @@ class PublicController extends BaseController
             }
 
             $jobApplication->fill($request->input());
+            $jobApplication->application_answers = $this->prepareApplicationAnswers($request, $job);
             $jobApplication->save();
 
             $job::withoutEvents(fn () => $job::withoutTimestamps(fn () => $job->increment('number_of_applied')));
@@ -490,6 +492,53 @@ class PublicController extends BaseController
                 ->setError()
                 ->setMessage(trans('plugins/job-board::job-application.email.failed'));
         }
+    }
+
+    protected function prepareApplicationAnswers(Request $request, JobModel $job): ?array
+    {
+        $answers = [];
+
+        foreach (ApplicationFormManager::questionsForJob($job) as $question) {
+            $key = $question['key'];
+            $value = ApplicationFormManager::isFileType($question['type'])
+                ? $this->storeApplicationAnswerFile($request, $key)
+                : $request->input('custom_answers.' . $key);
+
+            if ($question['type'] === ApplicationFormManager::TYPE_CHECKBOX) {
+                $value = collect((array) $value)
+                    ->map(fn ($item) => trim((string) $item))
+                    ->filter()
+                    ->values()
+                    ->all();
+            }
+
+            if (ApplicationFormManager::emptyAnswer($value)) {
+                continue;
+            }
+
+            $answers[$key] = [
+                'label' => $question['label'],
+                'type' => $question['type'],
+                'value' => $value,
+            ];
+        }
+
+        return $answers ?: null;
+    }
+
+    protected function storeApplicationAnswerFile(Request $request, string $key): ?string
+    {
+        if (! $request->hasFile('custom_answer_files.' . $key)) {
+            return null;
+        }
+
+        $result = RvMedia::handleUpload($request->file('custom_answer_files.' . $key), 0, 'job-applications');
+
+        if ($result['error']) {
+            return null;
+        }
+
+        return $result['data']->url;
     }
 
     public function getJobCategory(

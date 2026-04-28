@@ -24,6 +24,7 @@ use Botble\JobBoard\Models\JobApplication;
 use Botble\JobBoard\Models\Tag;
 use Botble\JobBoard\Repositories\Interfaces\AnalyticsInterface;
 use Botble\JobBoard\Services\StoreTagService;
+use Botble\JobBoard\Supports\ApplicationFormManager;
 use Botble\Media\Facades\RvMedia;
 use Botble\Optimize\Facades\OptimizerHelper;
 use Botble\SeoHelper\Facades\SeoHelper;
@@ -371,19 +372,10 @@ class AccountJobController extends BaseController
             'mark_incomplete_required' => true,
         ], (array) $job->application_form_settings);
 
-        $supportedQuestionTypes = [
-            __('Short answer'),
-            __('Paragraph'),
-            __('Multiple choice'),
-            __('Checkbox'),
-            __('Phone'),
-            __('Email'),
-            __('File upload'),
-            __('CV upload'),
-            __('Yes/No'),
-        ];
+        $supportedQuestionTypes = ApplicationFormManager::supportedTypeOptions();
+        $questions = ApplicationFormManager::questionsForJob($job);
 
-        return JobBoardHelper::view('dashboard.jobs.application-form', compact('job', 'applicationSettings', 'supportedQuestionTypes'));
+        return JobBoardHelper::view('dashboard.jobs.application-form', compact('job', 'applicationSettings', 'supportedQuestionTypes', 'questions'));
     }
 
     public function updateApplicationForm(Job $job, Request $request)
@@ -394,31 +386,36 @@ class AccountJobController extends BaseController
             'application_mode' => ['required', Rule::in(['basic', 'custom'])],
             'auto_highlight' => ['nullable', 'boolean'],
             'mark_incomplete_required' => ['nullable', 'boolean'],
+            'questions' => ['nullable', 'array'],
+            'questions.*.label' => ['nullable', 'string', 'max:255'],
+            'questions.*.type' => ['nullable', Rule::in(array_keys(ApplicationFormManager::supportedTypeOptions()))],
+            'questions.*.placeholder' => ['nullable', 'string', 'max:255'],
+            'questions.*.help_text' => ['nullable', 'string', 'max:500'],
+            'questions.*.required' => ['nullable', 'boolean'],
+            'questions.*.options' => ['nullable'],
         ]);
+
+        $questions = ApplicationFormManager::normalizeQuestions((array) $request->input('questions', []));
+
+        if ($validated['application_mode'] === 'custom' && $questions === []) {
+            return back()
+                ->withInput()
+                ->with('error_msg', __('Add at least one valid custom question before enabling the custom application form.'));
+        }
 
         $job->application_mode = $validated['application_mode'];
         $job->application_form_settings = [
             'auto_highlight' => (bool) $request->boolean('auto_highlight'),
             'mark_incomplete_required' => (bool) $request->boolean('mark_incomplete_required'),
-            'builder_status' => $validated['application_mode'] === 'custom' ? 'planned' : 'default',
+            'builder_status' => $validated['application_mode'] === 'custom' ? 'active' : 'default',
         ];
         $job->application_form_schema = $validated['application_mode'] === 'custom'
             ? [
                 'version' => 1,
-                'builder_status' => 'planned',
-                'questions' => [],
-                'supported_types' => [
-                    'short_answer',
-                    'paragraph',
-                    'multiple_choice',
-                    'checkbox',
-                    'phone',
-                    'email',
-                    'file_upload',
-                    'cv_upload',
-                    'yes_no',
-                ],
-            ]
+                'builder_status' => 'active',
+                'questions' => $questions,
+                'supported_types' => array_keys(ApplicationFormManager::supportedTypeOptions()),
+                ]
             : null;
         $job->save();
 

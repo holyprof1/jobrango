@@ -4,6 +4,8 @@ namespace Botble\JobBoard\Http\Requests;
 
 use Botble\Base\Facades\BaseHelper;
 use Botble\Captcha\Facades\Captcha;
+use Botble\JobBoard\Models\Job;
+use Botble\JobBoard\Supports\ApplicationFormManager;
 use Botble\Support\Http\Requests\Request;
 use Illuminate\Validation\Rule;
 
@@ -47,6 +49,17 @@ class ApplyJobRequest extends Request
             }
 
             $rules = array_merge($rules, $internalRules);
+        } else {
+            $rules = array_merge($rules, [
+                'first_name' => 'nullable|max:120|min:2',
+                'last_name' => 'nullable|max:120|min:2',
+                'phone' => 'nullable|' . BaseHelper::getPhoneValidationRule(),
+            ]);
+        }
+
+        if ($job = $this->getJob()) {
+            [$customQuestionRules] = ApplicationFormManager::validationRules($job);
+            $rules = array_merge($rules, $customQuestionRules);
         }
 
         if (
@@ -62,7 +75,7 @@ class ApplyJobRequest extends Request
 
     public function attributes(): array
     {
-        return [
+        $attributes = [
             'first_name' => trans('plugins/job-board::messages.first_name_label'),
             'last_name' => trans('plugins/job-board::messages.last_name_label'),
             'email' => trans('plugins/job-board::messages.email_label'),
@@ -70,7 +83,14 @@ class ApplyJobRequest extends Request
             'message' => trans('plugins/job-board::messages.message_label'),
             'resume' => trans('plugins/job-board::messages.resume_attr'),
             'cover_letter' => trans('plugins/job-board::messages.cover_letter_label'),
-        ] + (is_plugin_active('captcha') ? Captcha::attributes() : []);
+        ];
+
+        if ($job = $this->getJob()) {
+            [, $customQuestionAttributes] = ApplicationFormManager::validationRules($job);
+            $attributes = array_merge($attributes, $customQuestionAttributes);
+        }
+
+        return $attributes + (is_plugin_active('captcha') ? Captcha::attributes() : []);
     }
 
     /**
@@ -112,5 +132,16 @@ class ApplyJobRequest extends Request
                 'example' => 'No-example',
             ],
         ];
+    }
+
+    protected function getJob(): ?Job
+    {
+        $jobId = (int) ($this->route('id') ?: $this->input('job_id'));
+
+        if (! $jobId) {
+            return null;
+        }
+
+        return Job::query()->find($jobId);
     }
 }

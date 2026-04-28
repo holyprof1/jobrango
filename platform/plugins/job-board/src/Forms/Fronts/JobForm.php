@@ -2,8 +2,11 @@
 
 namespace Botble\JobBoard\Forms\Fronts;
 
+use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Forms\FormAbstract;
+use Botble\Base\Forms\Fields\DatePickerField;
 use Botble\Base\Forms\Fields\SelectField;
+use Botble\Base\Forms\Fields\TextField;
 use Botble\JobBoard\Facades\JobBoardHelper;
 use Botble\JobBoard\Forms\Fields\CustomEditorField;
 use Botble\JobBoard\Forms\JobForm as FormsJobForm;
@@ -92,10 +95,45 @@ class JobForm extends FormsJobForm
                 'choices' => $currencyChoices,
                 'selected' => $selectedCurrencyId,
                 'colspan' => 3,
-            ])
-            ->addAfter('currency_id', 'jobrango_advanced_notice', 'html', [
-                'html' => '<div class="col-12"><details class="jobrango-advanced-settings"><summary>' . e(__('Advanced Settings')) . '</summary><div class="jobrango-advanced-settings__body"><p class="mb-2">' . e(__('Technical fields like moderation status, redirect behavior, visibility, coordinates, SEO, and internal IDs are kept out of the main posting flow.')) . '</p><p class="mb-0">' . e(__('If you need those controls later, they can be added without making the everyday job posting experience heavier.')) . '</p></div></details></div>',
             ]);
+
+        $this
+            ->addAfter('tag', 'jobrango_advanced_notice', 'html', [
+                'html' => '<div class="col-12"><div class="jobrango-advanced-settings"><div class="jobrango-advanced-settings__intro"><span class="jobrango-overview__eyebrow">' . e(__('Advanced Settings')) . '</span><h4>' . e(__('Final visibility and timing controls')) . '</h4><p>' . e(__('Use these only when this role needs extra visibility, deadline, or lifecycle adjustments.')) . '</p></div></div></div>',
+            ])
+            ->addAfter('jobrango_advanced_notice', 'application_closing_date', DatePickerField::class, [
+                'label' => trans('plugins/job-board::forms.application_closing_date'),
+                'value' => $this->getModel()->application_closing_date ? BaseHelper::formatDate($this->getModel()->application_closing_date) : '',
+                'colspan' => 6,
+            ])
+            ->addAfter('application_closing_date', 'hide_company', 'onOff', [
+                'label' => trans('plugins/job-board::forms.hide_company_details'),
+                'default_value' => false,
+            ])
+            ->addAfter('hide_company', 'never_expired', 'onOff', [
+                'label' => trans('plugins/job-board::forms.never_expired'),
+                'default_value' => true,
+                'help_block' => [
+                    'text' => trans('plugins/job-board::forms.never_expired_helper_text'),
+                ],
+            ])
+            ->addAfter('never_expired', 'auto_renew', 'onOff', [
+                'label' => trans('plugins/job-board::forms.auto_renew_label', ['days' => JobBoardHelper::jobExpiredDays()]),
+                'default_value' => false,
+                'help_block' => [
+                    'text' => trans('plugins/job-board::forms.auto_renew_helper_text'),
+                ],
+            ]);
+
+        if (! JobBoardHelper::isUniqueIdFieldHiddenInFrontForm()) {
+            $this->addAfter('auto_renew', 'unique_id', TextField::class, [
+                'label' => trans('plugins/job-board::job-board.form.unique_id'),
+                'value' => $this->getModel()->getKey() ? $this->getModel()->unique_id : $this->getModel()->generateUniqueId(),
+                'attr' => [
+                    'placeholder' => trans('plugins/job-board::job-board.form.unique_id_placeholder', ['unique_id' => $this->getModel()->generateUniqueId(true)]),
+                ],
+            ]);
+        }
 
         if (count($companies) === 1) {
             $this->addBefore('address', 'company_id', 'hidden', [

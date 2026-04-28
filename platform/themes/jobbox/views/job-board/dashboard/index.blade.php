@@ -37,7 +37,7 @@
                                 <div>
                                     <strong>{{ $applicant->full_name }}</strong>
                                     <p>{{ $applicant->job->name }}</p>
-                                    <span>{{ $applicant->display_id }} • {{ $applicant->created_at->diffForHumans() }}</span>
+                                    <span>{{ $applicant->display_id }} &bull; {{ $applicant->created_at->diffForHumans() }}</span>
                                 </div>
                                 <a href="{{ route('public.account.applicants.edit', $applicant->id) }}">{{ __('Review') }}</a>
                             </article>
