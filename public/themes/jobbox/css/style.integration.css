@@ -81,6 +81,72 @@
     margin-top: 16px;
 }
 
+.jobrango-mobile-menu__top {
+    display: grid;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.jobrango-mobile-menu__brand,
+.jobrango-dashboard-mobile-header__brand,
+.jobrango-dashboard-drawer__brand {
+    align-items: center;
+    display: inline-flex;
+    gap: 12px;
+}
+
+.jobrango-mobile-menu__brand img,
+.jobrango-dashboard-mobile-header__brand img,
+.jobrango-dashboard-drawer__brand img {
+    height: auto;
+    max-height: 44px;
+    width: auto;
+}
+
+.jobrango-mobile-menu__account {
+    align-items: center;
+    background: linear-gradient(135deg, #f8fbff 0%, #edf4ff 100%);
+    border: 1px solid rgba(11, 31, 77, 0.08);
+    border-radius: 20px;
+    display: flex;
+    gap: 12px;
+    padding: 12px 14px;
+}
+
+.jobrango-mobile-menu__account span,
+.jobrango-dashboard-mobile-header__brand-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.jobrango-mobile-menu__account small,
+.jobrango-dashboard-mobile-header__brand-copy small,
+.jobrango-mobile-menu__label {
+    color: #5c6c86;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.jobrango-mobile-menu__account strong,
+.jobrango-dashboard-mobile-header__brand-copy strong,
+.jobrango-dashboard-drawer__brand span {
+    color: #0b1f4d;
+    font-size: 0.98rem;
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.jobrango-mobile-menu__label {
+    display: block;
+    margin-bottom: 10px;
+}
+
 .jobrango-overview__intro {
     background: linear-gradient(135deg, #ffffff 0%, #f6f9ff 100%);
     border: 1px solid rgba(11, 31, 77, 0.08);
@@ -90,13 +156,59 @@
 }
 
 .jobrango-account-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
     position: sticky;
     top: 118px;
+}
+
+.jobrango-account-sidebar__heading,
+.jobrango-account-content,
+.jobrango-panel,
+.jobrango-stat-card {
+    background: #ffffff;
+    border: 1px solid rgba(11, 31, 77, 0.08);
+    border-radius: 22px;
+    box-shadow: 0 18px 40px rgba(11, 31, 77, 0.07);
+}
+
+.jobrango-account-sidebar__heading {
+    padding: 22px 20px 6px;
+}
+
+.jobrango-account-sidebar__heading h5,
+.jobrango-panel__header h3,
+.jobrango-stat-card strong,
+.jobrango-dashboard-job-card__brand-copy h4,
+.jobrango-empty-state h4 {
+    color: #0b1f4d;
+}
+
+.jobrango-account-sidebar__heading h5 {
+    font-size: 1rem;
+    margin-bottom: 8px;
+}
+
+.jobrango-account-sidebar__heading p,
+.jobrango-panel__header p,
+.jobrango-stat-card p,
+.jobrango-empty-state p,
+.jobrango-dashboard-job-card__meta {
+    color: #5c6c86;
+}
+
+.jobrango-account-sidebar__heading p,
+.jobrango-panel__header p,
+.jobrango-stat-card p,
+.jobrango-empty-state p {
+    margin-bottom: 0;
 }
 
 .jobrango-account-sidebar .nav {
     display: grid;
     gap: 10px;
+    padding: 0 20px 20px;
 }
 
 .jobrango-account-sidebar .nav li,
@@ -147,26 +259,299 @@
     font-weight: 700;
 }
 
+.jobrango-overview {
+    display: grid;
+    gap: 24px;
+}
+
+.jobrango-overview__eyebrow,
+.jobrango-stat-card span,
+.jobrango-profile-trigger__eyebrow {
+    color: #5c6c86;
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.jobrango-overview__intro h2 {
+    color: #0b1f4d;
+    font-size: clamp(1.65rem, 2vw, 2.1rem);
+    margin-bottom: 10px;
+}
+
+.jobrango-overview__intro p {
+    color: #4b5d7b;
+    margin-bottom: 0;
+    max-width: 640px;
+}
+
+.jobrango-overview__stats {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.jobrango-stat-card {
+    padding: 22px;
+}
+
+.jobrango-stat-card strong {
+    display: block;
+    font-size: 2rem;
+    line-height: 1.1;
+    margin: 12px 0 10px;
+}
+
+.jobrango-panel {
+    padding: 24px;
+}
+
+.jobrango-panel__header {
+    align-items: flex-start;
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.jobrango-panel__header h3 {
+    font-size: 1.15rem;
+    margin-bottom: 6px;
+}
+
 .jobrango-empty-state {
-    border: 1px dashed rgba(11, 31, 77, 0.15);
+    background: linear-gradient(135deg, #f8fbff 0%, #eef4ff 100%);
+    border: 1px solid rgba(11, 31, 77, 0.08);
+    border-radius: 20px;
+    padding: 26px 24px;
+}
+
+.jobrango-empty-state--compact {
+    padding: 22px 20px;
+}
+
+.jobrango-empty-state h4 {
+    font-size: 1.05rem;
+    margin-bottom: 10px;
+}
+
+.jobrango-empty-state p {
+    max-width: 520px;
+}
+
+.jobrango-action-list {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .jobrango-action-list a {
+    align-items: center;
+    background: #f5f8ff;
     border: 1px solid rgba(11, 31, 77, 0.08);
+    border-radius: 16px;
+    color: #0c3fa8;
+    display: inline-flex;
+    font-weight: 700;
+    justify-content: center;
+    min-height: 52px;
+    padding: 14px 16px;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.jobrango-action-list a:hover {
+    background: #0b1f4d;
+    border-color: #0b1f4d;
+    color: #ffffff;
+}
+
+.jobrango-dashboard-job-grid {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.jobrango-dashboard-job-card {
+    background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+    border: 1px solid rgba(11, 31, 77, 0.08);
+    border-radius: 22px;
+    box-shadow: 0 16px 36px rgba(11, 31, 77, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-height: 100%;
+    padding: 22px;
+}
+
+.jobrango-dashboard-job-card__header,
+.jobrango-dashboard-job-card__brand,
+.jobrango-dashboard-job-card__footer {
+    align-items: flex-start;
+    display: flex;
+    gap: 14px;
+    justify-content: space-between;
+}
+
+.jobrango-dashboard-job-card__brand {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.jobrango-dashboard-job-card__logo {
+    align-items: center;
+    background: linear-gradient(135deg, #0c3fa8 0%, #1f6bff 100%);
+    border-radius: 18px;
+    color: #ffffff;
+    display: inline-flex;
+    flex: 0 0 52px;
+    font-size: 1rem;
+    font-weight: 800;
+    height: 52px;
+    justify-content: center;
+    letter-spacing: 0.08em;
+    width: 52px;
+}
+
+.jobrango-dashboard-job-card__brand-copy {
+    min-width: 0;
+}
+
+.jobrango-dashboard-job-card__brand-copy span {
+    color: #5c6c86;
+    display: block;
+    font-size: 0.92rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.jobrango-dashboard-job-card__brand-copy h4 {
+    font-size: 1.06rem;
+    line-height: 1.4;
+    margin-bottom: 0;
+}
+
+.jobrango-dashboard-job-card__brand-copy h4 a {
+    color: inherit;
+}
+
+.jobrango-dashboard-job-card__badge {
+    background: #eaf2ff;
+    border-radius: 999px;
+    color: #0c3fa8;
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-size: 0.8rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 10px 12px;
+}
+
+.jobrango-dashboard-job-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 0.93rem;
+    gap: 8px 18px;
+}
+
+.jobrango-dashboard-job-card__meta span {
+    align-items: center;
+    display: inline-flex;
+    position: relative;
+}
+
+.jobrango-dashboard-job-card__meta span + span::before {
+    color: #9aa6bd;
+    content: "\2022";
+    margin-right: 10px;
+}
+
+.jobrango-dashboard-job-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.jobrango-dashboard-job-card__tags span {
+    background: #ffffff;
+    border: 1px solid rgba(11, 31, 77, 0.08);
+    border-radius: 999px;
+    color: #4b5d7b;
+    font-size: 0.83rem;
+    font-weight: 600;
+    padding: 8px 12px;
+}
+
+.jobrango-dashboard-job-card__footer {
+    gap: 16px;
+    margin-top: auto;
+}
+
+.jobrango-dashboard-job-card__footer strong {
+    color: #0b1f4d;
+    display: block;
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+.jobrango-dashboard-job-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.jobrango-dashboard-job-card__actions a,
+.jobrango-dashboard-job-card__actions button {
+    align-items: center;
+    background: #f3f7ff;
+    border: 1px solid rgba(11, 31, 77, 0.08);
+    border-radius: 12px;
+    color: #0c3fa8;
+    display: inline-flex;
+    font-size: 0.92rem;
+    font-weight: 700;
+    justify-content: center;
+    min-height: 42px;
+    padding: 10px 14px;
+}
+
+.jobrango-dashboard-job-card__actions button {
+    background: #fff7f7;
+    border-color: rgba(182, 55, 55, 0.14);
+    color: #b63737;
+}
+
+.jobrango-dashboard-job-card__actions form {
+    margin: 0;
+}
+
+.jobrango-account-content {
+    padding: 0;
 }
 
 .jobrango-job-card {
     background: #ffffff;
     border: 1px solid rgba(11, 31, 77, 0.08);
-    border-radius: 24px;
-    box-shadow: 0 18px 40px rgba(11, 31, 77, 0.08);
-    gap: 20px;
-    padding: 24px;
+    border-radius: 18px;
+    box-shadow: 0 12px 28px rgba(11, 31, 77, 0.05);
+    gap: 18px;
+    padding: 20px;
     position: relative;
 }
 
+.jobrango-job-card.card-grid-2.featured-job-item {
+    border: 1px solid rgba(11, 31, 77, 0.08);
+}
+
+.jobrango-job-card .flash {
+    display: none;
+}
+
 .jobrango-job-card__overlay {
-    border-radius: 22px;
+    border-radius: 18px;
     inset: 0;
     position: absolute;
     z-index: 1;
@@ -174,15 +559,12 @@
 
 .jobrango-job-card__actions,
 .jobrango-job-card__body,
-.jobrango-job-card__company,
 .jobrango-job-card__company-name,
 .jobrango-job-card__company-row,
 .jobrango-job-card__footer,
 .jobrango-job-card__meta,
 .jobrango-job-card__title,
 .jobrango-job-card .job-card-taxonomy,
-.jobrango-job-card .job-company-badge,
-.jobrango-job-card .job-company-badge__link,
 .jobrango-job-card .salary-information {
     position: relative;
     z-index: 2;
@@ -199,32 +581,19 @@
 }
 
 .jobrango-job-card__company-row {
-    align-items: flex-start;
+    align-items: center;
     display: flex;
-    gap: 14px;
+    gap: 12px;
     justify-content: space-between;
 }
 
-.jobrango-job-card__company {
-    align-items: center;
-    display: flex;
-    gap: 14px;
-    min-width: 0;
-}
-
 .jobrango-job-card__company-name {
-    color: #0b1f4d;
-    font-size: 15px;
-    font-weight: 700;
+    color: #51607d;
+    font-size: 13px;
+    font-weight: 600;
     line-height: 1.4;
+    min-width: 0;
     overflow-wrap: anywhere;
-}
-
-.jobrango-job-card .job-company-badge__image,
-.jobrango-job-card .job-company-badge__fallback {
-    border-radius: 16px;
-    height: 52px;
-    width: 52px;
 }
 
 .jobrango-job-card__body {
@@ -234,17 +603,23 @@
     gap: 12px;
 }
 
+.jobrango-job-card__title {
+    margin: 0;
+}
+
 .jobrango-job-card__title a {
     color: #0b1f4d;
-    font-size: 1.1rem;
+    font-size: 1.18rem;
     font-weight: 700;
-    line-height: 1.35;
+    line-height: 1.3;
 }
 
 .jobrango-job-card__meta {
+    color: #667792;
     display: flex;
     flex-wrap: wrap;
-    gap: 8px 18px;
+    font-size: 14px;
+    gap: 8px 14px;
 }
 
 .jobrango-job-card__meta span {
@@ -267,20 +642,21 @@
 }
 
 .jobrango-job-card .job-card-taxonomy .btn {
-    background: #f3f6fb;
-    border: 0;
+    background: #ffffff;
+    border: 1px solid rgba(11, 31, 77, 0.08);
     border-radius: 999px;
     color: #3a4966;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 600;
     margin: 0 !important;
-    padding: 8px 12px;
+    padding: 7px 12px;
 }
 
 .jobrango-job-card .salary-information {
     color: #0b1f4d;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 700;
+    line-height: 1.45;
 }
 
 .jobrango-job-card .salary-information .text-muted {
@@ -288,12 +664,12 @@
 }
 
 .jobrango-job-card__footer {
-    align-items: flex-end;
+    align-items: center;
     border-top: 1px solid rgba(11, 31, 77, 0.08);
     display: flex;
     gap: 16px;
     justify-content: space-between;
-    padding-top: 18px;
+    padding-top: 16px;
 }
 
 .jobrango-job-card__actions {
@@ -306,9 +682,12 @@
 }
 
 .jobrango-job-card__actions .btn {
-    border-radius: 14px;
-    min-width: 120px;
-    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    min-height: 42px;
+    min-width: 112px;
+    padding: 10px 16px;
 }
 
 .jobrango-job-card__actions .btn-border {
@@ -322,19 +701,41 @@
 }
 
 .jobrango-job-card__type {
+    align-items: center;
+    background: #f5f7fb;
+    border: 1px solid rgba(11, 31, 77, 0.08);
+    border-radius: 999px;
+    color: #40506d;
+    display: inline-flex;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
     margin-left: auto;
+    padding: 7px 11px;
 }
 
 .jobrango-job-card--list {
     align-items: stretch;
 }
 
-.jobrango-job-card--list .jobrango-job-card__footer {
-    flex: 0 0 272px;
-}
-
 .jobrango-job-card--company {
     padding: 22px 24px;
+}
+
+.jobrango-job-card__utility {
+    margin: -4px 0 0;
+    position: relative;
+    text-align: right;
+    z-index: 2;
+}
+
+.jobrango-job-card__utility button {
+    background: transparent;
+    border: 0;
+    color: #8f4a4a;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 0;
 }
 
 .ps-main__wrapper {
@@ -500,30 +901,133 @@
 .jobrango-main-menu > li > a,
 .jobrango-auth-nav .header-item,
 .jobrango-header-link {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
     white-space: nowrap;
+}
+
+.jobrango-header--authenticated .main-header {
+    align-items: center;
+    display: grid;
+    gap: 18px;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    min-height: 64px;
+}
+
+.jobrango-header--authenticated .header-left,
+.jobrango-header--authenticated .header-nav,
+.jobrango-header--authenticated .header-right {
+    align-items: center;
+    display: flex;
+}
+
+.jobrango-header--authenticated .header-nav,
+.jobrango-header--authenticated .header-right {
+    min-width: 0;
+}
+
+.jobrango-header--authenticated .header-left {
+    min-width: 0;
+}
+
+.jobrango-header--authenticated .header-nav {
+    flex: 1 1 auto;
+    justify-content: flex-start;
+}
+
+.jobrango-header--authenticated .nav-main-menu {
+    min-width: 0;
+    width: 100%;
+}
+
+.jobrango-header--authenticated .header-right {
+    justify-content: flex-end;
+    margin-left: auto;
+}
+
+.jobrango-header--authenticated .header-logo img {
+    height: auto;
+    max-height: 42px;
+    width: auto;
+}
+
+.jobrango-header--authenticated .jobrango-main-menu {
+    align-items: center;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 14px;
+    min-width: 0;
 }
 
 .jobrango-auth-nav {
     align-items: center;
     display: flex;
-    gap: 12px;
+    gap: 10px;
+    justify-content: flex-end;
     min-width: 0;
+    width: 100%;
 }
 
 .jobrango-auth-nav .header-menu {
-    flex-wrap: wrap;
-    gap: 10px;
+    align-items: center;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
     justify-content: flex-end;
+    margin-left: auto;
+    min-width: 0;
+}
+
+.jobrango-auth-nav .header-menu > li {
+    margin: 0;
+}
+
+.jobrango-auth-nav__item {
+    flex: 0 0 auto;
+}
+
+.jobrango-auth-nav__profile {
+    flex: 0 0 auto;
 }
 
 .jobrango-profile-trigger {
     align-items: center;
-    background: #f7faff;
+    background: #ffffff;
     border: 1px solid rgba(11, 31, 77, 0.08);
     border-radius: 999px;
     gap: 10px;
-    min-height: 46px;
-    padding: 4px 8px 4px 4px;
+    max-width: 196px;
+    min-height: 42px;
+    padding: 3px 10px 3px 3px;
+}
+
+.jobrango-profile-trigger__avatar {
+    flex: 0 0 36px;
+    height: 36px;
+    width: 36px;
+}
+
+.jobrango-profile-trigger__name {
+    color: #0b1f4d;
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.jobrango-profile-trigger__caret {
+    border-bottom: 2px solid #5c6c86;
+    border-right: 2px solid #5c6c86;
+    display: inline-block;
+    flex: 0 0 9px;
+    height: 9px;
+    margin-top: -4px;
+    transform: rotate(45deg);
+    width: 9px;
 }
 
 .jobrango-logout-link {
@@ -536,7 +1040,46 @@
 .jobrango-auth-nav .header-item {
     color: #14284f;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
+}
+
+.jobrango-auth-nav .header-item {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.job-company-badge__link {
+    background: #ffffff;
+    border: 0;
+    box-shadow: none;
+}
+
+.job-company-badge__fallback {
+    background: #f3f5f8;
+    border-radius: 14px;
+}
+
+.jobrango-header--authenticated .user-dropdown-menu {
+    border: 1px solid rgba(11, 31, 77, 0.08);
+    border-radius: 14px;
+    box-shadow: 0 16px 34px rgba(11, 31, 77, 0.1);
+    left: auto;
+    margin-top: 10px;
+    min-width: 220px;
+    right: 0;
+    padding: 10px;
+}
+
+.jobrango-header--authenticated .user-dropdown-menu .dropdown-item {
+    border-radius: 12px;
+    color: #14284f;
+    font-weight: 600;
+    padding: 10px 14px;
+}
+
+.jobrango-header--authenticated .user-dropdown-menu .dropdown-item:hover {
+    background: #f5f8ff;
+    color: #0c3fa8;
 }
 
 .mobile-header-wrapper-inner .mobile-menu li + li {
@@ -676,29 +1219,48 @@
 }
 
 .jobrango-dashboard-mobile-header {
+    align-items: center;
     background: #ffffff;
+    border-bottom: 1px solid rgba(11, 31, 77, 0.08);
+    display: grid;
+    gap: 12px;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    padding: 12px 16px;
 }
 
-.jobrango-dashboard-mobile-header__title {
-    color: #0b1f4d;
-    display: inline-block;
-    font-size: 15px;
-    font-weight: 700;
-    max-width: 180px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.jobrango-dashboard-mobile-header .header__left,
+.jobrango-dashboard-mobile-header .header__center,
+.jobrango-dashboard-mobile-header .header__right {
+    min-width: 0;
 }
 
+.jobrango-dashboard-mobile-header__toggle,
 .jobrango-dashboard-mobile-header__link {
     align-items: center;
     background: #edf3ff;
-    border-radius: 12px;
+    border: 1px solid rgba(11, 31, 77, 0.08);
+    border-radius: 14px;
     color: #0c3fa8;
     display: inline-flex;
-    height: 40px;
+    height: 44px;
     justify-content: center;
-    width: 40px;
+    width: 44px;
+}
+
+.jobrango-dashboard-mobile-header__toggle .navbar-toggler-icon {
+    position: static;
+}
+
+.jobrango-dashboard-mobile-header__brand {
+    min-width: 0;
+}
+
+.jobrango-dashboard-mobile-header__brand-copy strong {
+    font-size: 0.94rem;
+}
+
+.jobrango-dashboard-drawer__brand img {
+    max-height: 36px;
 }
 
 .jobrango-dashboard-shell .ps-main__wrapper {
@@ -1190,7 +1752,21 @@
 }
 
 @media screen and (max-width: 991px) {
+    .jobrango-header--authenticated .header-right {
+        display: flex !important;
+        min-width: auto;
+    }
+
+    .jobrango-auth-nav {
+        width: auto;
+    }
+
     .jobrango-auth-nav .header-menu {
+        display: flex !important;
+        margin-left: 0;
+    }
+
+    .jobrango-auth-nav__item {
         display: none !important;
     }
 
@@ -1213,9 +1789,127 @@
     .jobrango-applicant-job-summary {
         grid-template-columns: 1fr;
     }
+
+    .jobrango-overview__stats,
+    .jobrango-dashboard-job-grid,
+    .jobrango-action-list {
+        grid-template-columns: 1fr;
+    }
+
+    .jobrango-panel,
+    .jobrango-stat-card {
+        padding: 20px;
+    }
+}
+
+@media screen and (max-width: 1199px) {
+    .jobrango-header--authenticated .nav-main-menu {
+        display: none !important;
+    }
+
+    .jobrango-header--authenticated .burger-icon {
+        display: block;
+    }
+
+    .jobrango-header--authenticated .main-header {
+        gap: 16px;
+        min-height: 58px;
+    }
+
+    .jobrango-header--authenticated .header-logo img {
+        max-height: 40px;
+    }
+
+    .jobrango-auth-nav__item {
+        display: none !important;
+    }
+
+    .jobrango-profile-trigger {
+        max-width: 184px;
+    }
+}
+
+@media screen and (max-width: 1399px) {
+    .jobrango-header--authenticated .main-header {
+        gap: 14px;
+    }
+
+    .jobrango-header--authenticated .jobrango-main-menu {
+        gap: 10px;
+    }
+
+    .jobrango-auth-nav .header-menu {
+        gap: 2px;
+    }
+
+    .jobrango-auth-nav .header-item {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .jobrango-profile-trigger {
+        max-width: 176px;
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    .jobrango-header--authenticated .burger-icon {
+        display: none;
+    }
 }
 
 @media screen and (max-width: 767px) {
+    .jobrango-header--authenticated .header-logo img {
+        max-height: 44px;
+    }
+
+    .jobrango-profile-trigger {
+        border-radius: 16px;
+        gap: 0;
+        max-width: none;
+        min-height: 44px;
+        padding: 0;
+    }
+
+    .jobrango-profile-trigger__caret {
+        display: none;
+    }
+
+    .jobrango-profile-trigger img {
+        height: 44px;
+        width: 44px;
+    }
+
+    .jobrango-mobile-menu__brand img {
+        max-height: 38px;
+    }
+
+    .jobrango-dashboard-mobile-header {
+        padding: 10px 14px;
+    }
+
+    .jobrango-dashboard-mobile-header__brand-copy strong {
+        font-size: 0.88rem;
+    }
+
+    .jobrango-panel__header,
+    .jobrango-dashboard-job-card__header,
+    .jobrango-dashboard-job-card__footer,
+    .jobrango-overview__profile-meta {
+        flex-direction: column;
+    }
+
+    .jobrango-dashboard-job-card__actions {
+        justify-content: flex-start;
+    }
+
+    .jobrango-dashboard-job-card__actions a,
+    .jobrango-dashboard-job-card__actions button,
+    .jobrango-panel__header a,
+    .jobrango-action-list a {
+        width: 100%;
+    }
+
     .jobrango-employer-stats {
         grid-template-columns: 1fr;
     }

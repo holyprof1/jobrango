@@ -16,26 +16,15 @@
     @endphp
     <article class="card-grid-2 hover-up jobrango-job-card @if ($job->is_featured) featured-job-item @endif">
         <a class="jobrango-job-card__overlay" href="{{ $job->url }}" aria-label="{{ __('View :job', ['job' => $job->name]) }}"></a>
-        @if($job->is_featured)
-            <span class="flash"></span>
-        @endif
         <div class="jobrango-job-card__content">
             <div class="jobrango-job-card__company-row">
-                <div class="jobrango-job-card__company">
-                @include(Theme::getThemeNamespace('partials.job-company-badge'), [
-                    'job' => $job,
-                    'companyName' => $companyName,
-                    'companyUrl' => $job->company_url,
-                    'logo' => $job->company_logo_thumb,
-                ])
-                    @if ($job->company_url)
-                        <a class="jobrango-job-card__company-name" href="{{ $job->company_url }}">
-                            {{ $companyName }}
-                        </a>
-                    @else
-                        <span class="jobrango-job-card__company-name">{{ $companyName }}</span>
-                    @endif
-                </div>
+                @if ($job->company_url)
+                    <a class="jobrango-job-card__company-name" href="{{ $job->company_url }}">
+                        {{ $companyName }}
+                    </a>
+                @else
+                    <span class="jobrango-job-card__company-name">{{ $companyName }}</span>
+                @endif
                 @if ($jobTypeLabel)
                     <span class="jobrango-job-card__type">{{ $jobTypeLabel }}</span>
                 @endif

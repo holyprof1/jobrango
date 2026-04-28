@@ -90,40 +90,18 @@
                     </div>
 
                     @if ($savedJobs->isNotEmpty())
-                        <div class="jobrango-job-list">
+                        <div class="jobrango-dashboard-job-grid">
                             @foreach ($savedJobs as $job)
-                                <article class="jobrango-job-list__item">
-                                    <div class="jobrango-job-list__logo">
-                                        <img src="{{ $job->company->logo_thumb }}" alt="{{ $job->company->name }}">
-                                    </div>
-                                    <div class="jobrango-job-list__copy">
-                                        <h4><a href="{{ $job->url }}">{{ $job->name }}</a></h4>
-                                        <p>{{ $job->company->name }} | {{ $job->full_address ?: __('Location not specified') }}</p>
-                                    </div>
-                                    <div class="jobrango-job-list__meta">
-                                        <span>{{ $job->salary_text }}</span>
-                                    </div>
-                                </article>
+                                @include(Theme::getThemeNamespace('views.job-board.account.partials.compact-job-card'), ['job' => $job])
                             @endforeach
                         </div>
                     @elseif ($recommendedJobs->isNotEmpty())
                         <div class="jobrango-empty-state">
                             <h4>{{ __('No saved jobs yet') }}</h4>
                             <p>{{ __('These currently open roles are a good place to start.') }}</p>
-                            <div class="jobrango-job-list mt-3">
+                            <div class="jobrango-dashboard-job-grid mt-3">
                                 @foreach ($recommendedJobs as $job)
-                                    <article class="jobrango-job-list__item">
-                                        <div class="jobrango-job-list__logo">
-                                            <img src="{{ $job->company->logo_thumb }}" alt="{{ $job->company->name }}">
-                                        </div>
-                                        <div class="jobrango-job-list__copy">
-                                            <h4><a href="{{ $job->url }}">{{ $job->name }}</a></h4>
-                                            <p>{{ $job->company->name }} | {{ $job->full_address ?: __('Location not specified') }}</p>
-                                        </div>
-                                        <div class="jobrango-job-list__meta">
-                                            <a href="{{ $job->url }}">{{ __('View Job') }}</a>
-                                        </div>
-                                    </article>
+                                    @include(Theme::getThemeNamespace('views.job-board.account.partials.compact-job-card'), ['job' => $job])
                                 @endforeach
                             </div>
                         </div>
@@ -140,20 +118,9 @@
                     </div>
 
                     @if ($recommendedJobs->isNotEmpty())
-                        <div class="jobrango-job-list">
+                        <div class="jobrango-dashboard-job-grid">
                             @foreach ($recommendedJobs as $job)
-                                <article class="jobrango-job-list__item">
-                                    <div class="jobrango-job-list__logo">
-                                        <img src="{{ $job->company->logo_thumb }}" alt="{{ $job->company->name }}">
-                                    </div>
-                                    <div class="jobrango-job-list__copy">
-                                        <h4><a href="{{ $job->url }}">{{ $job->name }}</a></h4>
-                                        <p>{{ $job->company->name }} | {{ $job->full_address ?: __('Location not specified') }}</p>
-                                    </div>
-                                    <div class="jobrango-job-list__meta">
-                                        <a href="{{ $job->url }}">{{ __('View Job') }}</a>
-                                    </div>
-                                </article>
+                                @include(Theme::getThemeNamespace('views.job-board.account.partials.compact-job-card'), ['job' => $job])
                             @endforeach
                         </div>
                     @else

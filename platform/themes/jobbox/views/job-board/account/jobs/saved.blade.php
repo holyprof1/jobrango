@@ -1,7 +1,3 @@
-@php
-    $defaultCompanyLogo = theme_option('default_company_logo', true);
-@endphp
-
 @extends(Theme::getThemeNamespace('views.job-board.account.partials.layout-settings'))
 
 @section('content')
@@ -29,40 +25,12 @@
         </div>
 
         @if ($jobs->isNotEmpty())
-            <div class="jobrango-job-list">
+            <div class="jobrango-dashboard-job-grid">
                 @foreach ($jobs as $job)
-                    @php
-                        $companyLogo = $job->company->logo;
-                    @endphp
-                    <article class="jobrango-job-list__item">
-                        <div class="jobrango-job-list__logo">
-                            @if (! $job->hide_company && ($companyLogo || $defaultCompanyLogo))
-                                {{ RvMedia::image($companyLogo ?: $defaultCompanyLogo, $job->company->name, attributes: ['class' => 'img-fluid rounded-3']) }}
-                            @elseif (theme_option('logo'))
-                                {{ Theme::getLogoImage(['class' => 'img-fluid rounded-3'], 'logo') }}
-                            @endif
-                        </div>
-                        <div class="jobrango-job-list__copy">
-                            <h4><a href="{{ $job->url }}">{{ $job->name }}</a></h4>
-                            <p>
-                                @if (! $job->hide_company)
-                                    {{ $job->company->name }} |
-                                @endif
-                                {{ $job->full_address ?: __('Location not specified') }}
-                            </p>
-                            <span>{{ $job->salary_text }}</span>
-                        </div>
-                        <div class="jobrango-job-list__meta">
-                            <a href="{{ $job->url }}">{{ __('View Job') }}</a>
-                            <form id="bookmark-form-{{ $job->id }}" action="{{ route('public.account.jobs.saved.action') }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="job_id" value="{{ $job->id }}">
-                                <button class="btn btn-link p-0" onclick="return confirm('{{ __('Remove this saved job?') }}');" type="submit">
-                                    {{ __('Remove') }}
-                                </button>
-                            </form>
-                        </div>
-                    </article>
+                    @include(Theme::getThemeNamespace('views.job-board.account.partials.compact-job-card'), [
+                        'job' => $job,
+                        'showRemoveAction' => true,
+                    ])
                 @endforeach
             </div>
         @else

@@ -65,7 +65,7 @@ class AccountController extends BaseController
             ->get();
 
         $savedJobs = $account->savedJobs()
-            ->with(['company', 'jobTypes', 'currency'])
+            ->with(['company', 'jobTypes', 'categories', 'currency'])
             ->orderByDesc('jb_saved_jobs.created_at')
             ->orderByDesc('jb_jobs.created_at')
             ->limit(4)
@@ -75,7 +75,7 @@ class AccountController extends BaseController
             ->whereKeyNot($savedJobs->pluck('id')->all())
             ->whereKeyNot($recentApplications->pluck('job_id')->filter()->all())
             ->active()
-            ->with(['company', 'jobTypes', 'currency', 'slugable'])
+            ->with(['company', 'jobTypes', 'categories', 'currency', 'slugable'])
             ->latest('created_at')
             ->limit(3)
             ->get();

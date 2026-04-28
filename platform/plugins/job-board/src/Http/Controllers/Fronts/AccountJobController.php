@@ -570,6 +570,9 @@ class AccountJobController extends BaseController
         $with = [
             'slugable',
             'company',
+            'jobTypes',
+            'categories',
+            'currency',
         ];
 
         if (is_plugin_active('location')) {
