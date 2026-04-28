@@ -1,14 +1,28 @@
+@php
+    $account = auth('account')->user();
+    $companyName = $account->companies()->value('name') ?: $account->name;
+@endphp
+
 <header class="header--mobile jobrango-dashboard-mobile-header">
     <div class="header__left">
-        <button class="navbar-toggler">
+        <button class="navbar-toggler jobrango-dashboard-mobile-header__toggle">
             <span class="navbar-toggler-icon"></span>
         </button>
     </div>
     <div class="header__center">
-        <span class="jobrango-dashboard-mobile-header__title">{{ PageTitle::getTitle(false) }}</span>
+        <a href="{{ route('public.index') }}" class="jobrango-dashboard-mobile-header__brand">
+            <img
+                alt="{{ theme_option('site_title') }}"
+                src="{{ setting('theme-jobbox-logo') ? RvMedia::getImageUrl(setting('theme-jobbox-logo')) : url(config('core.base.general.logo')) }}"
+            >
+            <span class="jobrango-dashboard-mobile-header__brand-copy">
+                <small>{{ __('Employer workspace') }}</small>
+                <strong>{{ Str::limit($companyName, 24) }}</strong>
+            </span>
+        </a>
     </div>
     <div class="header__right">
-        <a href="{{ route('public.account.jobs.create') }}" class="jobrango-dashboard-mobile-header__link">
+        <a href="{{ route('public.account.jobs.create') }}" class="jobrango-dashboard-mobile-header__link" title="{{ __('Post a Job') }}">
             <x-core::icon name="ti ti-plus" />
         </a>
     </div>
@@ -16,7 +30,13 @@
 
 <aside class="ps-drawer--mobile jobrango-dashboard-drawer">
     <div class="ps-drawer__header py-3">
-        <h4 class="fs-3 mb-0">{{ __('Employer Menu') }}</h4>
+        <div class="jobrango-dashboard-drawer__brand">
+            <img
+                alt="{{ theme_option('site_title') }}"
+                src="{{ setting('theme-jobbox-logo') ? RvMedia::getImageUrl(setting('theme-jobbox-logo')) : url(config('core.base.general.logo')) }}"
+            >
+            <span>{{ __('Employer Menu') }}</span>
+        </div>
         <button class="ps-drawer__close">
             <x-core::icon name="ti ti-x" />
         </button>

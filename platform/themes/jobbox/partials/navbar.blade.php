@@ -106,7 +106,7 @@
         ]);
     }
 @endphp
-<header class="header {{ $account ? 'jobrango-header--authenticated' : '' }} @if (theme_option('enabled_sticky_header', 'yes') == 'yes') sticky-bar @endif">
+<header class="header jobrango-site-header {{ $account ? 'jobrango-header--authenticated' : '' }} @if (theme_option('enabled_sticky_header', 'yes') == 'yes') sticky-bar @endif">
     <div class="container">
         <div class="main-header">
             <div class="header-left">
@@ -122,6 +122,16 @@
                         @foreach ($primaryNavItems as $navItem)
                             <li><a href="{{ $navItem['url'] }}">{{ $navItem['label'] }}</a></li>
                         @endforeach
+
+                        @if ($account)
+                            @foreach ($authenticatedNavItems as $navItem)
+                                <li><a href="{{ $navItem['url'] }}">{{ $navItem['short_label'] ?? $navItem['label'] }}</a></li>
+                            @endforeach
+                        @else
+                            @foreach ($guestActionItems as $guestActionItem)
+                                <li><a class="{{ $guestActionItem['class'] === 'jobrango-header-link' ? 'jobrango-header-link' : '' }}" href="{{ $guestActionItem['url'] }}">{{ $guestActionItem['label'] }}</a></li>
+                            @endforeach
+                        @endif
                     </ul>
                 </nav>
                 <div class="burger-icon burger-icon-white">
@@ -136,11 +146,6 @@
                         <div class="jobrango-auth-nav">
                             <ul class="header-menu list-inline d-flex align-items-center mb-0 user-header-dropdown">
                                 {!! apply_filters('theme-header-right-nav', null) !!}
-                                @foreach ($authenticatedNavItems as $navItem)
-                                    <li class="list-inline-item jobrango-auth-nav__item">
-                                        <a class="header-item" href="{{ $navItem['url'] }}">{{ $navItem['short_label'] ?? $navItem['label'] }}</a>
-                                    </li>
-                                @endforeach
                                 <li class="list-inline-item dropdown jobrango-auth-nav__profile">
                                     <a href="#" class="d-inline-flex header-item jobrango-profile-trigger" id="userdropdown" data-bs-toggle="dropdown"
                                        aria-expanded="false">
@@ -166,12 +171,6 @@
                             <form id="{{ $logoutFormId }}" action="{{ $logoutRoute }}" method="POST" style="display: none;">
                                 @csrf
                             </form>
-                        </div>
-                    @else
-                        <div class="block-signin">
-                            @foreach ($guestActionItems as $guestActionItem)
-                                <a class="{{ $guestActionItem['class'] }}" href="{{ $guestActionItem['url'] }}">{{ $guestActionItem['label'] }}</a>
-                            @endforeach
                         </div>
                     @endif
                 @endif
