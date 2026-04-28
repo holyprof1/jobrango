@@ -3,6 +3,7 @@
 namespace Botble\JobBoard\Http\Requests;
 
 use Botble\Base\Enums\BaseStatusEnum;
+use Botble\Base\Rules\MediaImageRule;
 use Botble\Support\Http\Requests\Request;
 use Illuminate\Validation\Rule;
 
@@ -25,10 +26,14 @@ class CompanyRequest extends Request
             'number_of_offices' => ['nullable', 'numeric'],
             'number_of_employees' => ['nullable', 'numeric'],
             'annual_revenue' => ['nullable', 'string', 'max:60'],
+            'logo' => ['nullable', new MediaImageRule()],
+            'cover_image' => ['nullable', new MediaImageRule()],
             'facebook' => ['nullable', 'max:200'],
             'twitter' => ['nullable', 'max:200'],
             'linkedin' => ['nullable', 'max:200'],
             'instagram' => ['nullable', 'max:200'],
+            'is_featured' => ['sometimes', 'boolean'],
+            'is_verified' => ['sometimes', 'boolean'],
             'latitude' => ['max:20', 'nullable', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
             'longitude' => [
                 'max:20',

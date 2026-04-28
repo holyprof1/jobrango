@@ -70,20 +70,20 @@ class GeneralSettingForm extends SettingForm
                     ->helperText(trans('plugins/job-board::settings.general.enable_post_approval_helper'))
             )
             ->add(
+                'job_board_auto_verify_new_companies',
+                OnOffCheckboxField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('plugins/job-board::settings.general.auto_verify_new_companies'))
+                    ->value(JobBoardHelper::shouldAutoVerifyNewCompanies())
+                    ->helperText(trans('plugins/job-board::settings.general.auto_verify_new_companies_helper'))
+            )
+            ->add(
                 'job_board_verified_company_auto_approval',
                 OnOffCheckboxField::class,
                 OnOffFieldOption::make()
                     ->label(trans('plugins/job-board::settings.general.verified_company_auto_approval'))
-                    ->value(setting('job_board_verified_company_auto_approval', false))
+                    ->value(setting('job_board_verified_company_auto_approval', true))
                     ->helperText(trans('plugins/job-board::settings.general.verified_company_auto_approval_helper'))
-            )
-            ->add(
-                'verify_account_created_company',
-                OnOffCheckboxField::class,
-                OnOffFieldOption::make()
-                    ->label(trans('plugins/job-board::settings.general.verify_account_created_company'))
-                    ->value(setting('verify_account_created_company', true))
-                    ->helperText(trans('plugins/job-board::settings.general.verify_account_created_company_helper'))
             )
             ->addCloseCollapsible('job_board_enabled_register_as_employer', '1')
             ->add(

@@ -28,7 +28,7 @@
                         <dt class="col-5">{{ trans('core/base::tables.status') }}</dt>
                         <dd class="col-7">{!! BaseHelper::clean($company->status->toHtml()) !!}</dd>
                         
-                        <dt class="col-5">{{ trans('plugins/job-board::company.form.is_featured') }}</dt>
+                        <dt class="col-5">{{ __('Show on homepage') }}</dt>
                         <dd class="col-7">
                             @if($company->is_featured)
                                 <span class="badge bg-success text-success-fg">{{ trans('core/base::base.yes') }}</span>

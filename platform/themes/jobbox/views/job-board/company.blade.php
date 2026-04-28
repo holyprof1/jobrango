@@ -8,6 +8,8 @@
     Theme::set('pageTitle', $company->name);
 
     $coverImage = $company->cover_image ?: null;
+    $hasGenericCoverImage = $coverImage && str_contains(strtolower($coverImage), 'banner-section-search-box');
+    $coverImage = $hasGenericCoverImage ? null : $coverImage;
     $companySummary = trim(strip_tags((string) $company->description));
     $companyContent = trim((string) $company->content);
     $hasDemoDescription = $companySummary && str_contains(strtolower($companySummary), 'lorem ipsum');
@@ -34,7 +36,7 @@
                         <div class="jobrango-cover__inner">
                             <span class="jobrango-cover__eyebrow">{{ __('Company profile') }}</span>
                             <h1>{{ $company->name }}</h1>
-                            <p>{{ __('Clean employer branding without the generic demo illustration.') }}</p>
+                            <p>{{ __('Explore the company profile, active roles, and ways to get in touch.') }}</p>
                         </div>
                     </div>
                 @endif
@@ -62,10 +64,16 @@
                                 {{ __('Employer Dashboard') }}
                             </a>
                         </div>
-                    @elseif ($company->phone && (! JobBoardHelper::isCompanyInformationHiddenForGuests() || auth('account')->check()))
-                        <a class="btn btn-call-icon btn-apply btn-apply-big" href="tel:{{ $company->phone }}">
-                            {{ __('Contact Us') }}
-                        </a>
+                    @elseif (! JobBoardHelper::isCompanyInformationHiddenForGuests() || auth('account')->check())
+                        @if ($company->phone)
+                            <a class="btn btn-call-icon btn-apply btn-apply-big" href="tel:{{ $company->phone }}">
+                                {{ __('Contact Company') }}
+                            </a>
+                        @elseif ($company->email)
+                            <a class="btn btn-call-icon btn-apply btn-apply-big" href="mailto:{{ $company->email }}">
+                                {{ __('Contact Company') }}
+                            </a>
+                        @endif
                     @endif
                 </div>
             </div>
@@ -80,7 +88,7 @@
                 <div class="content-single">
                     <div class="tab-content">
                         <div class="tab-pane fade show active" id="tab-about" role="tabpanel" aria-labelledby="tab-about">
-                            <h4>{{ __('Welcome to :company_name', ['company_name' => $company->name]) }}</h4>
+                            <h4>{{ __('About :company_name', ['company_name' => $company->name]) }}</h4>
                             <div class="ck-content">
                                 @if ($hasDemoContent || ! $companyContent)
                                     <p>{{ __('This employer profile is available for candidate discovery, company research, and direct contact through JobRango.') }}</p>
@@ -93,6 +101,7 @@
                 </div>
 
                 <div class="box-related-job content-page box-list-jobs">
+                    <h5 class="mb-3">{{ __('Recent jobs at :company', ['company' => $company->name]) }}</h5>
                     @include(Theme::getThemeNamespace('views.job-board.partials.company-job-items'), ['jobs' => $jobs])
                 </div>
 

@@ -1,75 +1,67 @@
 # Employer Flow Report
 
-## What Changed
+## Company Flow Changes
 
-### Employer Header State
+### Employer Company Create/Edit
 
-- Employer header now shows:
-  - `Home`
-  - `Jobs`
-  - `Companies`
-  - `Employer Dashboard`
-  - `Post a Job`
-  - `Applicants`
-  - company/profile dropdown
-  - logout
+Employer-side company management is now focused on practical profile data instead of moderation/internal controls.
 
-### Employer Dashboard Sidebar
+Visible employer company fields now include:
 
-- Reworked the sidebar into a compact profile card plus tighter menu stack.
-- Menu order now matches the requested product flow more closely:
-  - Dashboard
-  - Jobs
-  - Companies
-  - Applicants
-  - Reviews
-  - Settings
+- logo
+- cover image
+- company name
+- description
+- company about/content
+- email
+- phone
+- website
+- CEO/contact person
+- year founded
+- number of offices
+- number of employees
+- annual revenue
+- location
+- address
+- postal code
+- social links
 
-### Employer Jobs Flow
+Hidden from employer flow:
 
-- `/account/jobs` now renders as a product-style jobs management page instead of a generic table.
-- Each employer job card now shows:
-  - readable display ID
-  - company context
-  - status and moderation badges
-  - applicant counts
-  - direct actions for `View Job`, `Edit`, `Applicants`, and `Application Form`
+- unique ID
+- homepage flag
+- verified flag
+- moderation status
+- latitude
+- longitude
 
-### Posting Flow
+### Company Save Behavior
 
-- Job create still uses the existing form engine, but the visible flow stays focused on normal hiring inputs.
-- After save, the flow now sends employers to:
-  - `/account/jobs/{job}/application-form`
+- Employer company save now uses an allowlist of safe fields before persistence.
+- Employer company create no longer resets logo and cover image to `null`.
+- New employer companies auto-verify and publish by default through the new company verification setting.
 
-### Applicants Flow
+### Job Posting Flow
 
-- `/account/applicants` now defaults to jobs-first context instead of mixing all applicants together.
-- Employers can open applicants filtered to a single job using:
-  - `/account/applicants?job_id={job}`
+- `/account/jobs/create` remains available to employers with posting access.
+- Verified + published companies now qualify for immediate job publishing when verified-company auto-approval is enabled.
+- This keeps the employer posting flow immediate without removing admin moderation settings.
 
-## Custom Application Form Status
+## Routes Confirmed
 
-Implemented now:
-
-- job-level `application_mode`
-- job-level `application_form_schema`
-- job-level `application_form_settings`
-- post-save setup screen
-- basic/custom mode selection
-- screening-setting toggles
-
-Not implemented yet:
-
-- real drag/drop or add-question builder
-- saved question authoring UI
-- custom candidate-side rendering per job
-- knockout scoring logic
+- `/account/companies`
+- `/account/companies/edit/{company}`
+- `/account/jobs/create`
 
 ## Smoke Validation
 
 - Demo employer credentials validated successfully.
-- Employer-owned jobs query works.
-- Sample employer job routes resolved for:
-  - application-form setup
-  - applicants filtered by job
-  - admin approval action
+- Browser route checks passed for:
+  - `/account/companies`
+  - `/account/companies/edit/21`
+  - `/account/jobs/create`
+
+## Later
+
+- Add a dedicated employer company card/list redesign if the current table still feels too admin-like.
+- Decide whether annual revenue should stay in the default employer form or move to an optional advanced panel.

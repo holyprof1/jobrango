@@ -11,6 +11,7 @@ use Botble\Base\Http\Actions\DeleteResourceAction;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Base\Supports\Breadcrumb;
 use Botble\JobBoard\Events\AdminApprovedCompanyEvent;
+use Botble\JobBoard\Facades\JobBoardHelper;
 use Botble\JobBoard\Forms\CompanyForm;
 use Botble\JobBoard\Http\Requests\AjaxCompanyRequest;
 use Botble\JobBoard\Http\Requests\CompanyRequest;
@@ -48,10 +49,20 @@ class CompanyController extends BaseController
 
     public function store(CompanyRequest $request, StoreCompanyAccountService $storeCompanyAccountService)
     {
+        $data = $request->input();
+        $this->syncVerificationData(
+            $data,
+            $request->has('is_verified')
+                ? $request->boolean('is_verified')
+                : JobBoardHelper::shouldAutoVerifyNewCompanies(),
+            Auth::id(),
+            $request->input('verification_note')
+        );
+
         /**
          * @var Company $company
          */
-        $company = Company::query()->create($request->input());
+        $company = Company::query()->create($data);
 
         event(new CreatedContentEvent(COMPANY_MODULE_SCREEN_NAME, $request, $company));
 
@@ -76,8 +87,17 @@ class CompanyController extends BaseController
     public function update(Company $company, CompanyRequest $request, StoreCompanyAccountService $storeCompanyAccountService)
     {
         $isApproved = $company->status->getValue() == BaseStatusEnum::PENDING && $request->input('status') == BaseStatusEnum::PUBLISHED;
+        $data = $request->input();
 
-        $company->fill($request->input());
+        $this->syncVerificationData(
+            $data,
+            $request->boolean('is_verified'),
+            Auth::id(),
+            $request->input('verification_note'),
+            $company
+        );
+
+        $company->fill($data);
         $company->save();
 
         if ($isApproved) {
@@ -144,7 +164,15 @@ class CompanyController extends BaseController
 
     public function ajaxCreateCompany(AjaxCompanyRequest $request)
     {
-        $company = Company::query()->create($request->input());
+        $data = $request->input();
+
+        $this->syncVerificationData(
+            $data,
+            JobBoardHelper::shouldAutoVerifyNewCompanies(),
+            Auth::id()
+        );
+
+        $company = Company::query()->create($data);
 
         event(new CreatedContentEvent(COMPANY_MODULE_SCREEN_NAME, $request, $company));
 
@@ -188,10 +216,7 @@ class CompanyController extends BaseController
                 ->setMessage(trans('plugins/job-board::company.already_verified'));
         }
 
-        $company->is_verified = true;
-        $company->verified_at = Carbon::now();
-        $company->verified_by = Auth::id();
-        $company->verification_note = $request->input('verification_note');
+        $company->markAsVerified(Auth::id(), Carbon::now(), $request->input('verification_note'));
         $company->save();
 
         return $this
@@ -208,14 +233,60 @@ class CompanyController extends BaseController
                 ->setMessage(trans('plugins/job-board::company.not_verified_yet'));
         }
 
-        $company->is_verified = false;
-        $company->verified_at = null;
-        $company->verified_by = null;
-        $company->verification_note = $request->input('verification_note');
+        $company->markAsUnverified($request->input('verification_note'));
         $company->save();
 
         return $this
             ->httpResponse()
             ->setMessage(trans('plugins/job-board::company.unverified_successfully'));
+    }
+
+    public function toggleHomepage(Company $company, Request $request)
+    {
+        $company->is_featured = $request->boolean('is_featured');
+        $company->save();
+
+        return $this
+            ->httpResponse()
+            ->setMessage($company->is_featured ? __('Company will now appear on the homepage.') : __('Company removed from homepage selections.'));
+    }
+
+    public function toggleVerification(Company $company, Request $request)
+    {
+        if ($request->boolean('is_verified')) {
+            $company->markAsVerified(Auth::id(), Carbon::now());
+            $message = trans('plugins/job-board::company.verified_successfully');
+        } else {
+            $company->markAsUnverified();
+            $message = trans('plugins/job-board::company.unverified_successfully');
+        }
+
+        $company->save();
+
+        return $this
+            ->httpResponse()
+            ->setMessage($message);
+    }
+
+    protected function syncVerificationData(
+        array &$data,
+        bool $isVerified,
+        ?int $verifiedBy = null,
+        ?string $verificationNote = null,
+        ?Company $company = null
+    ): void {
+        $data['is_verified'] = $isVerified;
+
+        if ($isVerified) {
+            $data['verified_at'] = $company?->verified_at ?: Carbon::now();
+            $data['verified_by'] = $company?->verified_by ?: $verifiedBy;
+        } else {
+            $data['verified_at'] = null;
+            $data['verified_by'] = null;
+        }
+
+        if ($verificationNote !== null) {
+            $data['verification_note'] = $verificationNote;
+        }
     }
 }

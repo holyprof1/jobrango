@@ -18,7 +18,6 @@ use Botble\Table\Columns\IdColumn;
 use Botble\Table\Columns\ImageColumn;
 use Botble\Table\Columns\NameColumn;
 use Botble\Table\Columns\StatusColumn;
-use Botble\Table\Columns\YesNoColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -57,7 +56,7 @@ class CompanyTable extends TableAbstract
                 'id',
                 'logo',
                 'name',
-                'unique_id',
+                'is_featured',
                 'is_verified',
                 'created_at',
                 'status',
@@ -73,16 +72,39 @@ class CompanyTable extends TableAbstract
             ImageColumn::make('logo')
                 ->title(trans('plugins/job-board::messages.logo')),
             NameColumn::make()->route('companies.edit'),
-            FormattedColumn::make('unique_id')
+            FormattedColumn::make('display_id')
                 ->getValueUsing(function (FormattedColumn $column) {
                     $item = $column->getItem();
 
-                    return BaseHelper::clean($item->unique_id ?: '&mdash;');
+                    return BaseHelper::clean($item->display_id ?: '&mdash;');
                 })
-                ->title(trans('plugins/job-board::job-board.form.unique_id'))
+                ->title(__('Company ID'))
                 ->alignLeft(),
-            YesNoColumn::make('is_verified')
-                ->title(trans('plugins/job-board::company.verified'))
+            FormattedColumn::make('is_verified')
+                ->title(__('Verified'))
+                ->getValueUsing(function (FormattedColumn $column) {
+                    $item = $column->getItem();
+
+                    return view('plugins/job-board::companies.partials.table-toggle', [
+                        'url' => route('companies.toggle-verification', $item->id),
+                        'inputName' => 'is_verified',
+                        'checked' => (bool) $item->is_verified,
+                        'label' => $item->is_verified ? __('On') : __('Off'),
+                    ])->render();
+                })
+                ->alignCenter(),
+            FormattedColumn::make('is_featured')
+                ->title(__('Homepage'))
+                ->getValueUsing(function (FormattedColumn $column) {
+                    $item = $column->getItem();
+
+                    return view('plugins/job-board::companies.partials.table-toggle', [
+                        'url' => route('companies.toggle-homepage', $item->id),
+                        'inputName' => 'is_featured',
+                        'checked' => (bool) $item->is_featured,
+                        'label' => $item->is_featured ? __('On') : __('Off'),
+                    ])->render();
+                })
                 ->alignCenter(),
             CreatedAtColumn::make(),
             StatusColumn::make(),
@@ -141,7 +163,7 @@ class CompanyTable extends TableAbstract
         return [
             'operations' => [
                 'title' => trans('core/base::tables.operations'),
-                'width' => '300px',
+                'width' => '220px',
                 'class' => 'text-center',
                 'orderable' => false,
                 'searchable' => false,

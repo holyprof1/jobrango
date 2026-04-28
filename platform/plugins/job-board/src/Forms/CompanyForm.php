@@ -3,7 +3,7 @@
 namespace Botble\JobBoard\Forms;
 
 use Botble\Base\Forms\FieldOptions\DescriptionFieldOption;
-use Botble\Base\Forms\FieldOptions\IsFeaturedFieldOption;
+use Botble\Base\Forms\FieldOptions\OnOffFieldOption;
 use Botble\Base\Forms\FieldOptions\StatusFieldOption;
 use Botble\Base\Forms\FieldOptions\TextFieldOption;
 use Botble\Base\Forms\Fields\OnOffField;
@@ -54,7 +54,10 @@ class CompanyForm extends FormAbstract
             ->add(
                 'is_featured',
                 OnOffField::class,
-                IsFeaturedFieldOption::make()
+                OnOffFieldOption::make()
+                    ->label(__('Show on homepage'))
+                    ->helperText(__('Enable this to include the company in homepage sections like the logo rail and top companies.'))
+                    ->defaultValue(0)
             )
             ->add('content', 'editor', [
                 'label' => trans('core/base::forms.content'),
@@ -62,14 +65,6 @@ class CompanyForm extends FormAbstract
                     'rows' => 4,
                     'placeholder' => trans('core/base::forms.description_placeholder'),
                 ],
-            ])
-            ->add('tax_id', 'text', [
-                'label' => trans('plugins/job-board::forms.tax_id'),
-                'attr' => [
-                    'placeholder' => trans('plugins/job-board::forms.tax_id'),
-                    'data-counter' => 60,
-                ],
-                'colspan' => 4,
             ])
             ->add('ceo', 'text', [
                 'label' => trans('plugins/job-board::forms.company_ceo'),
@@ -197,6 +192,24 @@ class CompanyForm extends FormAbstract
                 ]);
             })
             ->add('status', SelectField::class, StatusFieldOption::make())
+            ->add(
+                'is_verified',
+                OnOffField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('plugins/job-board::company.verified'))
+                    ->helperText(__('Verified companies can post jobs immediately when verified-company auto-approval is enabled.'))
+                    ->defaultValue(
+                        $this->getModel()->getKey()
+                            ? (bool) $this->getModel()->is_verified
+                            : JobBoardHelper::shouldAutoVerifyNewCompanies()
+                    )
+            )
+            ->add('logo', 'mediaImage', [
+                'label' => trans('plugins/job-board::forms.logo'),
+            ])
+            ->add('cover_image', 'mediaImage', [
+                'label' => trans('plugins/job-board::forms.cover_image'),
+            ])
             ->add('accounts', 'tags', [
                 'label' => trans('plugins/job-board::forms.account_manager'),
                 'value' => $accounts,
@@ -209,21 +222,14 @@ class CompanyForm extends FormAbstract
                     'data-whitelist' => $accounts,
                 ],
             ])
-            ->add(
-                'unique_id',
-                TextField::class,
-                TextFieldOption::make()
-                    ->value($this->getModel()->getKey() ? $this->getModel()->unique_id : $this->getModel()->generateUniqueId())
-                    ->label(trans('plugins/job-board::job-board.form.unique_id'))
-            )
-            ->add('logo', 'mediaImage', [
-                'label' => trans('plugins/job-board::forms.logo'),
-            ])
-            ->add('cover_image', 'mediaImage', [
-                'label' => trans('plugins/job-board::forms.cover_image'),
-            ])
             ->setBreakFieldPoint('status')
             ->addMetaBoxes([
+                'advanced_company' => [
+                    'title' => __('Advanced'),
+                    'content' => view('plugins/job-board::companies.partials.advanced-fields', [
+                        'company' => $this->getModel(),
+                    ])->render(),
+                ],
                 'social_links' => [
                     'title' => trans('plugins/job-board::forms.social_links'),
                     'content' => view(

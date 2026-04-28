@@ -2,6 +2,7 @@
 
 namespace Botble\JobBoard\Http\Requests;
 
+use Botble\Base\Rules\MediaImageRule;
 use Botble\Support\Http\Requests\Request;
 
 class AccountCompanyRequest extends Request
@@ -13,6 +14,7 @@ class AccountCompanyRequest extends Request
             'slug' => ['nullable', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
             'description' => ['nullable', 'max:400'],
+            'content' => ['nullable', 'string', 'max:100000'],
             'website' => ['nullable', 'max:120'],
             'address' => ['nullable', 'max:250'],
             'postal_code' => ['nullable', 'max:20'],
@@ -22,6 +24,8 @@ class AccountCompanyRequest extends Request
             'number_of_offices' => ['nullable', 'numeric'],
             'number_of_employees' => ['nullable', 'numeric'],
             'annual_revenue' => ['nullable', 'max:60'],
+            'logo' => ['nullable', new MediaImageRule()],
+            'cover_image' => ['nullable', new MediaImageRule()],
             'logo_input' => ['nullable', 'file', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
             'cover_image_input' => ['nullable', 'file', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
             'facebook' => ['nullable', 'max:200'],

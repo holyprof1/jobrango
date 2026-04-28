@@ -79,7 +79,24 @@ class JobBoardHelper
 
     public function isVerifiedCompanyAutoApprovalEnabled(): bool
     {
-        return setting('job_board_verified_company_auto_approval', 0) == 1;
+        return setting('job_board_verified_company_auto_approval', 1) == 1;
+    }
+
+    public function shouldAutoVerifyNewCompanies(): bool
+    {
+        $setting = setting('job_board_auto_verify_new_companies');
+
+        if ($setting !== null) {
+            return (bool) $setting;
+        }
+
+        $legacySetting = setting('verify_account_created_company');
+
+        if ($legacySetting !== null) {
+            return ! (bool) $legacySetting;
+        }
+
+        return true;
     }
 
     public function getThousandSeparatorForInputMask(): string

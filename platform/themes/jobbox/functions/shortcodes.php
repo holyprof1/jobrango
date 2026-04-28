@@ -49,7 +49,7 @@ app()->booted(function (): void {
 
                 $featuredCompanies = Company::query()
                     ->wherePublished()
-                    ->where('is_featured', true)
+                    ->showOnHomepage()
                     ->with($with)
                     ->take((int) $shortcode->limit_company ?: Arr::first(JobBoardHelper::getPerPageParams()))->latest()
                     ->get();
@@ -375,7 +375,8 @@ app()->booted(function (): void {
                 }
 
                 $companies = Company::query()
-                    ->where('is_featured', 1)
+                    ->wherePublished()
+                    ->showOnHomepage()
                     ->with($with)
                     ->withCount([
                         'reviews',

@@ -1,47 +1,67 @@
 # Admin Approval Settings Report
 
-## Implemented
+## Company Verification Settings
 
-### Quick Moderation Actions
+New/default behavior:
 
-Admin job list now exposes direct actions for:
+- `job_board_auto_verify_new_companies`
+  - default: `true`
+  - effect: new companies created by employers or admins start verified
 
-- `View`
-- `Approve`
-- `Reject`
-- `Edit`
+- `job_board_verified_company_auto_approval`
+  - default: `true`
+  - effect: when job post approval is enabled, published + verified companies can still auto-publish jobs
 
-These actions are available without opening each job first.
-
-### Approval Settings
-
-Existing setting already used:
+Existing moderation setting remains:
 
 - `job_board_enable_post_approval`
 
-New setting added:
+## Company Approval Logic
 
-- `job_board_verified_company_auto_approval`
+### New Companies
 
-## Approval Logic
+- Employer-created companies:
+  - publish immediately
+  - verify automatically by default
 
-### If post approval is OFF
+- Admin-created companies:
+  - default to verified
+  - can still be saved with a different status if the admin changes it
 
-- jobs auto-approve and publish as before
+### Jobs From Companies
 
-### If post approval is ON
+- If `job_board_enable_post_approval` is off:
+  - jobs publish immediately
 
-- jobs require moderation by default
-- if `verified_company_auto_approval` is enabled, jobs from published and verified companies auto-approve
+- If `job_board_enable_post_approval` is on:
+  - published + verified companies auto-approve jobs when `job_board_verified_company_auto_approval` is on
+  - all other jobs remain pending moderation
 
-## Safe Behavior
+## Admin Quick Actions
 
-- Verified-company auto-approval defaults to off.
-- This keeps moderation strict unless an admin explicitly enables the faster path.
+Admin company list now exposes direct row-level controls for:
+
+- `Verified` toggle
+- `Homepage` toggle
+- `View`
+- `Edit`
+- `Delete`
+
+These controls work without opening the company first.
+
+## Routes and Controllers
+
+- `POST /admin/job-board/companies/{company}/toggle-verification`
+- `POST /admin/job-board/companies/{company}/toggle-homepage`
+- `platform/plugins/job-board/src/Http/Controllers/CompanyController.php`
+- `platform/plugins/job-board/src/Tables/CompanyTable.php`
 
 ## Validation
 
-- Admin moderation routes exist for:
-  - `/admin/job-board/jobs/{job}/view`
-  - `/admin/job-board/jobs/{job}/approve`
-  - `/admin/job-board/jobs/{job}/reject`
+- Route checks passed for:
+  - `/admin/job-board/companies`
+  - admin company edit page
+  - admin company detail/view page
+- Browser smoke test confirmed:
+  - verify toggle changed state and restored correctly
+  - homepage toggle changed state and restored correctly

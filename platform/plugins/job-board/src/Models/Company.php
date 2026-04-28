@@ -11,6 +11,7 @@ use Botble\JobBoard\Facades\JobBoardHelper;
 use Botble\JobBoard\Models\Concerns\HasActiveJobsRelation;
 use Botble\JobBoard\Models\Concerns\UniqueId;
 use Botble\Media\Facades\RvMedia;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -131,6 +132,37 @@ class Company extends BaseModel
         return $query;
     }
 
+    public function scopeShowOnHomepage(Builder $query): Builder
+    {
+        return $query->where('is_featured', true);
+    }
+
+    public function markAsVerified(?int $verifiedBy = null, ?CarbonInterface $verifiedAt = null, ?string $note = null): static
+    {
+        $this->is_verified = true;
+        $this->verified_at = $verifiedAt ?: now();
+        $this->verified_by = $verifiedBy;
+
+        if ($note !== null) {
+            $this->verification_note = $note;
+        }
+
+        return $this;
+    }
+
+    public function markAsUnverified(?string $note = null): static
+    {
+        $this->is_verified = false;
+        $this->verified_at = null;
+        $this->verified_by = null;
+
+        if ($note !== null) {
+            $this->verification_note = $note;
+        }
+
+        return $this;
+    }
+
     public function getLogoThumbAttribute(): string
     {
         $logo = $this->logo ?: theme_option('default_company_logo');
@@ -180,6 +212,11 @@ class Company extends BaseModel
                 return view('plugins/job-board::partials.verified-badge', ['size' => 'sm'])->render();
             }
         );
+    }
+
+    protected function displayId(): Attribute
+    {
+        return Attribute::get(fn () => 'JR-COMP-' . $this->prefixedSequenceId());
     }
 
     protected static function booted(): void

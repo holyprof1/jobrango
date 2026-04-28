@@ -16,6 +16,7 @@ class GeneralSettingRequest extends Request
             'job_board_enabled_register_as_employer' => $onOffRule,
             'verify_account_email' => $onOffRule,
             'job_board_email_verification_expire_minutes' => ['required', 'integer', 'min:1', 'max:10080'],
+            'job_board_auto_verify_new_companies' => $onOffRule,
             'verify_account_created_company' => $onOffRule,
             'job_board_enable_credits_system' => $onOffRule,
             'job_board_enable_post_approval' => $onOffRule,

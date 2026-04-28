@@ -3,11 +3,12 @@
 namespace Botble\JobBoard\Forms\Fronts;
 
 use Botble\Base\Forms\FieldOptions\DescriptionFieldOption;
+use Botble\Base\Forms\Fields\HtmlField;
 use Botble\Base\Forms\Fields\TextareaField;
 use Botble\Base\Forms\FormAbstract;
 use Botble\JobBoard\Facades\JobBoardHelper;
 use Botble\JobBoard\Forms\Fields\CustomEditorField;
-use Botble\JobBoard\Http\Requests\CompanyRequest;
+use Botble\JobBoard\Http\Requests\AccountCompanyRequest;
 use Botble\JobBoard\Models\Company;
 use Botble\Location\Fields\Options\SelectLocationFieldOption;
 use Botble\Location\Fields\SelectLocationField;
@@ -18,11 +19,14 @@ class CompanyForm extends FormAbstract
     {
         $this
             ->setupModel(new Company())
-            ->setValidatorClass(CompanyRequest::class)
+            ->setValidatorClass(AccountCompanyRequest::class)
             ->columns(12)
             ->disablePermalinkField()
             ->setFormOption('enctype', 'multipart/form-data')
             ->template(JobBoardHelper::viewPath('dashboard.forms.base'))
+            ->add('company_branding_notice', HtmlField::class, [
+                'html' => '<div class="col-12"><div class="jobrango-advanced-settings"><div class="jobrango-advanced-settings__intro"><span class="jobrango-overview__eyebrow">' . e(__('Branding')) . '</span><h4>' . e(__('Company profile basics')) . '</h4><p>' . e(__('Keep this simple: add your logo, summary, contact details, and a few facts candidates care about.')) . '</p></div></div></div>',
+            ])
             ->add('name', 'text', [
                 'label' => trans('plugins/job-board::forms.company_name'),
                 'required' => true,
@@ -31,9 +35,15 @@ class CompanyForm extends FormAbstract
                     'data-counter' => 120,
                 ],
             ])
+            ->add('logo', 'mediaImage', [
+                'label' => trans('plugins/job-board::forms.logo'),
+            ])
+            ->add('cover_image', 'mediaImage', [
+                'label' => trans('plugins/job-board::forms.cover_image'),
+            ])
             ->add('description', TextareaField::class, DescriptionFieldOption::make())
             ->add('content', CustomEditorField::class, [
-                'label' => trans('core/base::forms.content'),
+                'label' => __('About the company'),
                 'attr' => [
                     'rows' => 4,
                     'placeholder' => trans('core/base::forms.description_placeholder'),
@@ -63,6 +73,46 @@ class CompanyForm extends FormAbstract
                 ],
                 'colspan' => 12,
             ])
+            ->add('ceo', 'text', [
+                'label' => trans('plugins/job-board::forms.company_ceo'),
+                'attr' => [
+                    'placeholder' => trans('plugins/job-board::forms.company_ceo'),
+                    'data-counter' => 120,
+                ],
+                'colspan' => 6,
+            ])
+            ->add('year_founded', 'number', [
+                'label' => trans('plugins/job-board::forms.year_founded'),
+                'attr' => [
+                    'placeholder' => trans('plugins/job-board::forms.year_founded_placeholder'),
+                    'data-counter' => 10,
+                ],
+                'colspan' => 3,
+            ])
+            ->add('number_of_offices', 'number', [
+                'label' => trans('plugins/job-board::forms.number_of_offices'),
+                'attr' => [
+                    'placeholder' => trans('plugins/job-board::forms.number_of_offices_placeholder'),
+                    'data-counter' => 10,
+                ],
+                'colspan' => 3,
+            ])
+            ->add('number_of_employees', 'text', [
+                'label' => trans('plugins/job-board::forms.number_of_employees'),
+                'attr' => [
+                    'placeholder' => trans('plugins/job-board::forms.number_of_employees_placeholder'),
+                    'data-counter' => 10,
+                ],
+                'colspan' => 6,
+            ])
+            ->add('annual_revenue', 'text', [
+                'label' => trans('plugins/job-board::forms.annual_revenue'),
+                'attr' => [
+                    'placeholder' => trans('plugins/job-board::forms.annual_revenue_placeholder'),
+                    'data-counter' => 10,
+                ],
+                'colspan' => 6,
+            ])
             ->when(is_plugin_active('location'), function (FormAbstract $form): void {
                 $form->add(
                     'location_data',
@@ -86,53 +136,7 @@ class CompanyForm extends FormAbstract
                 ],
                 'colspan' => 6,
             ])
-            ->when(JobBoardHelper::isEnabledLatLongFields(), function (FormAbstract $form): void {
-                $form->add('latitude', 'text', [
-                    'label' => trans('plugins/job-board::forms.latitude'),
-                    'attr' => [
-                        'placeholder' => 'Ex: 1.462260',
-                        'data-counter' => 25,
-                    ],
-                    'help_block' => [
-                        'tag' => 'a',
-                        'text' => trans('plugins/job-board::forms.latitude_helper'),
-                        'attr' => [
-                            'href' => 'https://www.latlong.net/convert-address-to-lat-long.html',
-                            'target' => '_blank',
-                            'rel' => 'nofollow',
-                            'class' => 'd-block mt-1 small',
-                        ],
-                    ],
-                    'colspan' => 6,
-                ]);
-            })
-            ->when(JobBoardHelper::isEnabledLatLongFields(), function (FormAbstract $form): void {
-                $form->add('longitude', 'text', [
-                    'label' => trans('plugins/job-board::forms.longitude'),
-                    'attr' => [
-                        'placeholder' => 'Ex: 103.812530',
-                        'data-counter' => 25,
-                    ],
-                    'help_block' => [
-                        'tag' => 'a',
-                        'text' => trans('plugins/job-board::forms.longitude_helper'),
-                        'attr' => [
-                            'href' => 'https://www.latlong.net/convert-address-to-lat-long.html',
-                            'target' => '_blank',
-                            'rel' => 'nofollow',
-                            'class' => 'd-block mt-1 small',
-                        ],
-                    ],
-                    'colspan' => 6,
-                ]);
-            })
-            ->add('logo', 'mediaImage', [
-                'label' => trans('plugins/job-board::forms.logo'),
-            ])
-            ->add('cover_image', 'mediaImage', [
-                'label' => trans('plugins/job-board::forms.cover_image'),
-            ])
-            ->setBreakFieldPoint('logo')
+            ->setBreakFieldPoint('cover_image')
             ->addMetaBoxes([
                 'social_links' => [
                     'title' => trans('plugins/job-board::forms.social_links'),

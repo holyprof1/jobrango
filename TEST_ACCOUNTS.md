@@ -2,7 +2,7 @@
 
 These credentials are for local/demo testing only. Change or remove them before production.
 
-Validation status on 2026-04-26:
+Validation status on 2026-04-28:
 
 - Job seeker credentials: valid
 - Employer credentials: valid
@@ -40,5 +40,9 @@ Validation status on 2026-04-26:
 
 - Employer route smoke test resolved a sample job route:
   - `JR-JOB-52`
-- Local browser-interaction testing was not automated in this pass.
-- Credential validation was performed directly against the local database/auth hashes.
+- Employer company edit route resolved:
+  - `/account/companies/edit/21`
+- Public company route resolved:
+  - `/companies/honda`
+- Admin company management route resolved:
+  - `/admin/job-board/companies`

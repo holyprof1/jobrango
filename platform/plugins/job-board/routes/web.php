@@ -259,6 +259,18 @@ AdminHelper::registerRoutes(function (): void {
                 'uses' => 'CompanyController@unverify',
                 'permission' => 'companies.edit',
             ])->wherePrimaryKey();
+
+            Route::post('{company}/toggle-homepage', [
+                'as' => 'toggle-homepage',
+                'uses' => 'CompanyController@toggleHomepage',
+                'permission' => 'companies.edit',
+            ])->wherePrimaryKey();
+
+            Route::post('{company}/toggle-verification', [
+                'as' => 'toggle-verification',
+                'uses' => 'CompanyController@toggleVerification',
+                'permission' => 'companies.edit',
+            ])->wherePrimaryKey();
         });
 
         Route::get('ajax/companies/{company}', [

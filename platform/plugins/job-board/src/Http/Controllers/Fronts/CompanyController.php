@@ -23,6 +23,7 @@ use Botble\Theme\Facades\Theme;
 use Closure;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class CompanyController extends BaseController
 {
@@ -88,19 +89,24 @@ class CompanyController extends BaseController
          */
         $account = auth('account')->user();
 
-        $request->merge([
-            'status' => setting('verify_account_created_company', 1) == 1 ? BaseStatusEnum::PENDING : BaseStatusEnum::PUBLISHED,
-            'logo' => null,
-            'cover_image' => null,
-            'is_featured' => false,
-        ]);
-
         $request = $this->handleUpload($request);
+        $data = $this->companyPayload($request);
+
+        $data['is_featured'] = false;
+
+        if (JobBoardHelper::shouldAutoVerifyNewCompanies()) {
+            $data['status'] = BaseStatusEnum::PUBLISHED;
+            $data['is_verified'] = true;
+            $data['verified_at'] = now();
+        } else {
+            $data['status'] = BaseStatusEnum::PENDING;
+            $data['is_verified'] = false;
+        }
 
         /** @var \Botble\JobBoard\Models\Company $company */
-        $company = Company::query()->create($request->input());
+        $company = Company::query()->create($data);
 
-        $company->accounts()->syncWithoutDetaching(['account_id' => $account->getKey()]);
+        $company->accounts()->syncWithoutDetaching([$account->getKey()]);
 
         $slug = app(SlugService::class)->create($request->input('name'), 0, Company::class);
 
@@ -148,6 +154,34 @@ class CompanyController extends BaseController
         }
 
         return $request;
+    }
+
+    protected function companyPayload(Request $request): array
+    {
+        return Arr::only($request->input(), [
+            'name',
+            'description',
+            'content',
+            'email',
+            'phone',
+            'website',
+            'address',
+            'postal_code',
+            'year_founded',
+            'number_of_offices',
+            'number_of_employees',
+            'annual_revenue',
+            'ceo',
+            'logo',
+            'cover_image',
+            'facebook',
+            'twitter',
+            'linkedin',
+            'instagram',
+            'country_id',
+            'state_id',
+            'city_id',
+        ]);
     }
 
     protected function getCompany(int $id, int $accountId)
@@ -203,16 +237,10 @@ class CompanyController extends BaseController
         $company = $this->getCompany($id, $account->getKey());
         abort_unless($company, 404);
 
-        $request->except([
-            'status',
-            'logo',
-            'cover_image',
-            'is_featured',
-        ]);
-
         $request = $this->handleUpload($request);
+        $data = $this->companyPayload($request);
 
-        $company->fill($request->input());
+        $company->fill($data);
         $company->save();
 
         event(new UpdatedContentEvent(COMPANY_MODULE_SCREEN_NAME, $request, $company));
