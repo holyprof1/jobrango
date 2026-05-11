@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\Factory;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Theme implements ThemeContract
@@ -705,7 +706,8 @@ class Theme implements ThemeContract
         if (app()->isLocal() && app()->hasDebugModeEnabled()) {
             $path = str_replace($this->getThemeNamespace(), $this->getThemeName(), $path);
             $file = str_replace('::', '/', str_replace('.', '/', $path));
-            dd(
+
+            throw new NotFoundHttpException(
                 'This theme has not supported this view, please create file "' . theme_path(
                     $file
                 ) . '.blade.php" to render this page!'
