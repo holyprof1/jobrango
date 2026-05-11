@@ -4,12 +4,12 @@
     $candidate = $jobApplication->account;
     $job = $jobApplication->job;
     $company = $job->company;
-    $candidateSlug = $candidate->slugable?->key;
-    $profileUrl = $candidate->id && $candidate->is_public_profile && $candidateSlug
+    $candidateSlug = $candidate?->slugable?->key;
+    $profileUrl = $candidate?->id && $candidate?->is_public_profile && $candidateSlug
         ? route('public.candidate', $candidateSlug)
         : null;
     $jobUrl = $jobApplication->job_url ?: null;
-    $resumeUrl = ($jobApplication->resume || ($candidate->id && $candidate->resume))
+    $resumeUrl = ($jobApplication->resume || ($candidate?->id && $candidate?->resume))
         ? route('public.account.applicants.download-cv', $jobApplication->id)
         : null;
     $coverLetterUrl = $jobApplication->cover_letter ? RvMedia::url($jobApplication->cover_letter) : null;
@@ -20,7 +20,7 @@
         ->map(fn ($part) => \Illuminate\Support\Str::substr($part, 0, 1))
         ->implode('');
     $candidateInitials = \Illuminate\Support\Str::upper($candidateInitials ?: \Illuminate\Support\Str::substr($jobApplication->full_name, 0, 1));
-    $candidateSummary = trim((string) ($candidate->bio ?: $candidate->description ?: ''));
+    $candidateSummary = trim((string) ($candidate?->bio ?: $candidate?->description ?: ''));
 @endphp
 
 @section('content')
@@ -44,7 +44,7 @@
 
         <section class="jobrango-applicant-review__hero">
             <div class="jobrango-applicant-review__identity">
-                @if ($candidate->id && $candidate->avatar_thumb_url)
+                @if ($candidate?->id && $candidate?->avatar_thumb_url)
                     <img class="jobrango-applicant-review__avatar" src="{{ $candidate->avatar_thumb_url }}" alt="{{ $jobApplication->full_name }}">
                 @else
                     <span class="jobrango-applicant-review__avatar jobrango-applicant-review__avatar--fallback">{{ $candidateInitials }}</span>
@@ -58,14 +58,16 @@
                         @endif
                         {!! $jobApplication->status->toHtml() !!}
                     </div>
-                    <p>{{ $jobApplication->display_id }} @if ($candidate->id) &bull; {{ $candidate->display_id }} @endif</p>
+                    <p>{{ $jobApplication->display_id }} @if ($candidate?->id) &bull; {{ $candidate->display_id }} @endif</p>
                     <div class="jobrango-applicant-review__highlights">
                         <span>{{ __('Applied :time', ['time' => $jobApplication->created_at->diffForHumans()]) }}</span>
-                        @if ($candidate->available_for_hiring)
+                        @if ($candidate?->available_for_hiring)
                             <span>{{ __('Open to work') }}</span>
                         @endif
-                        @if (! $profileUrl)
+                        @if ($candidate?->id && ! $profileUrl)
                             <span>{{ __('Public profile not available') }}</span>
+                        @elseif (! $candidate?->id)
+                            <span>{{ __('Applied as guest') }}</span>
                         @endif
                     </div>
                 </div>
@@ -85,7 +87,7 @@
                 </article>
                 <article>
                     <span>{{ __('Company') }}</span>
-                    <strong>{{ $company->name ?: __('No company selected') }}</strong>
+                    <strong>{{ $company?->name ?: __('No company selected') }}</strong>
                     <p>{{ $job->display_location ?: __('Location not specified') }}</p>
                 </article>
                 <article>
