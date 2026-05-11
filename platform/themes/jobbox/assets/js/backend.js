@@ -132,7 +132,7 @@ $(document).ready(function () {
                     }, 6000)
                 })
 
-            $('#alert-container').on('click', '.close-toast', function (event) {
+            $('#alert-container').off('click', '.close-toast').on('click', '.close-toast', function (event) {
                 event.preventDefault()
                 $(this).closest('.toast').remove()
             })
@@ -153,7 +153,7 @@ $(document).ready(function () {
             processData: false,
             beforeSend: () => {
                 _self.addClass('button-loading')
-                _self.attr('disabled')
+                _self.prop('disabled', true)
             },
             success: (res) => {
                 if (!res.error) {
