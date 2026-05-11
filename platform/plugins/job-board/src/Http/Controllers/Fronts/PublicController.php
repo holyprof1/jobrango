@@ -494,13 +494,21 @@ class PublicController extends BaseController
                 JobAppliedEvent::dispatch($jobApplication, $job);
             }
 
-            if (! $request->ajax()) {
-                return redirect()->to($job->apply_url);
-            }
-
             $message = $job->apply_url
                 ? trans('plugins/job-board::job-application.email.external_redirect')
                 : trans('plugins/job-board::job-application.email.success');
+
+            if (! $request->ajax()) {
+                if ($job->apply_url) {
+                    return redirect()
+                        ->away($job->apply_url)
+                        ->with('success_msg', $message);
+                }
+
+                return redirect()
+                    ->to($job->url . '#job-apply')
+                    ->with('success_msg', $message);
+            }
 
             return $this
                 ->httpResponse()
