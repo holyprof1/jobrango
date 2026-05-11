@@ -13,6 +13,7 @@
      data-full_address="{{ $job->full_address }}">
     @php
         $companyName = $job->company_name ?: $job->company?->name ?: $job->name;
+        $companyBadge = $job->company?->badge;
         $categoryLabels = $job->categories->pluck('name')->filter()->take(4);
         $isRemoteJob = (bool) $job->is_remote;
     @endphp
@@ -58,7 +59,7 @@
                         <a href="{{ $job->url }}" class="text-dark">{{ $job->name }}</a>
                     </h5>
                     @if ($job->has_company)
-                        <p class="text-muted fs-14 mb-0">{{ $companyName }} {!! $job->company->badge !!}</p>
+                        <p class="text-muted fs-14 mb-0">{{ $companyName }} {!! $companyBadge !!}</p>
                     @endif
                 </div>
             </div>
