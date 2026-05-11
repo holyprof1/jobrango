@@ -23,29 +23,31 @@
         @if ($applications->isNotEmpty())
             <div class="jobrango-job-list">
                 @foreach ($applications as $application)
+                    @php
+                        $job = $application->job;
+                        $company = $job?->company;
+                        $companyName = $company?->name ?: $job?->company_name;
+                        $companyLogo = $job?->company_logo_thumb ?: ($company?->logo_thumb ?: (theme_option('logo') ? RvMedia::getImageUrl(theme_option('logo')) : null));
+                    @endphp
                     <article class="jobrango-job-list__item">
                         <div class="jobrango-job-list__logo">
-                            @if ($application->job->hide_company)
-                                @if (theme_option('logo'))
-                                    <img src="{{ RvMedia::getImageUrl(theme_option('logo')) }}" alt="{{ theme_option('site_title') }}">
-                                @endif
-                            @else
-                                <img src="{{ $application->job->company->logo_thumb }}" alt="{{ $application->job->company->name }}">
+                            @if ($companyLogo)
+                                <img src="{{ $companyLogo }}" alt="{{ $companyName ?: theme_option('site_title') }}">
                             @endif
                         </div>
                         <div class="jobrango-job-list__copy">
                             <h4>
                                 @if ($application->job_url)
-                                    <a href="{{ $application->job_url }}">{{ $application->job->name }}</a>
+                                    <a href="{{ $application->job_url }}">{{ $job?->name ?: __('Unavailable job') }}</a>
                                 @else
-                                    <span class="text-decoration-line-through">{{ $application->job->name }}</span>
+                                    <span class="text-decoration-line-through">{{ $job?->name ?: __('Unavailable job') }}</span>
                                 @endif
                             </h4>
                             <p>
-                                @if (! $application->job->hide_company)
-                                    {{ $application->job->company->name }} |
+                                @if (! $job?->hide_company && $companyName)
+                                    {{ $companyName }} |
                                 @endif
-                                {{ $application->job->full_address ?: __('Location not specified') }}
+                                {{ $job?->full_address ?: __('Location not specified') }}
                             </p>
                             <span>{{ $application->created_at->diffForHumans() }}</span>
                         </div>
