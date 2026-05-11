@@ -717,11 +717,12 @@ class Job extends BaseModel
         }
 
         $displayType = setting('job_board_job_location_display', 'state_and_country');
+        $countryCode = $this->country?->code ?: '';
 
         $location = match ($displayType) {
-            'city_state_and_country' => ($this->city_name ? $this->city_name . ', ' : '') . ($this->state_name ? $this->state_name . ', ' : '') . $this->country->code,
+            'city_state_and_country' => ($this->city_name ? $this->city_name . ', ' : '') . ($this->state_name ? $this->state_name . ', ' : '') . $countryCode,
             'city_and_state' => ($this->city_name ? $this->city_name . ', ' : '') . $this->state_name,
-            default => ($this->state_name ? $this->state_name . ', ' : '') . $this->country->code,
+            default => ($this->state_name ? $this->state_name . ', ' : '') . $countryCode,
         };
 
         return trim(trim($location), ',');

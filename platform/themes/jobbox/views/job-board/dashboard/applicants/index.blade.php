@@ -33,7 +33,7 @@
                 </article>
                 <article>
                     <span>{{ __('Company') }}</span>
-                    <strong>{{ $selectedJob->company->name ?: __('No company selected') }}</strong>
+                    <strong>{{ $selectedJob->company?->name ?: __('No company selected') }}</strong>
                     <p>{{ $selectedJob->display_location ?: __('Location not specified') }}</p>
                 </article>
                 <article>
@@ -169,7 +169,7 @@
                                 <div>
                                     <span>{{ $job->display_id }}</span>
                                     <h3>{{ $job->name }}</h3>
-                                    <p>{{ $job->company->name ?: __('No company selected') }}</p>
+                                    <p>{{ $job->company?->name ?: __('No company selected') }}</p>
                                 </div>
                                 <div class="jobrango-employer-job-card__badges">
                                     {!! $job->status->toHtml() !!}
