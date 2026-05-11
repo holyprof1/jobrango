@@ -112,7 +112,7 @@ $(document).ready(function () {
             }
 
             let html = `
-                <div class="toast ${colorType}" id="${alertId}">
+                <div class="toast ${colorType}" id="${alertId}" role="status" aria-live="polite">
                     <div class="outer-container">
                         ${type}
                     </div>
@@ -120,11 +120,15 @@ $(document).ready(function () {
                         <p>${title}</p>
                         <p>${message}</p>
                     </div>
-                    <a class="close-toast" >&times;</a>
+                    <button class="close-toast" type="button" aria-label="${window.alertTranslations.close || 'Close'}">&times;</button>
                 </div>
             `
 
             $('#alert-container')
+                .attr({
+                    'aria-live': 'polite',
+                    'aria-relevant': 'additions',
+                })
                 .append(html)
                 .ready(() => {
                     window.setTimeout(() => {
@@ -187,7 +191,7 @@ $(document).ready(function () {
             placeholder: element.data('placeholder'),
             tags: true,
             ajax: {
-                url: $(this).data('url') || `${window.siteUrl}/ajax/locations`,
+                url: element.data('url') || `${window.siteUrl}/ajax/locations`,
                 dataType: 'json',
                 delay: 500,
                 type: 'GET',
@@ -1037,9 +1041,17 @@ $(document).ready(function () {
     $(document)
         .on('click', '.btn-advanced-filter', () => {
             $(document).find('.sidebar-filter-mobile').addClass('active')
+            $('body').addClass('sidebar-filter-mobile-active')
         })
         .on('click', '.sidebar-filter-mobile .backdrop, .close-sidebar-filter-mobile', () => {
             $(document).find('.sidebar-filter-mobile').removeClass('active')
+            $('body').removeClass('sidebar-filter-mobile-active')
+        })
+        .on('keydown', (event) => {
+            if (event.key === 'Escape') {
+                $(document).find('.sidebar-filter-mobile').removeClass('active')
+                $('body').removeClass('sidebar-filter-mobile-active')
+            }
         })
 
     const initEmployerAdvancedToggle = () => {

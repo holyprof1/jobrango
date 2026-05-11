@@ -1717,11 +1717,14 @@ span {
     .close-toast {
         position: absolute;
         background-color: transparent;
+        border: none;
         font-size: 20px;
         color: #656565;
         top: 5px;
         right: 10px;
         cursor: pointer;
+        line-height: 1;
+        padding: 0;
     }
 
     @keyframes fadeIn {
@@ -1877,6 +1880,10 @@ span {
 }
 
 @media (max-width: 991px) {
+    body.sidebar-filter-mobile-active {
+        overflow: hidden;
+    }
+
     .sidebar-filter-mobile {
         position: absolute;
         right: 0;
