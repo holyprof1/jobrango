@@ -6,14 +6,18 @@ use Botble\Ads\Facades\AdsManager;
 use Botble\Ads\Http\Requests\AdsRequest;
 use Botble\Ads\Models\Ads;
 use Botble\Base\Facades\BaseHelper;
+use Botble\Base\Forms\FieldOptions\CodeEditorFieldOption;
 use Botble\Base\Forms\FieldOptions\DatePickerFieldOption;
+use Botble\Base\Forms\FieldOptions\HtmlFieldOption;
 use Botble\Base\Forms\FieldOptions\MediaImageFieldOption;
 use Botble\Base\Forms\FieldOptions\NameFieldOption;
 use Botble\Base\Forms\FieldOptions\SelectFieldOption;
 use Botble\Base\Forms\FieldOptions\SortOrderFieldOption;
 use Botble\Base\Forms\FieldOptions\StatusFieldOption;
 use Botble\Base\Forms\FieldOptions\TextFieldOption;
+use Botble\Base\Forms\Fields\CodeEditorField;
 use Botble\Base\Forms\Fields\DatePickerField;
+use Botble\Base\Forms\Fields\HtmlField;
 use Botble\Base\Forms\Fields\MediaImageField;
 use Botble\Base\Forms\Fields\NumberField;
 use Botble\Base\Forms\Fields\OnOffField;
@@ -49,6 +53,7 @@ class AdsForm extends FormAbstract
                     ->choices([
                         'custom_ad' => trans('plugins/ads::ads.custom_ad'),
                         'google_adsense' => 'Google AdSense',
+                        'embed_code' => trans('plugins/ads::ads.embed_code_ad'),
                     ])
             )
             ->addOpenCollapsible('ads_type', 'google_adsense', $this->getModel()->ads_type)
@@ -60,6 +65,63 @@ class AdsForm extends FormAbstract
                     ->placeholder('E.g: 1234567890')
             )
             ->addCloseCollapsible('ads_type', 'google_adsense')
+            ->addOpenCollapsible('ads_type', 'embed_code', $this->getModel()->ads_type)
+            ->add(
+                'embed_code_help',
+                HtmlField::class,
+                HtmlFieldOption::make()->content(
+                    sprintf(
+                        '<div class="form-text mb-3">%s</div>',
+                        trans('plugins/ads::ads.embed_code_helper', [
+                            'sizes' => implode(', ', array_keys(Ads::getEmbedSizeChoices())),
+                        ])
+                    )
+                )
+            )
+            ->add(
+                'embed_provider',
+                SelectField::class,
+                SelectFieldOption::make()
+                    ->label(trans('plugins/ads::ads.embed_provider'))
+                    ->choices([
+                        'adsterra' => 'Adsterra',
+                        'custom' => trans('plugins/ads::ads.custom_embed'),
+                    ])
+            )
+            ->add(
+                'embed_size',
+                SelectField::class,
+                SelectFieldOption::make()
+                    ->label(trans('plugins/ads::ads.embed_size'))
+                    ->choices(Ads::getEmbedSizeChoices())
+                    ->helperText(trans('plugins/ads::ads.embed_size_helper'))
+            )
+            ->add('embed_width', NumberField::class, [
+                'label' => trans('plugins/ads::ads.embed_width'),
+                'attr' => [
+                    'min' => 1,
+                    'placeholder' => '320',
+                ],
+                'helper_block' => [
+                    'text' => trans('plugins/ads::ads.embed_dimension_helper'),
+                ],
+            ])
+            ->add('embed_height', NumberField::class, [
+                'label' => trans('plugins/ads::ads.embed_height'),
+                'attr' => [
+                    'min' => 1,
+                    'placeholder' => '50',
+                ],
+            ])
+            ->add(
+                'embed_code',
+                CodeEditorField::class,
+                CodeEditorFieldOption::make()
+                    ->label(trans('plugins/ads::ads.embed_code'))
+                    ->mode('html')
+                    ->helperText(trans('plugins/ads::ads.embed_code_example'))
+            )
+            ->addCloseCollapsible('ads_type', 'embed_code')
             ->addOpenCollapsible('ads_type', 'custom_ad', $this->getModel()->ads_type ?? 'custom_ad')
             ->add('url', TextField::class, [
                 'label' => trans('plugins/ads::ads.url'),
@@ -104,8 +166,7 @@ class AdsForm extends FormAbstract
                 DatePickerField::class,
                 DatePickerFieldOption::make()
                     ->label(trans('plugins/ads::ads.expired_at'))
-                    ->defaultValue(BaseHelper::formatDate(Carbon::now()->addMonth()))
-                    ->helperText(trans('plugins/ads::ads.expired_at_helper'))
+                    ->helperText(__('Leave this empty to keep the ad active until you disable it.'))
             )
             ->setBreakFieldPoint('status');
     }

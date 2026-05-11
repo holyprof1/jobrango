@@ -5,7 +5,9 @@ namespace Botble\JobBoard\Models;
 use Botble\Base\Casts\SafeContent;
 use Botble\Base\Models\BaseModel;
 use Botble\JobBoard\Enums\JobApplicationStatusEnum;
+use Botble\JobBoard\Supports\ApplicantScreeningManager;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class JobApplication extends BaseModel
 {
@@ -23,11 +25,14 @@ class JobApplication extends BaseModel
         'job_id',
         'account_id',
         'status',
+        'screening_status',
+        'screening_summary',
     ];
 
     protected $casts = [
         'status' => JobApplicationStatusEnum::class,
         'application_answers' => 'array',
+        'screening_summary' => 'array',
         'first_name' => SafeContent::class,
         'last_name' => SafeContent::class,
         'message' => SafeContent::class,
@@ -65,5 +70,15 @@ class JobApplication extends BaseModel
         }
 
         return $url;
+    }
+
+    protected function screeningStatusLabel(): Attribute
+    {
+        return Attribute::get(fn () => ApplicantScreeningManager::screeningStatusLabel($this->screening_status));
+    }
+
+    protected function screeningStatusColor(): Attribute
+    {
+        return Attribute::get(fn () => ApplicantScreeningManager::screeningStatusColor($this->screening_status));
     }
 }

@@ -2,6 +2,29 @@
 
 @php
     $builderQuestions = old('questions', $questions ?? []);
+    $savedScreeningRules = $screeningRules ?? [];
+    $questionIndexMap = collect($questions ?? [])->pluck('key')->flip();
+    $builderScreeningRules = old('screening_rules');
+
+    if (! is_array($builderScreeningRules)) {
+        $builderScreeningRules = collect($savedScreeningRules)
+            ->map(function ($rule) use ($questionIndexMap) {
+                $questionIndex = $questionIndexMap->get($rule['question_key']);
+
+                if ($questionIndex === null) {
+                    return null;
+                }
+
+                return [
+                    'question_index' => $questionIndex,
+                    'operator' => $rule['operator'] ?? 'equals',
+                    'value' => $rule['value'] ?? null,
+                ];
+            })
+            ->filter()
+            ->values()
+            ->all();
+    }
 @endphp
 
 @section('content')
@@ -40,18 +63,69 @@
                 </label>
             </div>
 
+            <div class="jobrango-application-placeholder mt-4">
+                <div>
+                    <span class="jobrango-overview__eyebrow">{{ __('Candidate View') }}</span>
+                    <h4>{{ __('Applicants always start with the essentials') }}</h4>
+                    <p>{{ __('The public apply page always keeps the standard contact fields below. Switch to custom mode to add your own screening questions underneath them for this role.') }}</p>
+                </div>
+                <div class="jobrango-application-placeholder__types">
+                    <span>{{ __('First name') }}</span>
+                    <span>{{ __('Last name') }}</span>
+                    <span>{{ __('Email') }}</span>
+                    <span>{{ __('Phone') }}</span>
+                    <span>{{ __('Message') }}</span>
+                    <span>{{ __('Resume') }}</span>
+                    <span>{{ __('Cover letter') }}</span>
+                    <span data-custom-question-count>{{ __('Custom questions: :count', ['count' => count($builderQuestions)]) }}</span>
+                </div>
+            </div>
+
             <div class="jobrango-application-settings mt-4">
                 <h4>{{ __('Screening & Completion Rules') }}</h4>
-                <label class="cb-container">
-                    <input type="checkbox" name="auto_highlight" value="1" @checked(old('auto_highlight', $applicationSettings['auto_highlight']))>
-                    <span class="text-small">{{ __('Auto-highlight strong applicants based on the answers they submit for this job.') }}</span>
-                    <span class="checkmark"></span>
-                </label>
                 <label class="cb-container">
                     <input type="checkbox" name="mark_incomplete_required" value="1" @checked(old('mark_incomplete_required', $applicationSettings['mark_incomplete_required']))>
                     <span class="text-small">{{ __('Mark candidates as incomplete if they skip required custom questions.') }}</span>
                     <span class="checkmark"></span>
                 </label>
+                <div class="row g-3 mt-2">
+                    <div class="col-lg-6">
+                        <label class="form-label">{{ __('Automatic screening action') }}</label>
+                        <select class="form-control" name="screening_action" data-screening-action>
+                            @foreach (\Botble\JobBoard\Supports\ApplicantScreeningManager::screeningActionOptions() as $value => $label)
+                                <option value="{{ $value }}" @selected(old('screening_action', $applicationSettings['screening_action']) === $value)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        <small>{{ __('Use this to automatically highlight strong matches or hide auto-removed applicants from the default active list.') }}</small>
+                    </div>
+                    <div class="col-lg-6">
+                        <label class="form-label">{{ __('Rule logic') }}</label>
+                        <select class="form-control" name="screening_logic" data-screening-logic>
+                            @foreach (\Botble\JobBoard\Supports\ApplicantScreeningManager::logicOptions() as $value => $label)
+                                <option value="{{ $value }}" @selected(old('screening_logic', $applicationSettings['screening_logic']) === $value)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        <small>{{ __('Choose whether every rule must match, or if any single rule is enough.') }}</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="jobrango-application-builder mt-4" data-screening-builder>
+                <div class="jobrango-application-builder__header">
+                    <div>
+                        <span class="jobrango-overview__eyebrow">{{ __('Auto Screening Rules') }}</span>
+                        <h4>{{ __('Tell the system who to flag or remove') }}</h4>
+                        <p>{{ __('Example: if a candidate answers "No" to relocation and "No" to remote work, you can combine those with AND or OR and decide what happens automatically.') }}</p>
+                    </div>
+                    <button class="btn btn-border hover-up" type="button" data-add-screening-rule>{{ __('Add Rule') }}</button>
+                </div>
+
+                <div class="jobrango-application-builder__list" data-screening-rule-list></div>
+
+                <div class="jobrango-empty-state jobrango-empty-state--compact d-none" data-empty-screening-builder>
+                    <h4>{{ __('No screening rules yet') }}</h4>
+                    <p>{{ __('Add rules after you define your custom questions so the employer dashboard can highlight or auto-remove applicants based on their answers.') }}</p>
+                </div>
             </div>
 
             <div class="jobrango-application-builder mt-4" data-application-builder>
@@ -128,6 +202,37 @@
             </div>
         </article>
     </template>
+
+    <template id="jobrango-screening-rule-template">
+        <article class="jobrango-question-card" data-screening-rule-item>
+            <div class="jobrango-question-card__header">
+                <div>
+                    <span class="jobrango-question-card__badge">{{ __('Screening rule') }}</span>
+                    <strong>{{ __('Answer-based filter') }}</strong>
+                </div>
+                <button class="btn btn-link p-0 text-danger" type="button" data-remove-screening-rule>{{ __('Remove') }}</button>
+            </div>
+            <div class="row g-3">
+                <div class="col-lg-4">
+                    <label class="form-label">{{ __('Question') }}</label>
+                    <select class="form-control" data-rule-field="question_index"></select>
+                </div>
+                <div class="col-lg-4">
+                    <label class="form-label">{{ __('Condition') }}</label>
+                    <select class="form-control" data-rule-field="operator">
+                        @foreach (\Botble\JobBoard\Supports\ApplicantScreeningManager::operatorOptions() as $value => $label)
+                            <option value="{{ $value }}">{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-lg-4" data-rule-value-wrap>
+                    <label class="form-label">{{ __('Value') }}</label>
+                    <input class="form-control" type="text" data-rule-value-text placeholder="{{ __('Example: yes, remote, weekend') }}">
+                    <select class="form-control d-none" data-rule-value-select></select>
+                </div>
+            </div>
+        </article>
+    </template>
 @endsection
 
 @push('footer')
@@ -144,18 +249,54 @@
             const emptyState = builder.querySelector('[data-empty-builder]');
             const template = document.getElementById('jobrango-question-template');
             const addQuestionButton = builder.querySelector('[data-add-question]');
+            const customQuestionCount = document.querySelector('[data-custom-question-count]');
             const supportedOptionTypes = ['multiple_choice', 'checkbox'];
             const initialQuestions = @json(array_values($builderQuestions));
+            const screeningBuilder = document.querySelector('[data-screening-builder]');
+            const screeningTemplate = document.getElementById('jobrango-screening-rule-template');
+            const screeningRuleList = screeningBuilder?.querySelector('[data-screening-rule-list]');
+            const screeningEmptyState = screeningBuilder?.querySelector('[data-empty-screening-builder]');
+            const addScreeningRuleButton = screeningBuilder?.querySelector('[data-add-screening-rule]');
+            const screeningActionField = document.querySelector('[data-screening-action]');
+            const screeningInitialRules = @json(array_values($builderScreeningRules));
+            const operatorsWithoutValue = ['answered', 'not_answered'];
+            const selectQuestionText = @json(__('Select a custom question'));
+            const selectOptionText = @json(__('Select an option'));
 
             const questionName = (index, field) => `questions[${index}][${field}]`;
+            const screeningRuleName = (index, field) => `screening_rules[${index}][${field}]`;
 
             const toggleBuilderMode = () => {
                 const selectedMode = document.querySelector('input[name="application_mode"]:checked')?.value;
                 builder.classList.toggle('is-disabled', selectedMode !== 'custom');
+                addQuestionButton.disabled = selectedMode !== 'custom';
+
+                if (! customQuestionCount) {
+                    return;
+                }
+
+                if (selectedMode !== 'custom') {
+                    customQuestionCount.textContent = '{{ __('Custom questions: off in basic mode') }}';
+                    toggleScreeningBuilderMode();
+
+                    return;
+                }
+
+                customQuestionCount.textContent = `{{ __('Custom questions') }}: ${questionList.children.length}`;
+
+                toggleScreeningBuilderMode();
             };
 
             const toggleEmptyState = () => {
                 emptyState.classList.toggle('d-none', questionList.children.length !== 0);
+            };
+
+            const toggleScreeningEmptyState = () => {
+                if (! screeningEmptyState || ! screeningRuleList) {
+                    return;
+                }
+
+                screeningEmptyState.classList.toggle('d-none', screeningRuleList.children.length !== 0);
             };
 
             const refreshIndices = () => {
@@ -165,6 +306,122 @@
                         field.setAttribute('name', questionName(index, fieldName));
                     });
                 });
+            };
+
+            const collectQuestionDefinitions = () => {
+                return Array.from(questionList.children)
+                    .map((item, index) => {
+                        const label = item.querySelector('[data-field="label"]').value.trim();
+                        const type = item.querySelector('[data-field="type"]').value;
+                        const optionsText = item.querySelector('[data-field="options"]').value || '';
+                        const options = optionsText
+                            .split(/\r\n|\r|\n|,/)
+                            .map((option) => option.trim())
+                            .filter(Boolean);
+
+                        return {
+                            index: String(index),
+                            label,
+                            type,
+                            options: type === 'yes_no' ? ['yes', 'no'] : options,
+                        };
+                    })
+                    .filter((question) => question.label);
+            };
+
+            const populateScreeningQuestionSelect = (select, selectedValue = '') => {
+                const questions = collectQuestionDefinitions();
+                const fallbackOption = `<option value="">${selectQuestionText}</option>`;
+
+                select.innerHTML = fallbackOption + questions
+                    .map((question) => `<option value="${question.index}">${question.label}</option>`)
+                    .join('');
+
+                if (selectedValue !== '' && questions.some((question) => question.index === String(selectedValue))) {
+                    select.value = String(selectedValue);
+                }
+            };
+
+            const toggleScreeningRuleValue = (item) => {
+                const questionSelect = item.querySelector('[data-rule-field="question_index"]');
+                const operatorSelect = item.querySelector('[data-rule-field="operator"]');
+                const textInput = item.querySelector('[data-rule-value-text]');
+                const selectInput = item.querySelector('[data-rule-value-select]');
+                const valueWrap = item.querySelector('[data-rule-value-wrap]');
+                const selectedQuestion = collectQuestionDefinitions().find((question) => question.index === questionSelect.value);
+
+                if (operatorsWithoutValue.includes(operatorSelect.value)) {
+                    valueWrap.classList.add('d-none');
+                    textInput.disabled = true;
+                    selectInput.disabled = true;
+
+                    return;
+                }
+
+                valueWrap.classList.remove('d-none');
+
+                if (selectedQuestion && selectedQuestion.options.length) {
+                    selectInput.innerHTML = `<option value="">${selectOptionText}</option>` + selectedQuestion.options
+                        .map((option) => `<option value="${option.replace(/"/g, '&quot;')}">${option}</option>`)
+                        .join('');
+
+                    const selectedValue = selectInput.getAttribute('data-selected-value') || textInput.value || '';
+                    if (selectedValue) {
+                        selectInput.value = selectedValue;
+                    }
+
+                    selectInput.classList.remove('d-none');
+                    selectInput.disabled = false;
+                    textInput.classList.add('d-none');
+                    textInput.disabled = true;
+                    textInput.value = selectInput.value;
+                } else {
+                    selectInput.classList.add('d-none');
+                    selectInput.disabled = true;
+                    textInput.classList.remove('d-none');
+                    textInput.disabled = false;
+                }
+            };
+
+            const refreshScreeningRuleIndices = () => {
+                if (! screeningRuleList) {
+                    return;
+                }
+
+                Array.from(screeningRuleList.children).forEach((item, index) => {
+                    item.querySelector('[data-rule-field="question_index"]').setAttribute('name', screeningRuleName(index, 'question_index'));
+                    item.querySelector('[data-rule-field="operator"]').setAttribute('name', screeningRuleName(index, 'operator'));
+                    item.querySelector('[data-rule-value-text]').setAttribute('name', screeningRuleName(index, 'value'));
+                    item.querySelector('[data-rule-value-select]').removeAttribute('name');
+                });
+            };
+
+            const toggleScreeningBuilderMode = () => {
+                if (! screeningBuilder || ! addScreeningRuleButton || ! screeningActionField) {
+                    return;
+                }
+
+                const selectedMode = document.querySelector('input[name="application_mode"]:checked')?.value;
+                const hasQuestions = collectQuestionDefinitions().length > 0;
+                const enabled = selectedMode === 'custom' && screeningActionField.value !== 'none';
+
+                screeningBuilder.classList.toggle('is-disabled', ! enabled);
+                addScreeningRuleButton.disabled = ! enabled || ! hasQuestions;
+            };
+
+            const refreshScreeningQuestionOptions = () => {
+                if (! screeningRuleList) {
+                    return;
+                }
+
+                Array.from(screeningRuleList.children).forEach((item) => {
+                    const questionSelect = item.querySelector('[data-rule-field="question_index"]');
+                    const previousValue = questionSelect.value;
+                    populateScreeningQuestionSelect(questionSelect, previousValue);
+                    toggleScreeningRuleValue(item);
+                });
+
+                toggleScreeningBuilderMode();
             };
 
             const toggleOptions = (item) => {
@@ -183,14 +440,44 @@
                     item.remove();
                     refreshIndices();
                     toggleEmptyState();
+                    toggleBuilderMode();
+                    refreshScreeningQuestionOptions();
                 });
 
                 item.querySelector('[data-field="type"]').addEventListener('change', function () {
                     toggleOptions(item);
+                    refreshScreeningQuestionOptions();
                 });
 
                 item.querySelector('[data-field="label"]').addEventListener('input', function () {
                     updateTitle(item);
+                    refreshScreeningQuestionOptions();
+                });
+
+                item.querySelector('[data-field="options"]').addEventListener('input', function () {
+                    refreshScreeningQuestionOptions();
+                });
+            };
+
+            const bindScreeningRuleItem = (item) => {
+                item.querySelector('[data-remove-screening-rule]').addEventListener('click', function () {
+                    item.remove();
+                    refreshScreeningRuleIndices();
+                    toggleScreeningEmptyState();
+                    toggleScreeningBuilderMode();
+                });
+
+                item.querySelector('[data-rule-field="question_index"]').addEventListener('change', function () {
+                    toggleScreeningRuleValue(item);
+                });
+
+                item.querySelector('[data-rule-field="operator"]').addEventListener('change', function () {
+                    toggleScreeningRuleValue(item);
+                });
+
+                item.querySelector('[data-rule-value-select]').addEventListener('change', function () {
+                    item.querySelector('[data-rule-value-text]').value = this.value;
+                    this.setAttribute('data-selected-value', this.value);
                 });
             };
 
@@ -213,6 +500,35 @@
                 updateTitle(appendedItem);
                 refreshIndices();
                 toggleEmptyState();
+                toggleBuilderMode();
+                refreshScreeningQuestionOptions();
+            };
+
+            const addScreeningRule = (rule = {}) => {
+                if (! screeningTemplate || ! screeningRuleList) {
+                    return;
+                }
+
+                const fragment = screeningTemplate.content.cloneNode(true);
+                const item = fragment.querySelector('[data-screening-rule-item]');
+                const questionSelect = item.querySelector('[data-rule-field="question_index"]');
+                const operatorSelect = item.querySelector('[data-rule-field="operator"]');
+                const textInput = item.querySelector('[data-rule-value-text]');
+                const selectInput = item.querySelector('[data-rule-value-select]');
+
+                populateScreeningQuestionSelect(questionSelect, rule.question_index ?? '');
+                operatorSelect.value = rule.operator || 'equals';
+                textInput.value = rule.value || '';
+                selectInput.setAttribute('data-selected-value', rule.value || '');
+
+                bindScreeningRuleItem(item);
+                screeningRuleList.appendChild(fragment);
+
+                const appendedItem = screeningRuleList.lastElementChild;
+                toggleScreeningRuleValue(appendedItem);
+                refreshScreeningRuleIndices();
+                toggleScreeningEmptyState();
+                toggleScreeningBuilderMode();
             };
 
             initialQuestions.forEach((question) => addQuestion(question));
@@ -221,15 +537,32 @@
                 toggleEmptyState();
             }
 
+            screeningInitialRules.forEach((rule) => addScreeningRule(rule));
+
+            if (! screeningInitialRules.length) {
+                toggleScreeningEmptyState();
+            }
+
             addQuestionButton.addEventListener('click', function () {
                 addQuestion();
             });
+
+            if (addScreeningRuleButton) {
+                addScreeningRuleButton.addEventListener('click', function () {
+                    addScreeningRule();
+                });
+            }
 
             modeInputs.forEach((input) => {
                 input.addEventListener('change', toggleBuilderMode);
             });
 
+            if (screeningActionField) {
+                screeningActionField.addEventListener('change', toggleScreeningBuilderMode);
+            }
+
             toggleBuilderMode();
+            refreshScreeningQuestionOptions();
         });
     </script>
 @endpush

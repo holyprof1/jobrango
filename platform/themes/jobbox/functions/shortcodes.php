@@ -47,12 +47,32 @@ app()->booted(function (): void {
                     'metadata',
                 ];
 
+                $limit = (int) $shortcode->limit_company ?: Arr::first(JobBoardHelper::getPerPageParams());
+
                 $featuredCompanies = Company::query()
                     ->wherePublished()
                     ->showOnHomepage()
                     ->with($with)
-                    ->take((int) $shortcode->limit_company ?: Arr::first(JobBoardHelper::getPerPageParams()))->latest()
+                    ->withCount(['activeJobs'])
+                    ->take($limit)
+                    ->latest()
                     ->get();
+
+                if ($featuredCompanies->count() < $limit) {
+                    $featuredCompanies = $featuredCompanies->concat(
+                        Company::query()
+                            ->wherePublished()
+                            ->where('is_verified', true)
+                            ->whereNotIn('id', $featuredCompanies->modelKeys())
+                            ->with($with)
+                            ->withCount(['activeJobs'])
+                            ->having('active_jobs_count', '>', 0)
+                            ->orderByDesc('active_jobs_count')
+                            ->latest()
+                            ->take($limit - $featuredCompanies->count())
+                            ->get()
+                    );
+                }
 
                 return Theme::partial('shortcodes.search-box', compact('shortcode', 'featuredCompanies'));
             }
@@ -374,6 +394,8 @@ app()->booted(function (): void {
                     $with = array_merge($with, array_keys(Location::getSupported(Job::class)));
                 }
 
+                $limit = 15;
+
                 $companies = Company::query()
                     ->wherePublished()
                     ->showOnHomepage()
@@ -383,8 +405,29 @@ app()->booted(function (): void {
                         'activeJobs as jobs_count',
                     ])
                     ->withAvg('reviews', 'star')
-                    ->take(15)->latest()
+                    ->take($limit)
+                    ->latest()
                     ->get();
+
+                if ($companies->count() < $limit) {
+                    $companies = $companies->concat(
+                        Company::query()
+                            ->wherePublished()
+                            ->where('is_verified', true)
+                            ->whereNotIn('id', $companies->modelKeys())
+                            ->with($with)
+                            ->withCount([
+                                'reviews',
+                                'activeJobs as jobs_count',
+                            ])
+                            ->withAvg('reviews', 'star')
+                            ->having('jobs_count', '>', 0)
+                            ->orderByDesc('jobs_count')
+                            ->latest()
+                            ->take($limit - $companies->count())
+                            ->get()
+                    );
+                }
 
                 return Theme::partial('shortcodes.top-companies', compact('shortcode', 'companies'));
             }

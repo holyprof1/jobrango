@@ -55,7 +55,7 @@
                     </div>
 
                     <div class="jobrango-employer-job-card__meta">
-                        <span>{{ $job->location ?: __('Location not specified') }}</span>
+                        <span>{{ $job->display_location ?: __('Location not specified') }}</span>
                         <span>{{ __('Applicants: :count', ['count' => number_format($job->applicants_count)]) }}</span>
                         <span>{{ __('New: :count', ['count' => number_format($job->new_applicants_count)]) }}</span>
                     </div>

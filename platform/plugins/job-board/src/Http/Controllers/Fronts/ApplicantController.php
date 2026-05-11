@@ -5,14 +5,19 @@ namespace Botble\JobBoard\Http\Controllers\Fronts;
 use Botble\Base\Events\UpdatedContentEvent;
 use Botble\Base\Http\Actions\DeleteResourceAction;
 use Botble\Base\Http\Controllers\BaseController;
+use Botble\JobBoard\Enums\JobApplicationStatusEnum;
 use Botble\JobBoard\Facades\JobBoardHelper;
-use Botble\JobBoard\Forms\Fronts\ApplicantForm;
 use Botble\JobBoard\Http\Requests\EditJobApplicationRequest;
 use Botble\JobBoard\Models\Account;
 use Botble\JobBoard\Models\Job;
 use Botble\JobBoard\Models\JobApplication;
+use Botble\JobBoard\Supports\ApplicantScreeningManager;
+use Botble\JobBoard\Supports\ApplicationFormManager;
 use Botble\SeoHelper\Facades\SeoHelper;
 use Botble\Theme\Facades\Theme;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
@@ -42,6 +47,15 @@ class ApplicantController extends BaseController
 
         $selectedJob = null;
         $applications = null;
+        $applicationQuestions = [];
+        $applicationStats = [];
+        $applicantFilters = [
+            'search' => trim((string) $request->input('search')),
+            'status' => (string) $request->input('status'),
+            'screening_scope' => (string) $request->input('screening_scope', 'active'),
+            'filter_logic' => (string) $request->input('filter_logic', ApplicantScreeningManager::LOGIC_AND),
+            'answer_filters' => [],
+        ];
 
         if ($selectedJobId) {
             $selectedJob = Job::query()
@@ -55,11 +69,45 @@ class ApplicantController extends BaseController
                 ])
                 ->findOrFail($selectedJobId);
 
-            $applications = JobApplication::query()
+            $applicationQuestions = ApplicationFormManager::questionsForJob($selectedJob);
+            $applicantFilters['answer_filters'] = ApplicantScreeningManager::normalizeStoredRules(
+                collect((array) $request->input('answer_filters', []))
+                    ->map(fn ($rule) => [
+                        'question_key' => Arr::get($rule, 'question_key'),
+                        'operator' => Arr::get($rule, 'operator'),
+                        'value' => Arr::get($rule, 'value'),
+                    ])
+                    ->all(),
+                $applicationQuestions
+            );
+
+            $allApplications = JobApplication::query()
                 ->where('job_id', $selectedJob->getKey())
                 ->with(['account', 'job.company'])
                 ->latest('created_at')
-                ->paginate(12)
+                ->get();
+
+            $applicationStats = [
+                'total' => $allApplications->count(),
+                'highlighted' => $allApplications->filter(
+                    fn (JobApplication $application) => ($application->screening_status ?: ApplicantScreeningManager::STATUS_NEUTRAL) === ApplicantScreeningManager::STATUS_HIGHLIGHTED
+                )->count(),
+                'disqualified' => $allApplications->filter(
+                    fn (JobApplication $application) => ($application->screening_status ?: ApplicantScreeningManager::STATUS_NEUTRAL) === ApplicantScreeningManager::STATUS_DISQUALIFIED
+                )->count(),
+                'incomplete' => $allApplications->filter(
+                    fn (JobApplication $application) => ($application->screening_status ?: ApplicantScreeningManager::STATUS_NEUTRAL) === ApplicantScreeningManager::STATUS_INCOMPLETE
+                )->count(),
+                'active' => $allApplications->filter(
+                    fn (JobApplication $application) => ($application->screening_status ?: ApplicantScreeningManager::STATUS_NEUTRAL) !== ApplicantScreeningManager::STATUS_DISQUALIFIED
+                )->count(),
+            ];
+
+            $filteredApplications = $allApplications
+                ->filter(fn (JobApplication $application) => $this->matchesApplicantFilters($application, $applicantFilters))
+                ->values();
+
+            $applications = $this->paginateCollection($filteredApplications, 12, 'page')
                 ->withQueryString();
         }
 
@@ -75,7 +123,23 @@ class ApplicantController extends BaseController
 
         SeoHelper::setTitle($title);
 
-        return JobBoardHelper::scope('dashboard.applicants.index', compact('jobs', 'selectedJob', 'applications'));
+        $statusOptions = JobApplicationStatusEnum::labels();
+        $screeningScopeOptions = ApplicantScreeningManager::screeningStatusOptions();
+        $filterLogicOptions = ApplicantScreeningManager::logicOptions();
+        $filterOperatorOptions = ApplicantScreeningManager::operatorOptions();
+
+        return JobBoardHelper::scope('dashboard.applicants.index', compact(
+            'jobs',
+            'selectedJob',
+            'applications',
+            'applicationQuestions',
+            'applicationStats',
+            'applicantFilters',
+            'statusOptions',
+            'screeningScopeOptions',
+            'filterLogicOptions',
+            'filterOperatorOptions'
+        ));
     }
 
     public function edit(int|string $id)
@@ -90,7 +154,7 @@ class ApplicantController extends BaseController
             ->whereHas('job.company.accounts', function (Builder $query) use ($account): void {
                 $query->where('account_id', $account->getKey());
             })
-            ->with(['account'])
+            ->with(['account.slugable', 'job.company'])
             ->where('id', $id)
             ->firstOrFail();
 
@@ -98,9 +162,16 @@ class ApplicantController extends BaseController
 
         $this->pageTitle($title);
 
+        Theme::breadcrumb()
+            ->add(trans('plugins/job-board::messages.my_profile'), route('public.account.dashboard'))
+            ->add(trans('plugins/job-board::messages.applicants'), route('public.account.applicants.index'))
+            ->add($jobApplication->full_name);
+
         SeoHelper::setTitle($title);
 
-        return ApplicantForm::createFromModel($jobApplication)->renderForm();
+        $statusOptions = JobApplicationStatusEnum::labels();
+
+        return JobBoardHelper::scope('dashboard.applicants.edit', compact('jobApplication', 'statusOptions'));
     }
 
     public function update(int|string $id, EditJobApplicationRequest $request)
@@ -125,7 +196,7 @@ class ApplicantController extends BaseController
 
         return $this
             ->httpResponse()
-            ->setPreviousUrl(route('public.account.applicants.index'))
+            ->setPreviousUrl(route('public.account.applicants.edit', $jobApplication->getKey()))
             ->withUpdatedSuccessMessage();
     }
 
@@ -145,5 +216,77 @@ class ApplicantController extends BaseController
             ->firstOrFail();
 
         return DeleteResourceAction::make($jobApplication);
+    }
+
+    protected function matchesApplicantFilters(JobApplication $application, array $filters): bool
+    {
+        $search = trim((string) Arr::get($filters, 'search'));
+
+        if ($search !== '') {
+            $haystack = collect([
+                $application->full_name,
+                $application->email,
+                $application->phone,
+            ])->filter()->implode(' ');
+
+            if (! str_contains(mb_strtolower($haystack), mb_strtolower($search))) {
+                return false;
+            }
+        }
+
+        $status = Arr::get($filters, 'status');
+
+        if ($status && $application->status->getValue() !== $status) {
+            return false;
+        }
+
+        $screeningStatus = $application->screening_status ?: ApplicantScreeningManager::STATUS_NEUTRAL;
+        $screeningScope = Arr::get($filters, 'screening_scope', 'active');
+
+        if ($screeningScope === 'active' && $screeningStatus === ApplicantScreeningManager::STATUS_DISQUALIFIED) {
+            return false;
+        }
+
+        if (
+            $screeningScope &&
+            $screeningScope !== 'all' &&
+            $screeningScope !== 'active' &&
+            $screeningStatus !== $screeningScope
+        ) {
+            return false;
+        }
+
+        $answerFilters = Arr::get($filters, 'answer_filters', []);
+
+        if ($answerFilters !== []) {
+            $evaluation = ApplicantScreeningManager::evaluateRules(
+                $application->application_answers ?: [],
+                $answerFilters,
+                (string) Arr::get($filters, 'filter_logic', ApplicantScreeningManager::LOGIC_AND)
+            );
+
+            if (! $evaluation['matched']) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    protected function paginateCollection(Collection $items, int $perPage, string $pageName = 'page'): LengthAwarePaginator
+    {
+        $currentPage = LengthAwarePaginator::resolveCurrentPage($pageName);
+        $results = $items->forPage($currentPage, $perPage)->values();
+
+        return new LengthAwarePaginator(
+            $results,
+            $items->count(),
+            $perPage,
+            $currentPage,
+            [
+                'path' => LengthAwarePaginator::resolveCurrentPath(),
+                'pageName' => $pageName,
+            ]
+        );
     }
 }

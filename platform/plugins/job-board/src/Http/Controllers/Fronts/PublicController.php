@@ -25,6 +25,7 @@ use Botble\JobBoard\Models\JobSkill;
 use Botble\JobBoard\Models\JobType;
 use Botble\JobBoard\Models\Tag;
 use Botble\JobBoard\Repositories\Interfaces\JobInterface;
+use Botble\JobBoard\Supports\ApplicantScreeningManager;
 use Botble\JobBoard\Supports\ApplicationFormManager;
 use Botble\Language\Facades\Language;
 use Botble\Location\Facades\Location;
@@ -70,26 +71,41 @@ class PublicController extends BaseController
         ]);
 
         if (! $job) {
-            $expiredJob = JobModel::query()
-                ->where('id', $slug->reference_id)
-                ->first();
+            $job = JobModel::query()
+                ->with([
+                    'tags.slugable',
+                    'jobTypes',
+                    'slugable',
+                    'jobExperience',
+                    'company',
+                    'company.metadata',
+                    'company.slugable',
+                    'categories',
+                    'skills',
+                ])
+                ->find($slug->reference_id);
 
-            if ($expiredJob && $expiredJob->is_expired) {
-                return $this->showExpiredJob($expiredJob, $slug);
+            if (! $job) {
+                abort(404);
             }
 
-            abort(404);
+            if ($job->is_expired) {
+                return $this->showExpiredJob($job, $slug);
+            }
         }
 
         $job->setRelation('slugable', $slug);
 
-        SeoHelper::setTitle($job->name)->setDescription($job->description);
+        $jobDescription = Str::limit($job->public_description, 160);
+
+        SeoHelper::setTitle($job->name)->setDescription($jobDescription);
 
         $meta = new SeoOpenGraph();
-        $meta->setDescription($job->description);
+        $meta->setDescription($jobDescription);
         $meta->setUrl($job->url);
         $meta->setTitle($job->name);
         $meta->setType('article');
+        $meta->setImage(RvMedia::getImageUrl(theme_option('logo')));
 
         $companyJobs = collect();
 
@@ -259,7 +275,7 @@ class PublicController extends BaseController
 
         $filtersData['jobs'] = $jobs;
         if ($requestQuery['city_id']) {
-            $filtersData['stateId'] = $requestQuery['city_id'];
+            $filtersData['cityId'] = $requestQuery['city_id'];
         }
         if ($requestQuery['state_id']) {
             $filtersData['stateId'] = $requestQuery['state_id'];
@@ -460,6 +476,10 @@ class PublicController extends BaseController
 
             $jobApplication->fill($request->input());
             $jobApplication->application_answers = $this->prepareApplicationAnswers($request, $job);
+
+            $screeningEvaluation = ApplicantScreeningManager::evaluateApplication($job, $jobApplication->application_answers);
+            $jobApplication->screening_status = $screeningEvaluation['screening_status'];
+            $jobApplication->screening_summary = $screeningEvaluation['screening_summary'];
             $jobApplication->save();
 
             $job::withoutEvents(fn () => $job::withoutTimestamps(fn () => $job->increment('number_of_applied')));
@@ -517,6 +537,7 @@ class PublicController extends BaseController
             }
 
             $answers[$key] = [
+                'key' => $key,
                 'label' => $question['label'],
                 'type' => $question['type'],
                 'value' => $value,
@@ -656,7 +677,7 @@ class PublicController extends BaseController
 
             $filtersData['jobs'] = $jobs;
             if ($requestQuery['city_id']) {
-                $filtersData['stateId'] = $requestQuery['city_id'];
+                $filtersData['cityId'] = $requestQuery['city_id'];
             }
             if ($requestQuery['state_id']) {
                 $filtersData['stateId'] = $requestQuery['state_id'];

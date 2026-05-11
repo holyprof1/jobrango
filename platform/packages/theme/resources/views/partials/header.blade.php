@@ -8,6 +8,8 @@
 
 @if ($favicon = theme_option('favicon'))
     {{ Html::favicon(RvMedia::getImageUrl($favicon), ['type' => theme_option('favicon_type', 'image/x-icon')]) }}
+@elseif (file_exists(public_path('favicon.ico')))
+    {{ Html::favicon(asset('favicon.ico'), ['type' => 'image/x-icon']) }}
 @endif
 
 @if (Theme::has('headerMeta'))

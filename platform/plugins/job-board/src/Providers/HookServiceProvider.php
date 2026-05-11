@@ -15,6 +15,7 @@ use Botble\Base\Supports\TwigCompiler;
 use Botble\JobBoard\Enums\InvoiceStatusEnum;
 use Botble\JobBoard\Enums\JobApplicationStatusEnum;
 use Botble\JobBoard\Enums\ModerationStatusEnum;
+use Botble\JobBoard\Enums\SalaryTypeEnum;
 use Botble\JobBoard\Facades\JobBoardHelper;
 use Botble\JobBoard\Models\Account;
 use Botble\JobBoard\Models\Category;
@@ -309,6 +310,10 @@ class HookServiceProvider extends ServiceProvider
                         return $html;
                     }
 
+                    if (! $job->isJobOpen()) {
+                        return $html;
+                    }
+
                     $expiredAt = Carbon::now()->toDateString();
 
                     if (! $job->is_expired) {
@@ -319,12 +324,14 @@ class HookServiceProvider extends ServiceProvider
                         }
                     }
 
-                    $address = [
+                    $jobDescription = BaseHelper::clean($job->public_description);
+
+                    $address = array_filter([
                         '@type' => 'PostalAddress',
-                        'addressLocality' => $job->city_name . ', ' . $job->state_name,
+                        'addressLocality' => $job->city_name,
                         'addressRegion' => $job->state_name,
-                        'addressCountry' => $job->country_name,
-                    ];
+                        'addressCountry' => $job->country?->code ?: $job->country_name,
+                    ]);
 
                     if (! empty($job->address)) {
                         $address['streetAddress'] = $job->address;
@@ -348,12 +355,8 @@ class HookServiceProvider extends ServiceProvider
                             '@type' => 'ImageObject',
                             'url' => RvMedia::getImageUrl(theme_option('logo')),
                         ],
-                        'description' => BaseHelper::clean($job->content),
+                        'description' => $jobDescription,
                         'employmentType' => implode(', ', $job->jobTypes->pluck('name')->all()),
-                        'jobLocation' => [
-                            '@type' => 'Place',
-                            'address' => $address,
-                        ],
                         'hiringOrganization' => [
                             '@type' => 'Organization',
                             'name' => $job->company->name,
@@ -363,16 +366,59 @@ class HookServiceProvider extends ServiceProvider
                                 'url' => RvMedia::getImageUrl($job->company->logo, null, false, theme_option('logo')),
                             ],
                         ],
-                        'baseSalary' => [
-                            '@type' => 'MonetaryAmount',
-                            'currency' => strtoupper(get_application_currency()->title),
-                            'minValue' => $job->salary_from,
-                            'maxValue' => $job->salary_to,
-                            'unitText' => strtoupper($job->salary_range),
-                        ],
                         'validThrough' => $expiredAt,
-                        'datePosted' => $job->created_at->toIso8601String(),
+                        'datePosted' => ($job->source_updated_at ?: $job->created_at)->toIso8601String(),
                     ];
+
+                    if ($job->shouldRenderLocationSchema() && ! empty($address['addressCountry'])) {
+                        $schema['jobLocation'] = [
+                            '@type' => 'Place',
+                            'address' => $address,
+                        ];
+                    }
+
+                    if (
+                        ! $job->hide_salary &&
+                        (string) $job->salary_type === SalaryTypeEnum::FIXED &&
+                        ($job->salary_from || $job->salary_to)
+                    ) {
+                        $salaryValue = [
+                            '@type' => 'QuantitativeValue',
+                            'unitText' => match ((string) $job->salary_range) {
+                                'hour', 'hourly' => 'HOUR',
+                                'day', 'daily' => 'DAY',
+                                'week', 'weekly' => 'WEEK',
+                                'month', 'monthly' => 'MONTH',
+                                'year', 'yearly' => 'YEAR',
+                                default => 'MONTH',
+                            },
+                        ];
+
+                        if ($job->salary_from && $job->salary_to) {
+                            $salaryValue['minValue'] = (float) $job->salary_from;
+                            $salaryValue['maxValue'] = (float) $job->salary_to;
+                        } else {
+                            $salaryValue['value'] = (float) ($job->salary_from ?: $job->salary_to);
+                        }
+
+                        $schema['baseSalary'] = [
+                            '@type' => 'MonetaryAmount',
+                            'currency' => strtoupper((string) $job->displayCurrency()->title),
+                            'value' => $salaryValue,
+                        ];
+                    }
+
+                    if ($job->shouldExposeDirectApplyInSchema()) {
+                        $schema['directApply'] = true;
+                    }
+
+                    if ($job->source_name && $job->source_job_id) {
+                        $schema['identifier'] = [
+                            '@type' => 'PropertyValue',
+                            'name' => $job->source_name,
+                            'value' => $job->source_job_id,
+                        ];
+                    }
 
                     return $html . Html::tag('script', json_encode($schema), ['type' => 'application/ld+json'])
                             ->toHtml();

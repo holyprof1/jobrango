@@ -7,21 +7,23 @@
                 <h3>{{ __('Saved Jobs') }}</h3>
                 <p>{{ __('Manage the roles you bookmarked and reopen them when you are ready to apply.') }}</p>
             </div>
-            <form action="{{ URL::current() }}" method="GET" class="jobrango-inline-filter jobrango-inline-filter--wide">
-                <select class="form-control" name="order_by" aria-label="{{ __('Sort saved jobs') }}">
-                    <option value="">{{ __('Default') }}</option>
-                    <option value="newest" @selected(request('order_by') === 'newest')>{{ __('Newest') }}</option>
-                    <option value="oldest" @selected(request('order_by') === 'oldest')>{{ __('Oldest') }}</option>
-                    <option value="random" @selected(request('order_by') === 'random')>{{ __('Random') }}</option>
-                </select>
-                <select class="form-control" name="category" aria-label="{{ __('Filter saved jobs by category') }}">
-                    <option value="">{{ __('All categories') }}</option>
-                    @foreach (app(Botble\JobBoard\Repositories\Interfaces\CategoryInterface::class)->getCategories() as $category)
-                        <option value="{{ $category->id }}" @selected((int) request()->input('category') === (int) $category->id)>{{ $category->name }}</option>
-                    @endforeach
-                </select>
-                <button class="btn btn-default btn-shadow hover-up" type="submit">{{ __('Apply') }}</button>
-            </form>
+            @if ($jobs->isNotEmpty())
+                <form action="{{ URL::current() }}" method="GET" class="jobrango-inline-filter jobrango-inline-filter--wide">
+                    <select class="form-control" name="order_by" aria-label="{{ __('Sort saved jobs') }}">
+                        <option value="">{{ __('Default') }}</option>
+                        <option value="newest" @selected(request('order_by') === 'newest')>{{ __('Newest') }}</option>
+                        <option value="oldest" @selected(request('order_by') === 'oldest')>{{ __('Oldest') }}</option>
+                        <option value="random" @selected(request('order_by') === 'random')>{{ __('Random') }}</option>
+                    </select>
+                    <select class="form-control" name="category" aria-label="{{ __('Filter saved jobs by category') }}">
+                        <option value="">{{ __('All categories') }}</option>
+                        @foreach (app(Botble\JobBoard\Repositories\Interfaces\CategoryInterface::class)->getCategories() as $category)
+                            <option value="{{ $category->id }}" @selected((int) request()->input('category') === (int) $category->id)>{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+                    <button class="btn btn-default btn-shadow hover-up" type="submit">{{ __('Apply') }}</button>
+                </form>
+            @endif
         </div>
 
         @if ($jobs->isNotEmpty())

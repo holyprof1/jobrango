@@ -6,7 +6,7 @@
             ->map(fn ($jobType) => $jobType === 'Intern' ? 'Internship' : $jobType)
             ->first(fn ($jobType) => in_array($jobType, ['Full Time', 'Part Time', 'Contract', 'Freelance', 'Internship'], true));
         $tagLabels = $job->categories->pluck('name')->filter()->take(2)->values();
-        $isRemoteJob = \Illuminate\Support\Str::contains(\Illuminate\Support\Str::lower((string) $job->location), 'remote');
+        $isRemoteJob = (bool) $job->is_remote;
 
         if ($isRemoteJob && $tagLabels->count() < 2) {
             $tagLabels->push(__('Remote'));
@@ -36,8 +36,8 @@
                     <a href="{{ $job->url }}">{{ $job->name }}</a>
                 </h4>
                 <div class="jobrango-job-card__meta">
-                    @if ($job->location)
-                        <span>{{ $job->location }}</span>
+                    @if ($job->display_location)
+                        <span>{{ $job->display_location }}</span>
                     @endif
                     <span>{{ $job->created_at->diffForHumans() }}</span>
                 </div>

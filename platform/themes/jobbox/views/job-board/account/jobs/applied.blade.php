@@ -7,15 +7,17 @@
                 <h3>{{ __('Applied Jobs') }}</h3>
                 <p>{{ __('Review the roles you have already submitted and reopen any details you need.') }}</p>
             </div>
-            <form action="{{ URL::current() }}" method="GET" class="jobrango-inline-filter">
-                <select class="form-control" name="order_by" aria-label="{{ __('Sort applied jobs') }}">
-                    <option value="">{{ __('Default') }}</option>
-                    <option value="newest" @selected(request('order_by') === 'newest')>{{ __('Newest') }}</option>
-                    <option value="oldest" @selected(request('order_by') === 'oldest')>{{ __('Oldest') }}</option>
-                    <option value="random" @selected(request('order_by') === 'random')>{{ __('Random') }}</option>
-                </select>
-                <button class="btn btn-default btn-shadow hover-up" type="submit">{{ __('Apply') }}</button>
-            </form>
+            @if ($applications->isNotEmpty())
+                <form action="{{ URL::current() }}" method="GET" class="jobrango-inline-filter">
+                    <select class="form-control" name="order_by" aria-label="{{ __('Sort applied jobs') }}">
+                        <option value="">{{ __('Default') }}</option>
+                        <option value="newest" @selected(request('order_by') === 'newest')>{{ __('Newest') }}</option>
+                        <option value="oldest" @selected(request('order_by') === 'oldest')>{{ __('Oldest') }}</option>
+                        <option value="random" @selected(request('order_by') === 'random')>{{ __('Random') }}</option>
+                    </select>
+                    <button class="btn btn-default btn-shadow hover-up" type="submit">{{ __('Apply') }}</button>
+                </form>
+            @endif
         </div>
 
         @if ($applications->isNotEmpty())

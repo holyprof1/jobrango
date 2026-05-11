@@ -233,8 +233,14 @@ $(document).ready(function () {
         })
     }
 
+    const parseMoneyValue = (value, fallback = 0) => {
+        const normalizedValue = Number(String(value || '').replace(/[^0-9.-]+/g, ''))
+
+        return Number.isFinite(normalizedValue) ? normalizedValue : fallback
+    }
+
     const initUiSlider = (element) => {
-        let maxSalaryRange = parseInt(element.data('maxSalaryRange'))
+        let maxSalaryRange = parseMoneyValue(element.data('maxSalaryRange'))
         if (element.length > 0) {
             let moneyFormat = wNumb({
                 decimals: window.currencies.number_after_dot,
@@ -243,8 +249,11 @@ $(document).ready(function () {
             })
 
             const boxMoney = $('.box-input-money')
-            const salaryFrom = parseInt(boxMoney.find('input[name="offered_salary_from"]').val())
-            const salaryTo = parseInt(boxMoney.find('input[name="offered_salary_to"]').val())
+            const salaryFrom = parseMoneyValue(boxMoney.find('input[name="offered_salary_from"]').val())
+            const salaryTo = parseMoneyValue(
+                boxMoney.find('input[name="offered_salary_to"]').val(),
+                maxSalaryRange
+            )
 
             noUiSlider.create(element[0], {
                 start: [salaryFrom, salaryTo],
@@ -463,10 +472,10 @@ $(document).ready(function () {
                     }
                     break
                 default:
-                    if ($el.is('[name=max_price]')) {
-                        $el.val(value || $el.data('max'))
-                    } else if ($el.is('[name=min_price]')) {
-                        $el.val(value || $el.data('min'))
+                    if ($el.is('[name=offered_salary_to]')) {
+                        $el.val(parseMoneyValue(value, parseMoneyValue($el.data('defaultValue'))))
+                    } else if ($el.is('[name=offered_salary_from]')) {
+                        $el.val(parseMoneyValue(value))
                     } else if ($el.val() !== value) {
                         $el.val(value)
                     }
@@ -485,14 +494,8 @@ $(document).ready(function () {
                 }
 
                 if (obj.value) {
-                    // break with price
-                    if (['min_price', 'max_price'].includes(obj.name)) {
-                        const dataValue = JobBoardApp.$formSearch
-                            .find('input[name=' + obj.name + ']')
-                            .data(obj.name.substring(0, 3))
-                        if (dataValue === parseInt(obj.value)) {
-                            return
-                        }
+                    if (['offered_salary_from', 'offered_salary_to'].includes(obj.name)) {
+                        obj.value = parseMoneyValue(obj.value)
                     }
                     data.push(obj)
                 }
@@ -541,8 +544,8 @@ $(document).ready(function () {
                 }
 
                 data.map(function (obj) {
-                    if (obj.name === 'offered_salary_to') {
-                        obj.value = Number(obj.value.replace(/[^0-9.-]+/g, ''))
+                    if (['offered_salary_from', 'offered_salary_to'].includes(obj.name)) {
+                        obj.value = parseMoneyValue(obj.value)
                     }
 
                     if (uriData.find((item) => item.includes(obj.name))) {
@@ -890,6 +893,54 @@ $(document).ready(function () {
         $applyExternalJob.find('.modal-job-id').val('')
     })
 
+    const renderApplyFeedback = ($form, type, message) => {
+        const $feedback = $form.find('[data-application-feedback]')
+
+        if (!$feedback.length) {
+            if (type === 'success') {
+                showSuccess(message)
+            } else {
+                showError(message)
+            }
+
+            return
+        }
+
+        $feedback
+            .removeClass('d-none is-success is-danger')
+            .addClass(type === 'success' ? 'is-success' : 'is-danger')
+            .html(message)
+
+        const top = Math.max(0, $feedback.offset().top - 140)
+
+        window.scrollTo({
+            top,
+            behavior: 'smooth',
+        })
+    }
+
+    const collectApplyErrors = (res) => {
+        if (res.responseJSON && res.responseJSON.errors) {
+            const items = []
+
+            $.each(res.responseJSON.errors, (field, messages) => {
+                $.each([].concat(messages), (index, item) => {
+                    items.push(item)
+                })
+            })
+
+            if (items.length) {
+                return items.join('<br />')
+            }
+        }
+
+        if (res.responseJSON && res.responseJSON.message) {
+            return res.responseJSON.message
+        }
+
+        return res.statusText || 'Unable to submit your application right now.'
+    }
+
     $(document).on('submit', '.job-apply-form', function (e) {
         e.preventDefault()
 
@@ -904,13 +955,13 @@ $(document).ready(function () {
             contentType: false,
             processData: false,
             beforeSend: () => {
+                $this.find('[data-application-feedback]').addClass('d-none').empty()
                 _self.prop('disabled', true).addClass('button-loading')
             },
             success: (res) => {
                 if (!res.error) {
-                    if (!res.data.url) {
-                        showSuccess(res.message)
-                    }
+                    renderApplyFeedback($this, 'success', res.message)
+
                     setTimeout(function () {
                         if (res.data && res.data.url) {
                             window.location.replace(res.data.url)
@@ -919,11 +970,11 @@ $(document).ready(function () {
                         }
                     }, 1000)
                 } else {
-                    showError(res.message)
+                    renderApplyFeedback($this, 'error', res.message)
                 }
             },
             error: (res) => {
-                showError(res.responseJSON.message)
+                renderApplyFeedback($this, 'error', collectApplyErrors(res))
             },
             complete: () => {
                 if (typeof refreshRecaptcha !== 'undefined') {
@@ -991,6 +1042,78 @@ $(document).ready(function () {
             $(document).find('.sidebar-filter-mobile').removeClass('active')
         })
 
+    const initEmployerAdvancedToggle = () => {
+        $('.jobrango-advanced-settings').each(function () {
+            const $panel = $(this)
+            const $toggle = $panel.find('[data-jobrango-advanced-toggle]').first()
+
+            if (! $toggle.length) {
+                return
+            }
+
+            const $fieldWrapper = $panel.closest('.form-group')
+            let $nextField = $fieldWrapper.next('.jobrango-job-form__advanced-field')
+            const advancedFieldNodes = []
+
+            while ($nextField.length) {
+                advancedFieldNodes.push(...$nextField.toArray())
+                $nextField = $nextField.next('.jobrango-job-form__advanced-field')
+            }
+
+            const $advancedFields = $(advancedFieldNodes)
+
+            if (! $advancedFields.length) {
+                return
+            }
+
+            const setExpandedState = (expanded) => {
+                $panel.toggleClass('is-open', expanded)
+                $toggle.attr('aria-expanded', expanded ? 'true' : 'false')
+                $toggle.text(expanded ? $toggle.data('openLabel') : $toggle.data('closedLabel'))
+                $advancedFields.toggle(expanded)
+            }
+
+            setExpandedState(false)
+
+            $toggle.on('click', function () {
+                setExpandedState(! $panel.hasClass('is-open'))
+            })
+        })
+    }
+
+    const hideEmployerFeaturedImageField = () => {
+        const hideField = (_, element) => {
+            const $element = $(element)
+            $element
+                .closest('.mb-3.position-relative, .mb-3, .form-group')
+                .hide()
+        }
+
+        $('.jobrango-dashboard-shell form label').filter(function () {
+            return $(this).text().trim() === 'Featured Image'
+        }).each(hideField)
+
+        $('.jobrango-dashboard-shell .image-box-featured_image').each(hideField)
+        $('.jobrango-dashboard-shell input[name="featured_image"], .jobrango-dashboard-shell input[name="featured_image_input"]').each(hideField)
+
+        const formNode = document.querySelector('.jobrango-dashboard-shell form')
+
+        if (! formNode || formNode.dataset.jobrangoFeaturedImageObserver === 'true') {
+            return
+        }
+
+        const observer = new MutationObserver(() => {
+            hideEmployerFeaturedImageField()
+        })
+
+        observer.observe(formNode, {
+            childList: true,
+            subtree: true,
+        })
+
+        formNode.dataset.jobrangoFeaturedImageObserver = 'true'
+    }
+
     function updateUrlResetFilter() {
         const $btnResetFilter = $('.filter-block').find('.link-reset')
 
@@ -1003,5 +1126,8 @@ $(document).ready(function () {
         $('.btn-advanced-filter').hide()
     }
 
+    hideEmployerFeaturedImageField()
+    window.setTimeout(hideEmployerFeaturedImageField, 300)
+    initEmployerAdvancedToggle()
     updateUrlResetFilter()
 })

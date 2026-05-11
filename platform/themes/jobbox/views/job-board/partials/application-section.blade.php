@@ -18,8 +18,13 @@
                 @endif
             </p>
         </div>
-        @if ($job->salary_text)
-            <div class="jobrango-application-section__salary">{{ $job->salary_text }}</div>
+        @if ($job->detail_salary_text)
+            <div class="jobrango-application-section__salary">
+                {{ $job->detail_salary_text }}
+                @if ($job->salary_context_label)
+                    <small>{{ $job->salary_context_label }}</small>
+                @endif
+            </div>
         @endif
     </div>
 
@@ -45,6 +50,8 @@
             @csrf
             <input type="hidden" name="job_id" value="{{ $job->id }}">
             <input type="hidden" name="job_type" value="{{ $job->apply_url ? 'external' : 'internal' }}">
+
+            <div class="jobrango-application-section__notice is-danger d-none" data-application-feedback></div>
 
             <div class="row g-3">
                 <div class="col-md-6">
@@ -133,7 +140,7 @@
                         <label class="form-label" for="job-apply-resume">
                             {{ setting('job_board_require_resume_in_apply_job', false) && ! ($account && $account->resume) ? __('Resume upload') : __('Resume upload (optional)') }}
                         </label>
-                        <input class="form-control" id="job-apply-resume" name="resume" type="file" @required(setting('job_board_require_resume_in_apply_job', false) && ! ($account && $account->resume))>
+                        <input class="form-control" id="job-apply-resume" name="resume" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp" @required(setting('job_board_require_resume_in_apply_job', false) && ! ($account && $account->resume))>
                         @if ($account && $account->resume)
                             <small>{!! \Botble\Base\Facades\BaseHelper::clean(__('Current resume on file: :resume', ['resume' => '<a href="' . \Botble\Media\Facades\RvMedia::url($account->resume) . '" target="_blank">' . e($account->resume) . '</a>'])) !!}</small>
                         @endif
@@ -142,7 +149,7 @@
                         <label class="form-label" for="job-apply-cover-letter">
                             {{ setting('job_board_require_cover_letter_in_apply_job', false) && ! ($account && $account->cover_letter) ? __('Cover letter upload') : __('Cover letter upload (optional)') }}
                         </label>
-                        <input class="form-control" id="job-apply-cover-letter" name="cover_letter" type="file" @required(setting('job_board_require_cover_letter_in_apply_job', false) && ! ($account && $account->cover_letter))>
+                        <input class="form-control" id="job-apply-cover-letter" name="cover_letter" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp" @required(setting('job_board_require_cover_letter_in_apply_job', false) && ! ($account && $account->cover_letter))>
                         @if ($account && $account->cover_letter)
                             <small>{!! \Botble\Base\Facades\BaseHelper::clean(__('Current cover letter on file: :cover_letter', ['cover_letter' => '<a href="' . \Botble\Media\Facades\RvMedia::url($account->cover_letter) . '" target="_blank">' . e($account->cover_letter) . '</a>'])) !!}</small>
                         @endif

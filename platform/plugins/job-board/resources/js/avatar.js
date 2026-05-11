@@ -95,7 +95,11 @@ CropAvatar.prototype = {
     initPreview: function () {
         var url = this.$avatar.prop('src')
 
-        this.$avatarPreview.empty().html('<img src="' + url + '" alt="avatar">')
+        this.$avatarPreview.empty()
+
+        if (url) {
+            this.$avatarPreview.html('<img src="' + url + '" alt="avatar">')
+        }
     },
 
     initIframe: function () {

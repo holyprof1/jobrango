@@ -25,6 +25,7 @@ class JobResource extends JsonResource
             'address' => $this->address,
             'status' => $this->status,
             'apply_url' => $this->apply_url,
+            'is_remote' => (bool) $this->is_remote,
             'external_apply_behavior' => $this->external_apply_behavior,
             'is_freelance' => $this->is_freelance,
             'salary_from' => $this->salary_from,

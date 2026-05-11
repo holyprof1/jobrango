@@ -160,12 +160,28 @@ class CompanyController extends BaseController
 
         $companies = Company::query()
             ->wherePublished()
-            ->where('is_featured', true)
             ->with($with)
             ->withCount(['activeJobs'])
+            ->showOnHomepage()
             ->limit($limit)
             ->latest()
             ->get();
+
+        if ($companies->count() < $limit) {
+            $companies = $companies->concat(
+                Company::query()
+                    ->wherePublished()
+                    ->where('is_verified', true)
+                    ->whereNotIn('id', $companies->modelKeys())
+                    ->with($with)
+                    ->withCount(['activeJobs'])
+                    ->having('active_jobs_count', '>', 0)
+                    ->orderByDesc('active_jobs_count')
+                    ->latest()
+                    ->take($limit - $companies->count())
+                    ->get()
+            );
+        }
 
         return $this
             ->httpResponse()

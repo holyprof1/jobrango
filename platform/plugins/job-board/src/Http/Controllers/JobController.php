@@ -2,6 +2,7 @@
 
 namespace Botble\JobBoard\Http\Controllers;
 
+use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Events\BeforeEditContentEvent;
 use Botble\Base\Events\CreatedContentEvent;
 use Botble\Base\Events\UpdatedContentEvent;
@@ -18,6 +19,7 @@ use Botble\JobBoard\Enums\JobStatusEnum;
 use Botble\JobBoard\Http\Requests\ExpireJobsRequest;
 use Botble\JobBoard\Http\Requests\JobRequest;
 use Botble\JobBoard\Models\Account;
+use Botble\JobBoard\Models\Company;
 use Botble\JobBoard\Models\CustomFieldValue;
 use Botble\JobBoard\Models\Job;
 use Botble\JobBoard\Repositories\Interfaces\AnalyticsInterface;
@@ -25,6 +27,7 @@ use Botble\JobBoard\Services\StoreTagService;
 use Botble\JobBoard\Tables\JobTable;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class JobController extends BaseController
 {
@@ -85,7 +88,11 @@ class JobController extends BaseController
         event(new CreatedContentEvent(JOB_MODULE_SCREEN_NAME, $request, $job));
 
         if ($job->moderation_status == ModerationStatusEnum::APPROVED) {
-            event(new JobPublishedEvent($job));
+            $this->syncCompanyVerificationFromApprovedJob($job, Auth::id());
+
+            if ($job->status == JobStatusEnum::PUBLISHED) {
+                event(new JobPublishedEvent($job));
+            }
         }
 
         $storeTagService->execute($request, $job);
@@ -114,9 +121,8 @@ class JobController extends BaseController
             $request->merge(['employer_colleagues' => []]);
         }
 
-        $moderationStatus = $job->moderation_status;
-
-        $isApproved = ($job->moderation_status->getValue() == ModerationStatusEnum::PENDING) && ($request->input('moderation_status') == ModerationStatusEnum::APPROVED);
+        $wasApproved = $job->moderation_status == ModerationStatusEnum::APPROVED;
+        $isApproved = ! $wasApproved && $request->input('moderation_status') == ModerationStatusEnum::APPROVED;
 
         $job->fill($request->except(['expire_date']));
         $job->moderation_status = $request->input('moderation_status');
@@ -125,6 +131,11 @@ class JobController extends BaseController
 
         if ($isApproved) {
             AdminApprovedJobEvent::dispatch($job);
+            $this->syncCompanyVerificationFromApprovedJob($job, Auth::id());
+
+            if ($job->status == JobStatusEnum::PUBLISHED) {
+                event(new JobPublishedEvent($job));
+            }
         }
 
         $customFields = CustomFieldValue::formatCustomFields($request->input('custom_fields') ?? []);
@@ -140,13 +151,6 @@ class JobController extends BaseController
         $job->categories()->sync($request->input('categories', []));
 
         event(new UpdatedContentEvent(JOB_MODULE_SCREEN_NAME, $request, $job));
-
-        if (
-            $moderationStatus != ModerationStatusEnum::APPROVED
-            && $request->input('moderation_status') == ModerationStatusEnum::APPROVED
-        ) {
-            event(new JobPublishedEvent($job));
-        }
 
         $storeTagService->execute($request, $job);
 
@@ -201,7 +205,11 @@ class JobController extends BaseController
 
         if (! $wasApproved) {
             AdminApprovedJobEvent::dispatch($job);
-            event(new JobPublishedEvent($job));
+            $this->syncCompanyVerificationFromApprovedJob($job, Auth::id());
+
+            if ($job->status == JobStatusEnum::PUBLISHED) {
+                event(new JobPublishedEvent($job));
+            }
         }
 
         return redirect()
@@ -237,5 +245,21 @@ class JobController extends BaseController
 
         return $this
             ->httpResponse();
+    }
+
+    protected function syncCompanyVerificationFromApprovedJob(Job $job, ?int $verifiedBy = null): void
+    {
+        $company = Company::query()->find($job->company_id);
+
+        if (! $company || $company->is_verified) {
+            return;
+        }
+
+        if ($company->status !== BaseStatusEnum::PUBLISHED) {
+            $company->status = BaseStatusEnum::PUBLISHED;
+        }
+
+        $company->markAsVerified($verifiedBy);
+        $company->save();
     }
 }

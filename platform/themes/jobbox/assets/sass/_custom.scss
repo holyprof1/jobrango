@@ -3947,6 +3947,27 @@ form.auth-form {
     gap: 18px;
 }
 
+.banner-image-single--compact {
+    background: transparent !important;
+    height: auto;
+}
+
+.banner-hero.banner-image-single--compact {
+    margin-bottom: 12px;
+}
+
+.banner-hero .wrap-cover-image--compact {
+    padding-top: 0;
+}
+
+.banner-hero .wrap-cover-image--compact .jobrango-cover--job {
+    min-height: 180px;
+}
+
+.job-header-content--compact {
+    margin-top: 20px !important;
+}
+
 .jobrango-application-section {
     margin-top: 32px;
     padding: 28px;
@@ -3994,6 +4015,15 @@ form.auth-form {
     border-radius: 18px;
     background: #f7faff;
     color: #36507a;
+
+    ul {
+        margin: 10px 0 0;
+        padding-left: 18px;
+    }
+
+    li {
+        line-height: 1.6;
+    }
 }
 
 .jobrango-application-section__notice a {
@@ -4196,6 +4226,11 @@ form.auth-form {
         border-radius: 22px;
     }
 
+    .banner-hero .wrap-cover-image--compact .jobrango-cover--job {
+        min-height: 150px;
+        padding: 28px 24px;
+    }
+
     .jobrango-job-list__item,
     .jobrango-application-form__footer {
         align-items: flex-start;
@@ -4209,5 +4244,216 @@ form.auth-form {
     .jobrango-checkbox-grid,
     .jobrango-radio-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+.jobrango-dashboard-shell .ps-main__sidebar {
+    max-width: 320px;
+    min-width: 320px;
+    padding: 32px 0 32px 32px;
+}
+
+.jobrango-dashboard-shell .ps-sidebar {
+    gap: 18px;
+    height: auto;
+    min-height: calc(100vh - 64px);
+    padding-bottom: 24px;
+    position: sticky;
+    top: 32px;
+}
+
+.jobrango-dashboard-shell .ps-sidebar .ps-sidebar__top {
+    margin-bottom: 0 !important;
+    padding-right: 16px;
+}
+
+.jobrango-dashboard-shell .ps-sidebar .ps-sidebar__content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    justify-content: flex-start;
+    padding-right: 16px;
+}
+
+.jobrango-dashboard-shell .ps-sidebar .ps-sidebar__content .ps-sidebar__footer {
+    position: static;
+    width: auto;
+}
+
+.jobrango-dashboard-shell .ps-sidebar__center {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.jobrango-dashboard-shell .ps-main__wrapper {
+    padding: 32px 32px 24px;
+}
+
+.jobrango-dashboard-shell .row > .col-md-3 > .card:first-child {
+    position: sticky;
+    top: 24px;
+}
+
+.jobrango-dashboard-shell .card,
+.jobrango-dashboard-shell .meta-boxes {
+    border-radius: 24px;
+}
+
+.jobrango-dashboard-shell .card .card-body {
+    padding: 22px;
+}
+
+.jobrango-dashboard-shell .col-md-9 .card .card-body > .row {
+    row-gap: 18px;
+}
+
+.jobrango-dashboard-shell .col-md-9 .form-label {
+    color: #0b1f4d;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.jobrango-dashboard-shell .col-md-9 .form-control,
+.jobrango-dashboard-shell .col-md-9 .form-select,
+.jobrango-dashboard-shell .col-md-9 .select2-selection {
+    border-color: #dbe4f2;
+    border-radius: 16px;
+    min-height: 52px;
+}
+
+.jobrango-dashboard-shell .col-md-9 textarea.form-control {
+    min-height: 136px;
+}
+
+.jobrango-dashboard-shell .col-md-9 .card-body .form-check:not(.form-switch) {
+    align-items: center;
+    background: #f8fbff;
+    border: 1px solid rgba(11, 31, 77, 0.08);
+    border-radius: 18px;
+    display: flex;
+    gap: 12px;
+    margin: 0 !important;
+    min-height: 56px;
+    padding: 14px 16px;
+}
+
+.jobrango-dashboard-shell .col-md-9 .card-body .form-check:not(.form-switch) .form-check-input {
+    float: none;
+    margin: 0;
+    position: static;
+}
+
+.jobrango-dashboard-shell .col-md-9 .card-body .form-check:not(.form-switch) .form-check-label {
+    color: #32415d;
+    font-weight: 600;
+}
+
+.jobrango-dashboard-shell .col-md-9 .card-body .form-check:not(.form-switch) .form-check-input:checked + .form-check-label {
+    color: #0b1f4d;
+}
+
+.jobrango-dashboard-shell .col-md-9 .card-body .multi-check-list-wrapper {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.jobrango-dashboard-shell .col-md-9 .card-body .form-check.form-switch {
+    margin-bottom: 0;
+    min-height: 52px;
+    padding: 14px 16px;
+    border: 1px solid rgba(11, 31, 77, 0.08);
+    border-radius: 18px;
+    background: #ffffff;
+}
+
+.jobrango-dashboard-shell .col-md-9 .card-body .form-check.form-switch .form-check-label {
+    color: #243452;
+    font-weight: 600;
+}
+
+.jobrango-job-form__advanced-field {
+    display: none;
+}
+
+.jobrango-dashboard-shell .mb-3:has(.image-box-featured_image),
+.jobrango-dashboard-shell .mb-3:has(label[for='featured_image']),
+.jobrango-dashboard-shell .mb-3:has(input[name='featured_image']),
+.jobrango-dashboard-shell .mb-3:has(input[name='featured_image_input']) {
+    display: none !important;
+}
+
+.jobrango-advanced-settings {
+    padding: 20px 22px;
+    border-radius: 22px;
+    background:
+        radial-gradient(circle at top right, rgba(220, 235, 255, 0.95), transparent 44%),
+        linear-gradient(180deg, #fbfdff 0%, #f5f9ff 100%);
+}
+
+.jobrango-advanced-settings__intro {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.jobrango-advanced-settings__toggle {
+    flex: 0 0 auto;
+    min-height: 42px;
+    padding: 10px 14px;
+    border: 1px solid rgba(11, 31, 77, 0.08);
+    border-radius: 999px;
+    background: #ffffff;
+    color: #0c3fa8;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.jobrango-footer--account {
+    margin-top: 28px;
+}
+
+@media screen and (max-width: 1199px) {
+    .jobrango-dashboard-shell .ps-main__sidebar {
+        max-width: none;
+        min-width: 0;
+        padding: 0;
+    }
+
+    .jobrango-dashboard-shell .ps-sidebar {
+        min-height: 0;
+        position: static;
+        top: auto;
+    }
+}
+
+@media screen and (max-width: 991px) {
+    .jobrango-dashboard-shell .ps-main__wrapper {
+        padding: 18px 18px 24px;
+    }
+
+    .jobrango-dashboard-shell .row > .col-md-3 > .card:first-child {
+        position: static;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .jobrango-dashboard-shell .card .card-body {
+        padding: 18px;
+    }
+
+    .jobrango-dashboard-shell .col-md-9 .card-body .multi-check-list-wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .jobrango-advanced-settings__intro {
+        flex-direction: column;
+    }
+
+    .jobrango-advanced-settings__toggle {
+        width: 100%;
     }
 }

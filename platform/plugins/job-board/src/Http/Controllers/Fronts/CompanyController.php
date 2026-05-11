@@ -94,14 +94,10 @@ class CompanyController extends BaseController
 
         $data['is_featured'] = false;
 
-        if (JobBoardHelper::shouldAutoVerifyNewCompanies()) {
-            $data['status'] = BaseStatusEnum::PUBLISHED;
-            $data['is_verified'] = true;
-            $data['verified_at'] = now();
-        } else {
-            $data['status'] = BaseStatusEnum::PENDING;
-            $data['is_verified'] = false;
-        }
+        $data['status'] = BaseStatusEnum::PENDING;
+        $data['is_verified'] = false;
+        $data['verified_at'] = null;
+        $data['verified_by'] = null;
 
         /** @var \Botble\JobBoard\Models\Company $company */
         $company = Company::query()->create($data);

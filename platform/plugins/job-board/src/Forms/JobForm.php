@@ -9,6 +9,7 @@ use Botble\Base\Forms\FieldOptions\ContentFieldOption;
 use Botble\Base\Forms\FieldOptions\DescriptionFieldOption;
 use Botble\Base\Forms\FieldOptions\IsFeaturedFieldOption;
 use Botble\Base\Forms\FieldOptions\NameFieldOption;
+use Botble\Base\Forms\FieldOptions\OnOffFieldOption;
 use Botble\Base\Forms\FieldOptions\SelectFieldOption;
 use Botble\Base\Forms\FieldOptions\StatusFieldOption;
 use Botble\Base\Forms\FieldOptions\TextFieldOption;
@@ -58,6 +59,10 @@ class JobForm extends FormAbstract
          * @var Job $model
          */
         $model = $this->getModel();
+
+        if (! $model instanceof Job) {
+            $model = null;
+        }
 
         $currencies = Currency::query()
             ->oldest('order')
@@ -183,6 +188,10 @@ class JobForm extends FormAbstract
                 'default_value' => 1,
                 'colspan' => 6,
             ])
+            ->add('is_remote', OnOffField::class, OnOffFieldOption::make()
+                ->label(__('Remote role'))
+                ->helperText(__('Enable this when candidates can work remotely. Non-remote jobs need a location before they can be published.'))
+                ->defaultValue((bool) ($model?->is_remote)))
             ->when(JobBoardHelper::isZipCodeEnabled(), function (FormAbstract $form): void {
                 $form->add('zip_code', 'text', [
                     'label' => trans('plugins/job-board::forms.zip_code'),

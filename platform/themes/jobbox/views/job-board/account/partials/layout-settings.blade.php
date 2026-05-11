@@ -12,6 +12,7 @@
     $profileSummary = trim(strip_tags((string) ($account->description ?: $account->bio)));
     $profileSummary = $profileSummary ?: __('Complete your profile so employers can quickly understand your experience and preferred role.');
     $resumeLabel = $account->resume ? __('View CV / Resume') : __('Add CV / Resume');
+    $publicProfileUrl = filled($account->url) && ! str_ends_with($account->url, '/undefined') ? $account->url : null;
     $accountInitials = collect(explode(' ', $account->name))
         ->filter()
         ->take(2)
@@ -66,8 +67,8 @@
                 <div class="jobrango-account-hero__actions">
                     <a class="btn btn-default btn-shadow hover-up" href="{{ route('public.account.settings') }}">{{ __('Edit Profile') }}</a>
                     <a class="btn btn-border hover-up" href="{{ url('/jobs') }}">{{ __('Browse Jobs') }}</a>
-                    @if ($account->is_public_profile)
-                        <a class="btn btn-border hover-up" href="{{ $account->url }}">{{ __('Preview Profile') }}</a>
+                    @if ($account->is_public_profile && $publicProfileUrl)
+                        <a class="btn btn-border hover-up" href="{{ $publicProfileUrl }}">{{ __('Preview Profile') }}</a>
                     @else
                         <a class="btn btn-border hover-up" href="{{ route('public.account.settings') }}">{{ $resumeLabel }}</a>
                     @endif

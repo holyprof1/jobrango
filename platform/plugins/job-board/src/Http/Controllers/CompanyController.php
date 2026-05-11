@@ -54,10 +54,14 @@ class CompanyController extends BaseController
             $data,
             $request->has('is_verified')
                 ? $request->boolean('is_verified')
-                : JobBoardHelper::shouldAutoVerifyNewCompanies(),
+                : true,
             Auth::id(),
             $request->input('verification_note')
         );
+
+        if (empty($data['is_verified'])) {
+            $data['is_featured'] = false;
+        }
 
         /**
          * @var Company $company
@@ -96,6 +100,10 @@ class CompanyController extends BaseController
             $request->input('verification_note'),
             $company
         );
+
+        if (empty($data['is_verified'])) {
+            $data['is_featured'] = false;
+        }
 
         $company->fill($data);
         $company->save();
@@ -165,10 +173,12 @@ class CompanyController extends BaseController
     public function ajaxCreateCompany(AjaxCompanyRequest $request)
     {
         $data = $request->input();
+        $data['status'] = $data['status'] ?? BaseStatusEnum::PUBLISHED;
+        $data['is_featured'] = false;
 
         $this->syncVerificationData(
             $data,
-            JobBoardHelper::shouldAutoVerifyNewCompanies(),
+            true,
             Auth::id()
         );
 
@@ -216,6 +226,10 @@ class CompanyController extends BaseController
                 ->setMessage(trans('plugins/job-board::company.already_verified'));
         }
 
+        if ($company->status !== BaseStatusEnum::PUBLISHED) {
+            $company->status = BaseStatusEnum::PUBLISHED;
+        }
+
         $company->markAsVerified(Auth::id(), Carbon::now(), $request->input('verification_note'));
         $company->save();
 
@@ -234,6 +248,7 @@ class CompanyController extends BaseController
         }
 
         $company->markAsUnverified($request->input('verification_note'));
+        $company->is_featured = false;
         $company->save();
 
         return $this
@@ -243,6 +258,13 @@ class CompanyController extends BaseController
 
     public function toggleHomepage(Company $company, Request $request)
     {
+        if ($request->boolean('is_featured') && ! $company->is_verified) {
+            return $this
+                ->httpResponse()
+                ->setError()
+                ->setMessage(__('Only verified companies can be shown on the homepage.'));
+        }
+
         $company->is_featured = $request->boolean('is_featured');
         $company->save();
 
@@ -254,10 +276,15 @@ class CompanyController extends BaseController
     public function toggleVerification(Company $company, Request $request)
     {
         if ($request->boolean('is_verified')) {
+            if ($company->status !== BaseStatusEnum::PUBLISHED) {
+                $company->status = BaseStatusEnum::PUBLISHED;
+            }
+
             $company->markAsVerified(Auth::id(), Carbon::now());
             $message = trans('plugins/job-board::company.verified_successfully');
         } else {
             $company->markAsUnverified();
+            $company->is_featured = false;
             $message = trans('plugins/job-board::company.unverified_successfully');
         }
 
@@ -283,6 +310,7 @@ class CompanyController extends BaseController
         } else {
             $data['verified_at'] = null;
             $data['verified_by'] = null;
+            $data['is_featured'] = false;
         }
 
         if ($verificationNote !== null) {

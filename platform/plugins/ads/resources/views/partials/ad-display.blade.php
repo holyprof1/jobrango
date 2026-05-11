@@ -6,6 +6,28 @@
         @continue
     @endif
 
+    @if ($item->ads_type === 'embed_code' && $item->embed_code)
+        @php
+            $embedDimensions = $item->getEmbedDimensions();
+            $embedWrapperStyle = 'display: inline-block; max-width: 100%; overflow: hidden;';
+
+            if ($embedDimensions['width']) {
+                $embedWrapperStyle .= ' width: min(100%, ' . $embedDimensions['width'] . 'px);';
+            }
+
+            if ($embedDimensions['height']) {
+                $embedWrapperStyle .= ' min-height: ' . $embedDimensions['height'] . 'px;';
+            }
+        @endphp
+
+        <div {!! Html::attributes($attributes) !!}>
+            <div style="{{ $embedWrapperStyle }}">
+                {!! $item->embed_code !!}
+            </div>
+        </div>
+        @continue
+    @endif
+
     @continue(! $item->image)
 
     <div {!! Html::attributes($attributes) !!}>

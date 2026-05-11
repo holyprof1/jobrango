@@ -20,6 +20,7 @@ class EmployerSettingController extends BaseController
     public function edit()
     {
         SeoHelper::setTitle(trans('plugins/job-board::messages.account_settings'));
+        $this->pageTitle(trans('plugins/job-board::messages.account_settings'));
         /**
          * @var Account $account
          */

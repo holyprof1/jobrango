@@ -94,14 +94,8 @@ class JobRepository extends RepositoriesAbstract implements JobInterface
                     $this->model = $this->model->notClosed();
                 }
             } else {
-                if (! JobBoardHelper::isExpiredJobListing()) {
-                    // @phpstan-ignore-next-line
-                    $this->model = $this->model->notExpired();
-                }
-
-                if (! JobBoardHelper::isClosedJobListing()) {
-                    $this->model = $this->model->notClosed();
-                }
+                // Public listings/search should always hide expired and closed jobs.
+                $this->model = $this->model->notExpired()->notClosed();
             }
         }
 

@@ -56,7 +56,7 @@ class CompanyForm extends FormAbstract
                 OnOffField::class,
                 OnOffFieldOption::make()
                     ->label(__('Show on homepage'))
-                    ->helperText(__('Enable this to include the company in homepage sections like the logo rail and top companies.'))
+                    ->helperText(__('Only verified companies are eligible for homepage sections like the logo rail and top companies.'))
                     ->defaultValue(0)
             )
             ->add('content', 'editor', [
@@ -201,7 +201,7 @@ class CompanyForm extends FormAbstract
                     ->defaultValue(
                         $this->getModel()->getKey()
                             ? (bool) $this->getModel()->is_verified
-                            : JobBoardHelper::shouldAutoVerifyNewCompanies()
+                            : true
                     )
             )
             ->add('logo', 'mediaImage', [

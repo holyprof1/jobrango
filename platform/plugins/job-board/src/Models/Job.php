@@ -68,11 +68,20 @@ class Job extends BaseModel
         'employer_colleagues',
         'start_date',
         'application_closing_date',
+        'is_remote',
         'zip_code',
         'unique_id',
         'application_mode',
         'application_form_schema',
         'application_form_settings',
+        'source_name',
+        'source_type',
+        'source_job_id',
+        'source_url',
+        'source_payload_hash',
+        'imported_at',
+        'last_synced_at',
+        'source_updated_at',
     ];
 
     protected $casts = [
@@ -83,8 +92,12 @@ class Job extends BaseModel
         'expire_date' => 'datetime',
         'start_date' => 'date',
         'application_closing_date' => 'datetime',
+        'is_remote' => 'boolean',
         'application_form_schema' => 'array',
         'application_form_settings' => 'array',
+        'imported_at' => 'datetime',
+        'last_synced_at' => 'datetime',
+        'source_updated_at' => 'datetime',
         'name' => SafeContent::class,
         'description' => SafeContent::class,
         'content' => SafeContent::class,
@@ -197,6 +210,96 @@ class Job extends BaseModel
         );
     }
 
+    protected function listingSalaryText(): Attribute
+    {
+        return Attribute::get(function () {
+            if ($this->hide_salary) {
+                return trans('plugins/job-board::messages.attractive');
+            }
+
+            if ($this->isNegotiableSalary()) {
+                return trans('plugins/job-board::messages.negotiable');
+            }
+
+            return $this->salary_text;
+        });
+    }
+
+    protected function detailSalaryText(): Attribute
+    {
+        return Attribute::get(function () {
+            if ($this->hide_salary) {
+                return trans('plugins/job-board::messages.attractive');
+            }
+
+            if ($this->hasSalaryRange()) {
+                return $this->buildFixedSalaryText();
+            }
+
+            return $this->salary_text;
+        });
+    }
+
+    protected function salaryContextLabel(): Attribute
+    {
+        return Attribute::get(function () {
+            if ($this->hide_salary || ! $this->isNegotiableSalary()) {
+                return null;
+            }
+
+            return $this->hasSalaryRange()
+                ? __('Negotiable range')
+                : trans('plugins/job-board::messages.negotiable');
+        });
+    }
+
+    protected function displayLocation(): Attribute
+    {
+        return Attribute::get(function () {
+            $fullAddress = trim((string) ($this->full_address ?: ''));
+
+            if ($fullAddress !== '') {
+                return $fullAddress;
+            }
+
+            $location = trim((string) $this->location);
+
+            if ($location !== '') {
+                return $location;
+            }
+
+            return $this->is_remote ? __('Remote') : '';
+        });
+    }
+
+    protected function publicDescription(): Attribute
+    {
+        return Attribute::get(function () {
+            $description = trim((string) $this->description);
+
+            if ($description !== '') {
+                return $description;
+            }
+
+            $content = trim(strip_tags((string) $this->content));
+
+            if ($content !== '') {
+                return $content;
+            }
+
+            $category = $this->relationLoaded('categories')
+                ? $this->categories->pluck('name')->filter()->first()
+                : $this->categories()->pluck('name')->filter()->first();
+
+            $companyName = trim((string) ($this->company?->name ?: __('Hiring team')));
+
+            return __(':title at :company. Details will be updated soon.', [
+                'title' => $this->name,
+                'company' => $category ? $companyName . ' - ' . $category : $companyName,
+            ]);
+        });
+    }
+
     protected function displayId(): Attribute
     {
         return Attribute::get(fn () => 'JR-JOB-' . $this->prefixedSequenceId());
@@ -274,9 +377,9 @@ class Job extends BaseModel
         $now = Carbon::now()->toDateTimeString();
 
         return $query->where(function ($query) use ($now): void {
-            $query->where('never_expired', true)
-                ->orWhereNull('expire_date')
-                ->orWhere('expire_date', '>=', $now);
+            $query->where('jb_jobs.never_expired', true)
+                ->orWhereNull('jb_jobs.expire_date')
+                ->orWhere('jb_jobs.expire_date', '>=', $now);
         });
     }
 
@@ -284,8 +387,13 @@ class Job extends BaseModel
     {
         return $query->where(function ($query): void {
             $query
-                ->where('application_closing_date', '>=', Carbon::now()->toDateTimeString())
-                ->orWhereNull('application_closing_date');
+                ->where('jb_jobs.status', '!=', JobStatusEnum::CLOSED)
+                ->where('jb_jobs.application_closing_date', '>=', Carbon::now()->toDateTimeString())
+                ->orWhere(function (Builder $query): void {
+                    $query
+                        ->where('jb_jobs.status', '!=', JobStatusEnum::CLOSED)
+                        ->whereNull('jb_jobs.application_closing_date');
+                });
         });
     }
 
@@ -293,8 +401,8 @@ class Job extends BaseModel
     {
         return $query->where(function ($query): void {
             $query
-                ->where('expire_date', '<', Carbon::now()->toDateTimeString())
-                ->where('never_expired', false);
+                ->where('jb_jobs.expire_date', '<', Carbon::now()->toDateTimeString())
+                ->where('jb_jobs.never_expired', false);
         });
     }
 
@@ -303,7 +411,8 @@ class Job extends BaseModel
         // @phpstan-ignore-next-line
         return $query
             ->where(JobBoardHelper::getJobDisplayQueryConditions())
-            ->notExpired();
+            ->notExpired()
+            ->notClosed();
     }
 
     public function scopeAddSavedApplied(Builder $query): Builder
@@ -475,6 +584,75 @@ class Job extends BaseModel
         return true;
     }
 
+    public function hasSalaryRange(): bool
+    {
+        return (bool) ($this->salary_from || $this->salary_to);
+    }
+
+    public function isNegotiableSalary(): bool
+    {
+        return ! $this->hide_salary && (string) $this->salary_type === SalaryTypeEnum::NEGOTIABLE;
+    }
+
+    public function shouldRenderLocationSchema(): bool
+    {
+        return (bool) ($this->country?->code ?: $this->country_name);
+    }
+
+    public function shouldExposeDirectApplyInSchema(): bool
+    {
+        if (! $this->isJobOpen()) {
+            return false;
+        }
+
+        if (! $this->apply_url) {
+            return true;
+        }
+
+        return $this->isLikelyDirectExternalApplyUrl();
+    }
+
+    public function isLikelyDirectExternalApplyUrl(): bool
+    {
+        if (! $this->apply_url) {
+            return false;
+        }
+
+        $url = strtolower((string) $this->apply_url);
+        $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+        $path = strtolower((string) parse_url($url, PHP_URL_PATH));
+        $query = strtolower((string) parse_url($url, PHP_URL_QUERY));
+        $haystack = trim($host . ' ' . $path . ' ' . $query);
+
+        if ($haystack === '') {
+            return false;
+        }
+
+        foreach ([
+            'greenhouse.io',
+            'job-boards.greenhouse.io',
+            'boards.greenhouse.io',
+            'jobs.lever.co',
+            'workable.com',
+            'smartrecruiters.com',
+            'ashbyhq.com',
+            'bamboohr.com',
+            'myworkdayjobs.com',
+        ] as $knownDirectApplyHost) {
+            if (str_contains($host, $knownDirectApplyHost)) {
+                return true;
+            }
+        }
+
+        foreach (['apply', 'application', 'jobapplication', 'candidate'] as $keyword) {
+            if (str_contains($haystack, $keyword)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -534,13 +712,19 @@ class Job extends BaseModel
 
     public function getLocationAttribute(): ?string
     {
+        if ($this->is_remote && ! $this->state_name && ! $this->city_name && ! $this->country?->code) {
+            return __('Remote');
+        }
+
         $displayType = setting('job_board_job_location_display', 'state_and_country');
 
-        return match ($displayType) {
+        $location = match ($displayType) {
             'city_state_and_country' => ($this->city_name ? $this->city_name . ', ' : '') . ($this->state_name ? $this->state_name . ', ' : '') . $this->country->code,
             'city_and_state' => ($this->city_name ? $this->city_name . ', ' : '') . $this->state_name,
             default => ($this->state_name ? $this->state_name . ', ' : '') . $this->country->code,
         };
+
+        return trim(trim($location), ',');
     }
 
     public function customFields(): MorphMany
@@ -578,5 +762,39 @@ class Job extends BaseModel
     public function newEloquentBuilder($query): BaseQueryBuilder
     {
         return new FilterJobsBuilder($query);
+    }
+
+    protected function buildFixedSalaryText(): string
+    {
+        $salaryRange = $this->displaySalaryRangeLabel();
+        $from = (float) $this->salary_from;
+        $to = (float) $this->salary_to;
+
+        if ($from && $to) {
+            return sprintf(
+                '%s - %s / %s',
+                $this->formatDisplayedSalaryAmount($from),
+                $this->formatDisplayedSalaryAmount($to),
+                $salaryRange
+            );
+        }
+
+        if ($from) {
+            return sprintf(
+                '%s / %s',
+                __('From :price', ['price' => $this->formatDisplayedSalaryAmount($from)]),
+                $salaryRange
+            );
+        }
+
+        if ($to) {
+            return sprintf(
+                '%s / %s',
+                __('Upto :price', ['price' => $this->formatDisplayedSalaryAmount($to)]),
+                $salaryRange
+            );
+        }
+
+        return trans('plugins/job-board::messages.attractive');
     }
 }

@@ -1,10 +1,16 @@
+    @php
+        $isAccountArea = request()->routeIs('public.account.*');
+    @endphp
+
+    @unless ($isAccountArea)
         {!! dynamic_sidebar('pre_footer_sidebar') !!}
+    @endunless
     </main>
     @if (is_plugin_active('ads'))
         {!! apply_filters('ads_render', null, 'footer_before', ['class' => 'my-2 text-center']) !!}
     @endif
 
-    <footer class="footer mt-50 jobrango-footer">
+    <footer @class(['footer mt-50 jobrango-footer', 'jobrango-footer--account' => $isAccountArea])>
         <div class="container">
             <div class="row jobrango-footer__main">
                 {!! dynamic_sidebar('footer_sidebar') !!}

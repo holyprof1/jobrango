@@ -9,6 +9,8 @@
 
         @if (theme_option('favicon'))
             <link href="{{ RvMedia::getImageUrl(theme_option('favicon')) }}" rel="shortcut icon">
+        @elseif (file_exists(public_path('favicon.ico')))
+            <link href="{{ asset('favicon.ico') }}" rel="shortcut icon" type="image/x-icon">
         @endif
 
         <title>{{ PageTitle::getTitle(false) }}</title>

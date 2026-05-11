@@ -1,6 +1,8 @@
 @php
     Theme::asset()->usePath()->add('leaflet-css', 'plugins/leaflet/leaflet.css');
     Theme::asset()->container('footer')->usePath()->add('leaflet-js', 'plugins/leaflet/leaflet.js');
+    $hasCompanyCover = ! $job->hide_company && $company->id && $company->cover_image;
+    $isCompactHero = ! $hasCompanyCover;
 @endphp
 
 <section class="section-box-2">
@@ -9,22 +11,21 @@
     @endif
 
     <div class="container">
-        <div class="banner-hero banner-image-single">
-           <div class="wrap-cover-image">
-               @if(! $job->hide_company && $company->id && $company->cover_image)
+        <div @class(['banner-hero banner-image-single', 'banner-image-single--compact' => $isCompactHero])>
+           <div @class(['wrap-cover-image', 'wrap-cover-image--compact' => $isCompactHero])>
+               @if($hasCompanyCover)
                    <img src="{{ $company->cover_image_url }}" alt="{{ $company->name }}">
                @else
                    <div class="jobrango-cover jobrango-cover--job">
                        <div class="jobrango-cover__inner">
                            <span class="jobrango-cover__eyebrow">{{ __('Open role') }}</span>
-                           <h1>{{ $job->name }}</h1>
-                           <p>{{ __('A clean role header that keeps the focus on the job and employer details.') }}</p>
+                           <p>{{ __('Review the role snapshot below and apply directly from this page.') }}</p>
                        </div>
                    </div>
                @endif
            </div>
         </div>
-        <div class="mt-10 d-flex align-items-center job-header-content">
+        <div @class(['mt-10 d-flex align-items-center job-header-content', 'job-header-content--compact' => $isCompactHero])>
             <div>
                 <h1 class="h3">{{ $job->name }}
                     @if ($job->canShowSavedJob() && auth('account')->check())
@@ -42,6 +43,9 @@
                         <span class="card-briefcase">{{ $jobType->name }}</span>
                     @endforeach
                     <span class="card-time">{{ $job->created_at->diffForHumans() }}</span>
+                    @unless ($job->isJobOpen())
+                        <span class="card-briefcase text-danger">{{ $job->is_expired ? __('Expired') : __('Closed') }}</span>
+                    @endunless
                 </div>
             </div>
             @php($classButtonApply = 'btn btn-apply-icon btn-apply btn-apply-big hover-up ml-auto')
@@ -102,7 +106,7 @@
                             </div>
                         @endif
 
-                        @if($job->salary_from || $job->salary_to)
+                        @if($job->salary_from || $job->salary_to || $job->isNegotiableSalary())
                             <div class="col-md-6 d-flex mt-15">
                                 <div class="sidebar-icon-item">
                                     <img src="{{ Theme::asset()->url('imgs/page/job-single/salary.svg') }}" alt="{{ __('Salary') }}">
@@ -110,7 +114,10 @@
                                 <div class="sidebar-text-info ml-10">
                                     <span class="text-description salary-icon mb-10">{{ __('Salary') }}</span>
                                     @if (! JobBoardHelper::isSalaryHiddenForGuests())
-                                        <strong class="small-heading text-primary fw-bold">{{ $job->salary_text }}</strong>
+                                        <strong class="small-heading text-primary fw-bold">{{ $job->detail_salary_text }}</strong>
+                                        @if ($job->salary_context_label)
+                                            <small class="d-block">{{ $job->salary_context_label }}</small>
+                                        @endif
                                     @else
                                         <a class="job-hidden-job-for-guest-text mb-10" href="{{ route('public.account.login') }}">
                                             {{ __('Sign in to view salary') }}
@@ -148,7 +155,7 @@
                             </div>
                         @endif
 
-                        @if($job->full_address)
+                        @if($job->display_location)
                             <div class="col-md-6 d-flex mt-15">
                                 <div class="sidebar-icon-item">
                                     <img src="{{ Theme::asset()->url('imgs/page/job-single/location.svg') }}" alt="{{ __('Location') }}">
@@ -156,7 +163,7 @@
                                 <div class="sidebar-text-info ml-10">
                                     <span class="text-description mb-10">{{ __('Location') }}</span>
                                     <strong class="small-heading">
-                                        {{ $job->full_address }}
+                                        {{ $job->display_location }}
                                         {{ (JobBoardHelper::isZipCodeEnabled() && $job->zip_code) ? ', ' . $job->zip_code : '' }}
                                     </strong>
                                 </div>
@@ -216,7 +223,11 @@
                 </div>
                 <div class="content-single">
                     <div class="ck-content">
-                        {!! BaseHelper::clean($job->content) !!}
+                        @if (trim(strip_tags((string) $job->content)) !== '')
+                            {!! BaseHelper::clean($job->content) !!}
+                        @else
+                            <p>{{ __('Details will be updated soon.') }}</p>
+                        @endif
                     </div>
                 </div>
 
@@ -288,10 +299,10 @@
                                                         @endforeach
                                                     @endif
                                                 </div>
-                                                @if ($job->full_address)
+                        @if ($job->display_location && ! $job->is_remote)
                                                     <div class="text-muted">
                                                         <i class="uil uil-map"></i>
-                                                        <span>{{ $job->full_address }}</span>
+                                                        <span>{{ $job->display_location }}</span>
                                                     </div>
                                                 @endif
                                             </div>
@@ -314,6 +325,9 @@
             @if(! $job->hide_company && $company->id)
                 <div class="col-lg-4 col-md-12 col-sm-12 col-12 pl-40 pl-lg-15 mt-lg-30">
                     <div class="sidebar-border">
+                        @if (is_plugin_active('ads'))
+                            {!! apply_filters('ads_render', null, 'job_detail_sidebar', ['class' => 'mb-3 text-center']) !!}
+                        @endif
                         <div class="sidebar-heading">
                             <div class="avatar-sidebar">
                                 <figure>
@@ -380,8 +394,8 @@
                                                     <div class="mt-6">
                                                         <div class="similar-jobs-content">
                                                             <div class="d-flex align-items-center job-information">
-                                                                <div class="job-location">
-                                                                    <span class="card-location">{{ $companyJob->location }}</span>
+                                                            <div class="job-location">
+                                                                    <span class="card-location">{{ $companyJob->display_location ?: __('Location not specified') }}</span>
                                                                 </div>
                                                                 <div class="job-salary">
                                                                     <h6 class="card-price text-nowrap mb-0">

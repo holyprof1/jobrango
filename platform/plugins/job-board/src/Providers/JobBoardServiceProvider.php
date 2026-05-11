@@ -243,7 +243,7 @@ class JobBoardServiceProvider extends ServiceProvider
     {
         $this
             ->setNamespace('plugins/job-board')
-            ->loadAndPublishConfigurations(['permissions', 'email', 'general'])
+            ->loadAndPublishConfigurations(['permissions', 'email', 'general', 'sources'])
             ->loadMigrations()
             ->loadAndPublishViews()
             ->loadAndPublishTranslations()

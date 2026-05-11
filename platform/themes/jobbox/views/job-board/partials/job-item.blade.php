@@ -14,7 +14,7 @@
     @php
         $companyName = $job->company_name ?: $job->company?->name ?: $job->name;
         $categoryLabels = $job->categories->pluck('name')->filter()->take(4);
-        $isRemoteJob = \Illuminate\Support\Str::contains(\Illuminate\Support\Str::lower((string) $job->location), 'remote');
+        $isRemoteJob = (bool) $job->is_remote;
     @endphp
     @if ($job->canShowSavedJob())
         <div class="bookmark-label text-center">
@@ -69,7 +69,7 @@
                             <i class="fi fi-rr-map-marker text-primary me-1"></i>
                         </div>
                         <p class="text-muted mb-0">
-                            {{ $job->location }}
+                            {{ $job->display_location ?: __('Location not specified') }}
                         </p>
                     </div>
                 </div>
@@ -80,7 +80,7 @@
                 <div>
                     <p class="text-muted mb-2">
                         @if (! JobBoardHelper::isSalaryHiddenForGuests())
-                            <span class="text-primary">{{ $job->salary_text }}</span>
+                            <span class="text-primary">{{ $job->listing_salary_text }}</span>
                         @else
                             <a class="job-hidden-job-for-guest-text" href="{{ route('public.account.login') }}">
                                 {{ __('Sign in to view salary') }}

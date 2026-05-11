@@ -6,6 +6,7 @@ use Botble\JobBoard\Enums\JobStatusEnum;
 use Botble\JobBoard\Enums\ModerationStatusEnum;
 use Botble\JobBoard\Enums\SalaryTypeEnum;
 use Botble\Support\Http\Requests\Request;
+use Illuminate\Validation\Validator;
 use Illuminate\Validation\Rule;
 
 class JobRequest extends Request
@@ -31,8 +32,32 @@ class JobRequest extends Request
             'number_of_positions' => ['required', 'integer', 'max:10000'],
             'apply_url' => ['nullable', 'url', 'max:2048'],
             'external_apply_behavior' => ['nullable', 'in:,disabled,new_tab,current_tab'],
+            'is_remote' => ['sometimes', 'boolean'],
             'unique_id' => $this->getUniqueIdRules(),
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            $isPublishing = is_in_admin()
+                ? $this->input('status', JobStatusEnum::PUBLISHED) === JobStatusEnum::PUBLISHED
+                : true;
+
+            if (! $isPublishing || $this->boolean('is_remote')) {
+                return;
+            }
+
+            $hasLocation = filled($this->input('address'))
+                || (int) $this->input('country_id')
+                || (int) $this->input('state_id')
+                || (int) $this->input('city_id')
+                || (filled($this->input('latitude')) && filled($this->input('longitude')));
+
+            if (! $hasLocation) {
+                $validator->errors()->add('is_remote', __('Choose Remote or add a job location before publishing.'));
+            }
+        });
     }
 
     protected function getUniqueIdRules(): array|string

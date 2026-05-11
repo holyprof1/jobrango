@@ -60,6 +60,10 @@ class Company extends BaseModel
         'city_id',
         'tax_id',
         'unique_id',
+        'source_name',
+        'source_company_id',
+        'imported_at',
+        'last_synced_at',
     ];
 
     protected $casts = [
@@ -79,7 +83,10 @@ class Company extends BaseModel
         'instagram' => SafeContent::class,
         'ceo' => SafeContent::class,
         'is_verified' => 'boolean',
+        'is_featured' => 'boolean',
         'verified_at' => 'datetime',
+        'imported_at' => 'datetime',
+        'last_synced_at' => 'datetime',
     ];
 
     public function accounts(): BelongsToMany
@@ -134,7 +141,9 @@ class Company extends BaseModel
 
     public function scopeShowOnHomepage(Builder $query): Builder
     {
-        return $query->where('is_featured', true);
+        return $query
+            ->where('is_featured', true)
+            ->where('is_verified', true);
     }
 
     public function markAsVerified(?int $verifiedBy = null, ?CarbonInterface $verifiedAt = null, ?string $note = null): static

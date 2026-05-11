@@ -24,6 +24,7 @@ use Botble\JobBoard\Models\JobApplication;
 use Botble\JobBoard\Models\Tag;
 use Botble\JobBoard\Repositories\Interfaces\AnalyticsInterface;
 use Botble\JobBoard\Services\StoreTagService;
+use Botble\JobBoard\Supports\ApplicantScreeningManager;
 use Botble\JobBoard\Supports\ApplicationFormManager;
 use Botble\Media\Facades\RvMedia;
 use Botble\Optimize\Facades\OptimizerHelper;
@@ -159,16 +160,21 @@ class AccountJobController extends BaseController
 
         $job = new Job();
         $job->fill($request->input());
+        $isApproved = false;
 
         if ($this->shouldAutoApproveJob($request)) {
             $job->moderation_status = ModerationStatusEnum::APPROVED;
-
-            event(new JobPublishedEvent($job));
+            $isApproved = true;
         } else {
             $job->moderation_status = ModerationStatusEnum::PENDING;
         }
 
         $job->save();
+
+        if ($isApproved) {
+            $this->syncCompanyVerificationFromApprovedJob($job);
+            event(new JobPublishedEvent($job));
+        }
 
         $customFields = CustomFieldValue::formatCustomFields($request->input('custom_fields') ?? []);
 
@@ -259,6 +265,8 @@ class AccountJobController extends BaseController
             EmployerPostedJobEvent::dispatch($job, $job->author);
         }
 
+        $wasApproved = $job->moderation_status == ModerationStatusEnum::APPROVED;
+
         $job->fill($request->input());
 
         if ($job->moderation_status != ModerationStatusEnum::APPROVED && $this->shouldAutoApproveJob($request, $job)) {
@@ -266,6 +274,11 @@ class AccountJobController extends BaseController
         }
 
         $job->save();
+
+        if (! $wasApproved && $job->moderation_status == ModerationStatusEnum::APPROVED) {
+            $this->syncCompanyVerificationFromApprovedJob($job);
+            event(new JobPublishedEvent($job));
+        }
 
         $customFields = CustomFieldValue::formatCustomFields($request->input('custom_fields') ?? []);
 
@@ -354,6 +367,22 @@ class AccountJobController extends BaseController
         return (bool) $company->is_verified;
     }
 
+    protected function syncCompanyVerificationFromApprovedJob(Job $job): void
+    {
+        $company = Company::query()->find($job->company_id);
+
+        if (! $company || $company->is_verified) {
+            return;
+        }
+
+        if ($company->status !== BaseStatusEnum::PUBLISHED) {
+            $company->status = BaseStatusEnum::PUBLISHED;
+        }
+
+        $company->markAsVerified();
+        $company->save();
+    }
+
     public function editApplicationForm(Job $job)
     {
         abort_unless($this->canManageJob($job), 404);
@@ -370,12 +399,30 @@ class AccountJobController extends BaseController
         $applicationSettings = array_merge([
             'auto_highlight' => false,
             'mark_incomplete_required' => true,
+            'screening_action' => ApplicantScreeningManager::ACTION_NONE,
+            'screening_logic' => ApplicantScreeningManager::LOGIC_AND,
+            'screening_rules' => [],
         ], (array) $job->application_form_settings);
+
+        if (
+            $applicationSettings['screening_action'] === ApplicantScreeningManager::ACTION_NONE &&
+            ! empty($applicationSettings['auto_highlight']) &&
+            ! empty($applicationSettings['screening_rules'])
+        ) {
+            $applicationSettings['screening_action'] = ApplicantScreeningManager::ACTION_HIGHLIGHT;
+        }
 
         $supportedQuestionTypes = ApplicationFormManager::supportedTypeOptions();
         $questions = ApplicationFormManager::questionsForJob($job);
+        $screeningRules = ApplicantScreeningManager::normalizeStoredRules(
+            (array) ($applicationSettings['screening_rules'] ?? []),
+            $questions
+        );
 
-        return JobBoardHelper::view('dashboard.jobs.application-form', compact('job', 'applicationSettings', 'supportedQuestionTypes', 'questions'));
+        return JobBoardHelper::view(
+            'dashboard.jobs.application-form',
+            compact('job', 'applicationSettings', 'supportedQuestionTypes', 'questions', 'screeningRules')
+        );
     }
 
     public function updateApplicationForm(Job $job, Request $request)
@@ -384,8 +431,13 @@ class AccountJobController extends BaseController
 
         $validated = $request->validate([
             'application_mode' => ['required', Rule::in(['basic', 'custom'])],
-            'auto_highlight' => ['nullable', 'boolean'],
             'mark_incomplete_required' => ['nullable', 'boolean'],
+            'screening_action' => ['nullable', Rule::in(array_keys(ApplicantScreeningManager::screeningActionOptions()))],
+            'screening_logic' => ['nullable', Rule::in(array_keys(ApplicantScreeningManager::logicOptions()))],
+            'screening_rules' => ['nullable', 'array'],
+            'screening_rules.*.question_index' => ['nullable'],
+            'screening_rules.*.operator' => ['nullable', Rule::in(array_keys(ApplicantScreeningManager::operatorOptions()))],
+            'screening_rules.*.value' => ['nullable'],
             'questions' => ['nullable', 'array'],
             'questions.*.label' => ['nullable', 'string', 'max:255'],
             'questions.*.type' => ['nullable', Rule::in(array_keys(ApplicationFormManager::supportedTypeOptions()))],
@@ -396,6 +448,11 @@ class AccountJobController extends BaseController
         ]);
 
         $questions = ApplicationFormManager::normalizeQuestions((array) $request->input('questions', []));
+        $screeningRules = ApplicantScreeningManager::normalizeRulesFromBuilder(
+            (array) $request->input('screening_rules', []),
+            $questions
+        );
+        $screeningAction = $request->input('screening_action', ApplicantScreeningManager::ACTION_NONE);
 
         if ($validated['application_mode'] === 'custom' && $questions === []) {
             return back()
@@ -403,10 +460,24 @@ class AccountJobController extends BaseController
                 ->with('error_msg', __('Add at least one valid custom question before enabling the custom application form.'));
         }
 
+        if (
+            $validated['application_mode'] === 'custom' &&
+            $screeningAction !== ApplicantScreeningManager::ACTION_NONE &&
+            $screeningRules === []
+        ) {
+            return back()
+                ->withInput()
+                ->with('error_msg', __('Add at least one valid screening rule before enabling automatic applicant actions.'));
+        }
+
         $job->application_mode = $validated['application_mode'];
         $job->application_form_settings = [
-            'auto_highlight' => (bool) $request->boolean('auto_highlight'),
             'mark_incomplete_required' => (bool) $request->boolean('mark_incomplete_required'),
+            'screening_action' => $validated['application_mode'] === 'custom'
+                ? $screeningAction
+                : ApplicantScreeningManager::ACTION_NONE,
+            'screening_logic' => $request->input('screening_logic', ApplicantScreeningManager::LOGIC_AND),
+            'screening_rules' => $validated['application_mode'] === 'custom' ? $screeningRules : [],
             'builder_status' => $validated['application_mode'] === 'custom' ? 'active' : 'default',
         ];
         $job->application_form_schema = $validated['application_mode'] === 'custom'
@@ -418,6 +489,18 @@ class AccountJobController extends BaseController
                 ]
             : null;
         $job->save();
+
+        JobApplication::query()
+            ->where('job_id', $job->getKey())
+            ->get()
+            ->each(function (JobApplication $application) use ($job): void {
+                $screeningEvaluation = ApplicantScreeningManager::evaluateApplication($job, $application->application_answers);
+
+                $application->forceFill([
+                    'screening_status' => $screeningEvaluation['screening_status'],
+                    'screening_summary' => $screeningEvaluation['screening_summary'],
+                ])->save();
+            });
 
         AccountActivityLog::query()->create([
             'action' => 'update_application_form',

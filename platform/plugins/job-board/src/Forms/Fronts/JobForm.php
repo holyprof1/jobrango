@@ -6,7 +6,6 @@ use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Forms\FormAbstract;
 use Botble\Base\Forms\Fields\DatePickerField;
 use Botble\Base\Forms\Fields\SelectField;
-use Botble\Base\Forms\Fields\TextField;
 use Botble\JobBoard\Facades\JobBoardHelper;
 use Botble\JobBoard\Forms\Fields\CustomEditorField;
 use Botble\JobBoard\Forms\JobForm as FormsJobForm;
@@ -58,10 +57,12 @@ class JobForm extends FormsJobForm
             ->remove('application_closing_date')
             ->remove('apply_url')
             ->remove('external_apply_behavior')
+            ->remove('zip_code')
             ->remove('hide_company')
             ->remove('never_expired')
             ->remove('auto_renew')
             ->remove('status')
+            ->remove('is_remote')
             ->remove('is_freelance')
             ->remove('career_level_id')
             ->remove('functional_area_id')
@@ -69,6 +70,10 @@ class JobForm extends FormsJobForm
             ->remove('job_experience_id')
             ->remove('tag')
             ->remove('skills[]')
+            ->remove('unique_id')
+            ->remove('featured_image')
+            ->remove('latitude')
+            ->remove('longitude')
             ->removeMetaBox('image')
             ->removeMetaBox('colleagues')
             ->removeMetaBox('custom_fields_box')
@@ -98,23 +103,32 @@ class JobForm extends FormsJobForm
             ]);
 
         $this
-            ->addAfter('tag', 'jobrango_advanced_notice', 'html', [
-                'html' => '<div class="col-12"><div class="jobrango-advanced-settings"><div class="jobrango-advanced-settings__intro"><span class="jobrango-overview__eyebrow">' . e(__('Advanced Settings')) . '</span><h4>' . e(__('Final visibility and timing controls')) . '</h4><p>' . e(__('Use these only when this role needs extra visibility, deadline, or lifecycle adjustments.')) . '</p></div></div></div>',
+            ->addAfter('jobTypes[]', 'jobrango_advanced_notice', 'html', [
+                'html' => '<div class="col-12"><div class="jobrango-advanced-settings"><div class="jobrango-advanced-settings__intro"><div><span class="jobrango-overview__eyebrow">' . e(__('Advanced Settings')) . '</span><h4>' . e(__('Final visibility and timing controls')) . '</h4><p>' . e(__('Use these only when this role needs extra visibility, deadline, or lifecycle adjustments.')) . '</p></div><button class="jobrango-advanced-settings__toggle" type="button" data-jobrango-advanced-toggle data-open-label="' . e(__('Hide advanced settings')) . '" data-closed-label="' . e(__('Show advanced settings')) . '" aria-expanded="false">' . e(__('Show advanced settings')) . '</button></div></div></div>',
             ])
             ->addAfter('jobrango_advanced_notice', 'application_closing_date', DatePickerField::class, [
                 'label' => trans('plugins/job-board::forms.application_closing_date'),
                 'value' => $this->getModel()->application_closing_date ? BaseHelper::formatDate($this->getModel()->application_closing_date) : '',
                 'colspan' => 6,
+                'wrapper' => [
+                    'class' => 'form-group col-md-6 jobrango-job-form__advanced-field',
+                ],
             ])
             ->addAfter('application_closing_date', 'hide_company', 'onOff', [
                 'label' => trans('plugins/job-board::forms.hide_company_details'),
                 'default_value' => false,
+                'wrapper' => [
+                    'class' => 'form-group col-md-6 jobrango-job-form__advanced-field',
+                ],
             ])
             ->addAfter('hide_company', 'never_expired', 'onOff', [
                 'label' => trans('plugins/job-board::forms.never_expired'),
                 'default_value' => true,
                 'help_block' => [
                     'text' => trans('plugins/job-board::forms.never_expired_helper_text'),
+                ],
+                'wrapper' => [
+                    'class' => 'form-group col-md-6 jobrango-job-form__advanced-field',
                 ],
             ])
             ->addAfter('never_expired', 'auto_renew', 'onOff', [
@@ -123,17 +137,10 @@ class JobForm extends FormsJobForm
                 'help_block' => [
                     'text' => trans('plugins/job-board::forms.auto_renew_helper_text'),
                 ],
-            ]);
-
-        if (! JobBoardHelper::isUniqueIdFieldHiddenInFrontForm()) {
-            $this->addAfter('auto_renew', 'unique_id', TextField::class, [
-                'label' => trans('plugins/job-board::job-board.form.unique_id'),
-                'value' => $this->getModel()->getKey() ? $this->getModel()->unique_id : $this->getModel()->generateUniqueId(),
-                'attr' => [
-                    'placeholder' => trans('plugins/job-board::job-board.form.unique_id_placeholder', ['unique_id' => $this->getModel()->generateUniqueId(true)]),
+                'wrapper' => [
+                    'class' => 'form-group col-md-6 jobrango-job-form__advanced-field',
                 ],
             ]);
-        }
 
         if (count($companies) === 1) {
             $this->addBefore('address', 'company_id', 'hidden', [
@@ -149,5 +156,13 @@ class JobForm extends FormsJobForm
                 'choices' => $companies,
             ]);
         }
+
+        $this->addBefore('address', 'is_remote', 'onOff', [
+            'label' => __('Remote role'),
+            'default_value' => (bool) $this->getModel()->is_remote,
+            'help_block' => [
+                'text' => __('Turn this on for remote roles. Leave it off for location-based jobs and add the role location below.'),
+            ],
+        ]);
     }
 }

@@ -1,7 +1,7 @@
 @php
     $companyName = trim((string) ($job->company?->name ?: $job->company_name ?: ''));
     $companyName = $companyName ?: __('Hiring Team');
-    $location = $job->full_address ?: $job->location ?: __('Location not specified');
+    $location = $job->display_location ?: __('Location not specified');
     $jobTypeLabel = $job->relationLoaded('jobTypes')
         ? $job->jobTypes
             ->pluck('name')
@@ -54,7 +54,7 @@
 
     <div class="jobrango-job-card__footer">
         <div class="salary-information">
-            {{ $job->salary_text }}
+            {{ $job->listing_salary_text }}
         </div>
 
         <div class="jobrango-job-card__actions">

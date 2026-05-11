@@ -1,6 +1,13 @@
 @php
     $account = auth('account')->user();
     $companyName = $account->companies()->value('name') ?: $account->name;
+    $pageTitle = trim((string) PageTitle::getTitle(false));
+
+    if (! $pageTitle || $pageTitle === theme_option('site_title')) {
+        if (request()->routeIs('public.account.employer.settings.*')) {
+            $pageTitle = trans('plugins/job-board::messages.account_settings');
+        }
+    }
 @endphp
 
 <header class="header--mobile jobrango-dashboard-mobile-header">
@@ -66,7 +73,7 @@
         <header class="jobrango-dashboard-shell__header">
             <div>
                 <span class="jobrango-dashboard-shell__eyebrow">{{ __('Employer workspace') }}</span>
-                <h1>{{ PageTitle::getTitle(false) }}</h1>
+                <h1>{{ $pageTitle }}</h1>
                 <p>{{ __('Manage jobs, review applicants by role, and keep hiring activity organized.') }}</p>
             </div>
             <div class="jobrango-dashboard-shell__header-actions">

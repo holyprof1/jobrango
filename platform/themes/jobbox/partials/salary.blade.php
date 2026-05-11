@@ -4,6 +4,8 @@
 
 @if ($job->hide_salary)
     <span class="text-muted">{{ __('Attractive') }}</span>
+@elseif ($job->isNegotiableSalary())
+    <span class="card-text-price">{{ __('Negotiable') }}</span>
 @elseif ($job->salary_from || $job->salary_to)
     @if(! JobBoardHelper::isSalaryHiddenForGuests())
         @if ($job->salary_from && $job->salary_to)
@@ -26,6 +28,8 @@
             {{ __('Sign in to view salary') }}
         </a>
     @endif
+@elseif ($job->listing_salary_text)
+    <span class="text-muted">{{ $job->listing_salary_text }}</span>
 @else
     <span class="text-muted">{{ __('Attractive') }}</span>
 @endif
