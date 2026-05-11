@@ -363,12 +363,24 @@
                             <div class="sidebar-list-job">
                                 <ul>
                                     @foreach ($companyJobs as $companyJob)
+                                        @php
+                                            $similarCompany = $companyJob->company;
+                                            $similarCompanyUrl = $similarCompany?->url ?: $companyJob->company_url;
+                                            $similarCompanyName = $similarCompany?->name ?: $companyJob->company_name ?: __('Hiring Team');
+                                            $similarCompanyLogo = $companyJob->company_logo_thumb ?: $similarCompany?->logo_thumb;
+                                        @endphp
                                         <li>
                                             <div class="card-list-4 wow animate__ animate__fadeIn hover-up animated" style="visibility: visible; animation-name: fadeIn;">
                                                 <div class="image">
-                                                    <a href="{{ $companyJob->company->url }}">
-                                                        <img src="{{ $companyJob->company->logo_thumb }}" width="50" alt="{{ $companyJob->company->name }}">
-                                                    </a>
+                                                    @if ($similarCompanyLogo && $similarCompanyUrl)
+                                                        <a href="{{ $similarCompanyUrl }}">
+                                                            <img src="{{ $similarCompanyLogo }}" width="50" alt="{{ $similarCompanyName }}">
+                                                        </a>
+                                                    @elseif ($similarCompanyLogo)
+                                                        <img src="{{ $similarCompanyLogo }}" width="50" alt="{{ $similarCompanyName }}">
+                                                    @elseif ($similarCompanyUrl)
+                                                        <a href="{{ $similarCompanyUrl }}" class="sidebar-company">{{ $similarCompanyName }}</a>
+                                                    @endif
                                                 </div>
                                                 <div class="info-text">
                                                     <h5 class="font-md font-bold color-brand-1">
@@ -376,8 +388,8 @@
                                                     </h5>
                                                     <div class="d-flex align-items-center gap-3 font-xs color-text-mutted mt-0">
                                                         <span class="fi-icon"><i class="fi-rr-briefcase"></i>
-                                                            @if($job->jobTypes->isNotEmpty())
-                                                                @foreach($job->jobTypes as $jobType)
+                                                            @if($companyJob->jobTypes->isNotEmpty())
+                                                                @foreach($companyJob->jobTypes as $jobType)
                                                                     {{ $jobType->name }}
                                                                     @if (!$loop->last)
                                                                         ,
