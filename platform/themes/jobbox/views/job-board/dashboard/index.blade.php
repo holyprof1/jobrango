@@ -35,8 +35,11 @@
                         @foreach ($newApplicants as $applicant)
                             <article class="jobrango-employer-list__item">
                                 <div>
+                                    @php
+                                        $jobName = $applicant->job?->name ?: __('Unavailable job');
+                                    @endphp
                                     <strong>{{ $applicant->full_name }}</strong>
-                                    <p>{{ $applicant->job->name }}</p>
+                                    <p>{{ $jobName }}</p>
                                     <span>{{ $applicant->display_id }} &bull; {{ $applicant->created_at->diffForHumans() }}</span>
                                 </div>
                                 <a href="{{ route('public.account.applicants.edit', $applicant->id) }}">{{ __('Review') }}</a>
@@ -111,7 +114,7 @@
                                     <strong>{{ $job->name }}</strong>
                                     <span>{{ $job->display_id }}</span>
                                 </td>
-                                <td>{{ $job->company->name }}</td>
+                                <td>{{ $job->company?->name ?: __('No company selected') }}</td>
                                 <td>{{ BaseHelper::formatDate($job->expire_date) }}</td>
                                 <td>{!! $job->status->toHtml() !!}</td>
                                 <td>{{ number_format($job->applicants_count) }}</td>
