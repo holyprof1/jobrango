@@ -58,15 +58,19 @@
                                 <span>{{ __('Applied') }}</span>
                             </div>
                             @foreach ($recentApplications as $application)
+                                @php
+                                    $job = $application->job;
+                                    $companyName = $job?->company?->name ?: $job?->company_name ?: __('Unlisted company');
+                                @endphp
                                 <article class="jobrango-application-table__row">
                                     <div>
-                                        @if ($application->job->url)
-                                            <a href="{{ $application->job->url }}">{{ $application->job->name }}</a>
+                                        @if ($job?->url)
+                                            <a href="{{ $job->url }}">{{ $job->name }}</a>
                                         @else
-                                            {{ $application->job->name }}
+                                            {{ $job?->name ?: __('Unavailable job') }}
                                         @endif
                                     </div>
-                                    <div>{{ $application->job->company->name }}</div>
+                                    <div>{{ $companyName }}</div>
                                     <div>{{ $application->created_at->diffForHumans() }}</div>
                                 </article>
                             @endforeach
