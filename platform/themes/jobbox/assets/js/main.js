@@ -92,21 +92,45 @@
             endTrigger = $('.mobile-menu-close'),
             container = $('.mobile-header-active'),
             wrapper4 = $('body')
-        wrapper4.prepend('<div class="body-overlay-1"></div>')
+
+        if (!container.length || !navbarTrigger.length) {
+            return
+        }
+
+        if (!container.attr('id')) {
+            container.attr('id', 'mobile-header-drawer')
+        }
+
+        if (!wrapper4.children('.body-overlay-1').length) {
+            wrapper4.prepend('<div class="body-overlay-1"></div>')
+        }
+
+        navbarTrigger.attr({
+            'aria-controls': container.attr('id'),
+            'aria-expanded': 'false',
+        })
+
+        var overlay = wrapper4.children('.body-overlay-1').first()
+        var closeMobileHeader = function () {
+            container.removeClass('sidebar-visible')
+            wrapper4.removeClass('mobile-menu-active')
+            navbarTrigger.removeClass('burger-close').attr('aria-expanded', 'false')
+        }
+
         navbarTrigger.on('click', function (e) {
-            navbarTrigger.toggleClass('burger-close')
             e.preventDefault()
-            container.toggleClass('sidebar-visible')
-            wrapper4.toggleClass('mobile-menu-active')
+            var isOpening = !container.hasClass('sidebar-visible')
+
+            navbarTrigger.toggleClass('burger-close', isOpening).attr('aria-expanded', isOpening ? 'true' : 'false')
+            container.toggleClass('sidebar-visible', isOpening)
+            wrapper4.toggleClass('mobile-menu-active', isOpening)
         })
-        endTrigger.on('click', function () {
-            container.removeClass('sidebar-visible')
-            wrapper4.removeClass('mobile-menu-active')
-        })
-        $('.body-overlay-1').on('click', function () {
-            container.removeClass('sidebar-visible')
-            wrapper4.removeClass('mobile-menu-active')
-            navbarTrigger.removeClass('burger-close')
+        endTrigger.on('click', closeMobileHeader)
+        overlay.on('click', closeMobileHeader)
+        $(document).on('keydown', function (e) {
+            if (e.key === 'Escape' && container.hasClass('sidebar-visible')) {
+                closeMobileHeader()
+            }
         })
     }
     mobileHeaderActive()
@@ -116,34 +140,63 @@
     var $offCanvasNav = $('.mobile-menu'),
         $offCanvasNavSubMenu = $offCanvasNav.find('.sub-menu')
     /*Add Toggle Button With Off Canvas Sub Menu*/
-    $offCanvasNavSubMenu.parent().prepend('<span class="menu-expand"><i class="fi-rr-angle-small-down"></i></span>')
+    $offCanvasNavSubMenu.each(function (index) {
+        var $submenu = $(this)
+        var $parent = $submenu.parent()
+        var submenuId = $submenu.attr('id') || 'mobile-sub-menu-' + (index + 1)
+
+        $submenu.attr({
+            id: submenuId,
+            'aria-hidden': 'true',
+        })
+
+        if (! $parent.children('.menu-expand').length) {
+            $parent.prepend(
+                '<span class="menu-expand" role="button" tabindex="0" aria-expanded="false" aria-controls="' +
+                    submenuId +
+                    '"><i class="fi-rr-angle-small-down"></i></span>'
+            )
+        }
+    })
     /*Close Off Canvas Sub Menu*/
     $offCanvasNavSubMenu.slideUp()
     /*Category Sub Menu Toggle*/
     $offCanvasNav.on('click', 'li a, li .menu-expand', function (e) {
         var $this = $(this)
+        var $parent = $this.parent('li')
+        var $submenu = $this.siblings('ul')
+
         if (
-            $this
-                .parent()
-                .attr('class')
-                .match(/\b(menu-item-has-children|has-children|has-sub-menu)\b/) &&
+            $parent.attr('class').match(/\b(menu-item-has-children|has-children|has-sub-menu)\b/) &&
             ($this.attr('href') === '#' || $this.hasClass('menu-expand'))
         ) {
             e.preventDefault()
-            if ($this.siblings('ul:visible').length) {
-                $this.parent('li').removeClass('active')
-                $this.siblings('ul').slideUp()
+            if ($submenu.is(':visible')) {
+                $parent.removeClass('active')
+                $submenu.attr('aria-hidden', 'true').slideUp()
+                $parent.children('.menu-expand').attr('aria-expanded', 'false')
             } else {
-                $this.parent('li').addClass('active')
-                $this.closest('li').siblings('li').removeClass('active').find('li').removeClass('active')
-                $this.closest('li').siblings('li').find('ul:visible').slideUp()
-                $this.siblings('ul').slideDown()
+                var $siblings = $this.closest('li').siblings('li')
+
+                $parent.addClass('active')
+                $siblings.removeClass('active').find('li').removeClass('active')
+                $siblings.find('ul:visible').attr('aria-hidden', 'true').slideUp()
+                $siblings.find('.menu-expand').attr('aria-expanded', 'false')
+                $submenu.attr('aria-hidden', 'false').slideDown()
+                $parent.children('.menu-expand').attr('aria-expanded', 'true')
             }
+        }
+    })
+    $offCanvasNav.on('keydown', '.menu-expand', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            $(this).trigger('click')
         }
     })
     /*--- language currency active ----*/
     $('.mobile-language-active').on('click', function (e) {
         e.preventDefault()
+        $(this).attr('aria-expanded', $('.lang-dropdown-active').is(':visible') ? 'false' : 'true')
         $('.lang-dropdown-active').slideToggle(900)
     })
     /*--- categories-button-active-2 ----*/
@@ -597,7 +650,9 @@ function checkBilled() {
     }
 }
 //Perfect Scrollbar
-const ps = new PerfectScrollbar('.mobile-header-wrapper-inner')
+if (document.querySelector('.mobile-header-wrapper-inner')) {
+    new PerfectScrollbar('.mobile-header-wrapper-inner')
+}
 
 $(document).on('click', '.btn-remove-avatar', function (e) {
     e.preventDefault()
