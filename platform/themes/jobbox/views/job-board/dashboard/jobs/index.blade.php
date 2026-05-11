@@ -26,8 +26,8 @@
 
     <div class="jobrango-employer-toolbar">
         <form method="GET" action="{{ route('public.account.jobs.index') }}" class="jobrango-employer-toolbar__filters">
-            <input class="form-control" type="text" name="q" value="{{ $search }}" placeholder="{{ __('Search job title or ID') }}">
-            <select class="form-control" name="status">
+            <input class="form-control" type="text" name="q" value="{{ $search }}" placeholder="{{ __('Search job title or ID') }}" aria-label="{{ __('Search jobs') }}">
+            <select class="form-control" name="status" aria-label="{{ __('Filter jobs by status') }}">
                 <option value="">{{ __('All statuses') }}</option>
                 @foreach (\Botble\JobBoard\Enums\JobStatusEnum::labels() as $value => $label)
                     <option value="{{ $value }}" @selected($status === $value)>{{ $label }}</option>
@@ -44,9 +44,12 @@
                 <article class="jobrango-employer-job-card">
                     <div class="jobrango-employer-job-card__header">
                         <div>
+                            @php
+                                $companyName = $job->company?->name ?: __('No company selected');
+                            @endphp
                             <span>{{ $job->display_id }}</span>
                             <h3>{{ $job->name }}</h3>
-                            <p>{{ $job->company->name ?: __('No company selected') }}</p>
+                            <p>{{ $companyName }}</p>
                         </div>
                         <div class="jobrango-employer-job-card__badges">
                             {!! $job->status->toHtml() !!}
